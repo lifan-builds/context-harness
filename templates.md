@@ -1,10 +1,43 @@
 # Templates
 
-Use these templates when generating or updating `PLANS.md` and `FINDINGS.md`.
+Use these templates when generating or updating `PLANS.md`, `FINDINGS.md`, and `NOW.md`.
 
 ---
 
-## Skeleton Template
+## NOW.md Template
+
+The working memory scratchpad — always kept under 20 lines. Rewrite entirely on
+task switches (never append).
+
+```markdown
+# Now
+
+## Current Focus
+[One sentence: the specific task you are actively working on.]
+
+## Active Blockers
+- [Any issue preventing progress, or "None."]
+
+## Immediate Next Step
+[The single next action to take when this file is read.]
+
+## Session State
+- Last modified: YYYY-MM-DDTHH:MMZ
+- Files touched this session: [comma-separated list of recently modified files]
+```
+
+### NOW.md Rules
+
+| Rule | Detail |
+|---|---|
+| Maximum 20 lines | If it's longer, move content to PLANS.md |
+| Rewrite, don't append | On task switch, replace the entire file |
+| First read, last write | Read first on recovery; write last before session end |
+| Always current | Must reflect the actual state, never stale |
+
+---
+
+## ExecPlan Skeleton (PLANS.md)
 
 Adapt the section content to your specific project, but **keep all section headings
 present** — even if a section starts as "(None yet.)".
@@ -62,6 +95,10 @@ Summarize outcomes, gaps, and lessons learned; compare to the original purpose.
 ## Interfaces and Dependencies
 <!-- CONTRACT: Libraries, modules, and function signatures that must exist at the end.
      Use stable names and paths. -->
+
+## Archive
+<!-- Compacted summaries of completed phases. Each entry is a one-paragraph summary
+     preserving key decisions and outcomes. See Compaction Protocol. -->
 ```
 
 ---
@@ -113,32 +150,65 @@ src/styles/globals.css. Settings page is at src/pages/SettingsPage.tsx.
 - Toggle switches theme immediately — no reload required.
 - Preference survives browser restart.
 - `npm test -- --grep Theme` passes.
+
+## Archive
+(No completed phases yet — single-phase plan.)
 ```
 
 ---
 
-## Guidelines
+## Compaction Protocol
 
-| Guideline | Details |
-| --------- | ------- |
-| **Self-contained** | Define every term, include needed repo knowledge, avoid assuming external links are accessible |
-| **Outcome-focused** | Describe what the user can *do* after the change, not just what code was written |
-| **Living document** | Revise Progress, Surprises, Decision Log, and Outcomes as work proceeds — never leave them stale |
-| **Milestones tell a story** | Each milestone covers: goal → work → result → proof, and is independently verifiable |
-| **Formatting** | Use blank lines after headings; prefer prose over lists except in Progress |
+**When to compact:** The `UserPromptSubmit` hook warns when PLANS.md exceeds 200
+lines or FINDINGS.md exceeds 150 lines. Compact as soon as the warning appears.
 
-### Do's and Don'ts
+### Compaction Checklist
 
-| ✅ Do | ❌ Don't |
-| ----- | -------- |
-| Update Progress after every meaningful step | Leave completed items unchecked |
-| Record decisions immediately with rationale | Defer decision logging to "later" |
-| Write Surprises as Observation + Evidence pairs | Write vague notes like "had issues" |
-| Keep Concrete Steps copy-pasteable | Assume the reader knows the working directory |
-| Fill Outcomes when a phase ends | Leave Outcomes blank after completion |
-| Save findings every 2 research actions | Let research results scroll out of context |
-| Log all errors with context and resolution | Silently retry the same failing approach |
-| Write external content to FINDINGS.md only | Put untrusted content in PLANS.md |
+```
+1. SNAPSHOT (if in a git repo)
+   git add PLANS.md FINDINGS.md AGENTS.md && git commit -m "context: pre-compaction snapshot"
+
+2. PROMOTE LESSONS
+   Scan PLANS.md Surprises & FINDINGS.md Discoveries for reusable insights.
+   → Add qualifying entries to AGENTS.md § Learned Patterns.
+
+3. ARCHIVE COMPLETED PHASES (PLANS.md)
+   For each group of completed Progress items that form a logical phase:
+   → Write a one-paragraph summary under ## Archive.
+   → Remove the completed items from ## Progress.
+   → Remove associated entries from ## Surprises & Discoveries and ## Decision Log
+     (the summary should capture the essential decisions).
+
+4. GARBAGE-COLLECT FINDINGS.md
+   → Remove resolved Error Log entries (the resolution is captured; no need to keep).
+   → Remove Research & References entries older than the current phase
+     that have already been acted on.
+   → Keep only active/unresolved items.
+
+5. UPDATE NOW.md
+   → Rewrite to reflect the post-compaction state.
+```
+
+### Archive Entry Format
+
+Append to `## Archive` in PLANS.md:
+
+```markdown
+### Phase: [Phase Name] (Completed [YYYY-MM-DD])
+[One paragraph: what was accomplished, key decisions made (with rationale),
+notable surprises, and outcome. Max 4-5 sentences. Include commit hash or
+PR link if available.]
+```
+
+### Compaction Rules
+
+| Rule | Detail |
+|---|---|
+| Never lose decisions | Every archived Decision Log entry must be reflected in the Archive paragraph |
+| Promote before archiving | Check for Learned Patterns candidates before removing content |
+| Keep active items | Only archive/remove completed or resolved items |
+| Summary, not transcript | Archive paragraphs are dense summaries, not copies of the original entries |
+| Commit first | Always snapshot before compacting (safety net for over-compaction) |
 
 ---
 
@@ -183,12 +253,63 @@ Research results, discoveries, and external content collected during project wor
 | Example: FileNotFoundError | Running init script | 1: checked path — typo in config | Fixed config path | 2025-01-10 |
 ```
 
-### FINDINGS.md Guidelines
+---
+
+## Learned Patterns Section (AGENTS.md)
+
+Add this section to AGENTS.md. It grows organically as the agent discovers
+project-specific knowledge through experience.
+
+```markdown
+## Learned Patterns
+
+Project-specific gotchas, performance tips, and workarounds discovered during work.
+Each entry captures earned intuition that should persist across all future sessions.
+
+- [Lesson]. Discovered: [YYYY-MM-DD]. Evidence: [what happened].
+```
+
+### When to Add Entries
+
+| Trigger | Action |
+|---|---|
+| Spent >2 attempts on a problem | Distill the fix into a Learned Pattern once resolved |
+| Found a non-obvious project quirk | Document it immediately (don't wait) |
+| Discovered a performance optimization | Record the before/after evidence |
+| Encountered an environment-specific issue | Note the environment, symptom, and workaround |
+
+### Entry Quality Guidelines
+
+| ✅ Good Entry | ❌ Bad Entry |
+|---|---|
+| "CI requires `NODE_ENV=test` prefix or tests silently pass. Discovered: 2025-03-20. Evidence: 2hr debugging session, all assertions skipped without it." | "Tests were weird." |
+| "Always use `.include('roles')` with `UserService.findAll()` — N+1 query drops response from 800ms to 50ms. Discovered: 2025-03-25. Evidence: APM trace." | "Database is slow sometimes." |
+
+---
+
+## Guidelines
 
 | Guideline | Details |
 | --------- | ------- |
-| **Log immediately** | Write findings within 2 research actions — don't wait |
-| **Include sources** | Always note where information came from (URL, file, command output) |
-| **Track all errors** | Every error and its resolution, even "obvious" ones |
-| **Never repeat failures** | Check the Error Log before retrying — mutate the approach |
-| **Keep PLANS.md clean** | Raw external content belongs here, not in the execution plan |
+| **Self-contained** | Define every term, include needed repo knowledge, avoid assuming external links are accessible |
+| **Outcome-focused** | Describe what the user can *do* after the change, not just what code was written |
+| **Living document** | Revise Progress, Surprises, Decision Log, and Outcomes as work proceeds — never leave them stale |
+| **Milestones tell a story** | Each milestone covers: goal → work → result → proof, and is independently verifiable |
+| **Formatting** | Use blank lines after headings; prefer prose over lists except in Progress |
+| **Compact aggressively** | When thresholds are hit, archive and garbage-collect immediately |
+
+### Do's and Don'ts
+
+| ✅ Do | ❌ Don't |
+| ----- | -------- |
+| Update NOW.md before ending a session | Leave NOW.md stale from a previous task |
+| Update Progress after every meaningful step | Leave completed items unchecked |
+| Record decisions immediately with rationale | Defer decision logging to "later" |
+| Write Surprises as Observation + Evidence pairs | Write vague notes like "had issues" |
+| Keep Concrete Steps copy-pasteable | Assume the reader knows the working directory |
+| Fill Outcomes when a phase ends | Leave Outcomes blank after completion |
+| Save findings every 2 research actions | Let research results scroll out of context |
+| Log all errors with context and resolution | Silently retry the same failing approach |
+| Write external content to FINDINGS.md only | Put untrusted content in PLANS.md |
+| Compact when hooks warn about file size | Let files grow unboundedly |
+| Add Learned Patterns after debugging struggles | Forget hard-won lessons between sessions |

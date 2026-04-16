@@ -76,16 +76,22 @@ You define up to 9 rules across 3 categories:
 3. Always run the linter before committing
 ```
 
-**Objectives** (testable pass/fail criteria for the eval-loop)
+**Objectives** (mid-to-high level outcomes — what "done" means for the project)
 ```
-1. All tests pass (npm test exits 0)
-2. No type errors (tsc --noEmit exits 0)
-3. Code follows existing patterns in the codebase
+1. CLI users complete the core workflow on a fresh install (tests/smoke.sh exits 0)
+2. API p95 latency stays under 200ms at expected load (scripts/perf-check.js exits 0)
+3. Docs cover every public entry point (scripts/doc-coverage.js exits 0)
 ```
 
-`context-gen.js` prefills stack-specific defaults (TypeScript gets
-`tsc --noEmit`, Python gets `ruff check`, Go gets `go vet`, etc.) — you
-confirm or edit.
+Objectives are **outcome-level**, not dev hygiene. "All tests pass" or
+"no type errors" belong in **Always** (process habits). An Objective should
+answer: "if all of these hold, has the project succeeded at its purpose?"
+Push for verifiable form (a command, metric, or check) whenever feasible —
+observable-only is OK if automation isn't.
+
+`context-gen.js` prefills stack-specific Never/Always defaults (TypeScript
+gets `tsc --noEmit`, Python gets `ruff check`, Go gets `go vet`, etc.).
+Objectives are project-specific and are not auto-filled — you write them.
 
 ## Installation
 

@@ -81,23 +81,28 @@ Follow these on every task. They are non-negotiable.
 
 ### Step 1: Detect project info
 
-Run `node scripts/context-gen.js` (from the skill directory) to auto-detect
-project name, tech stack, directory structure, and **stack-specific
-Suggested Rules**. Capture stdout — it now contains three sections:
-`## Project`, `## Structure`, and `## Suggested Rules`.
+Run `node scripts/context-gen.js` to auto-detect project name, tech stack,
+directory structure, and stack-specific Suggested Rules. Output has three
+sections: `## Project`, `## Structure`, `## Suggested Rules`.
 
-If the script is unavailable, manually scan: package.json, pyproject.toml,
-Cargo.toml, go.mod, or directory layout.
+Fallback: scan package.json/pyproject.toml/Cargo.toml/go.mod manually.
 
 ### Step 2: Confirm user's 9 rules
 
-Present the `## Suggested Rules` block from context-gen.js stdout as a
-starting point and ask the user to confirm or edit. The defaults are already
-tailored to the detected stack (TypeScript gets `tsc --noEmit`, Python gets
-`ruff check`, Go gets `go vet`, etc.).
+Present the `## Suggested Rules` block as a starting point; user confirms
+or edits. Never/Always defaults are stack-tailored. Fewer than 3 per
+category is fine.
 
-Users may provide fewer than 3 per category — that's fine. The user always
-owns the final rules; the script only improves the starting point.
+**Objectives are not auto-filled** — too project-specific. They are
+**outcome-level success criteria**: "if every Objective holds, has the
+project achieved what it exists to achieve?" Hygiene (tests pass,
+type-check clean, lint clean) belongs in **Always**, not Objectives.
+Push for verifiable form (command / metric / scripted check) when feasible;
+observable-only is OK if automation isn't.
+
+- Right: `CLI users complete core workflow on fresh install (tests/smoke.sh exits 0)`
+- Right: `API p95 latency <200ms at expected load (scripts/perf.js exits 0)`
+- Wrong (move to Always): `All tests pass`, `No type errors`
 
 ### Step 3: Generate CONTEXT.md + NOW.md
 
@@ -125,12 +130,11 @@ Ask: "Do you have a multi-step task to plan?" If yes, create PLAN.md.
 
 If `AGENTS.md` exists but `CONTEXT.md` does not:
 
-1. Run context-gen.sh for fresh Project/Structure
+1. Run context-gen.js for fresh Project/Structure
 2. Copy Learned Patterns from AGENTS.md into CONTEXT.md
 3. Ask user to distill conventions into 3 Never + 3 Always + 3 Objectives
-4. Merge active items from PLANS.md + FINDINGS.md into a new PLAN.md
-5. Keep NOW.md as-is (format is unchanged)
-6. Offer to remove old files (AGENTS.md, PLANS.md, FINDINGS.md, EVALUATION.md)
+4. Merge active items from PLANS.md + FINDINGS.md into new PLAN.md
+5. Offer to remove old files (AGENTS.md, PLANS.md, FINDINGS.md, EVALUATION.md)
 
 ---
 
@@ -160,9 +164,10 @@ If `AGENTS.md` exists but `CONTEXT.md` does not:
 3. [User-defined]
 
 ### Objectives
-1. [Testable criterion, e.g., "All tests pass (npm test exits 0)"]
-2. [Testable criterion]
-3. [Testable criterion]
+<!-- Outcome-level project success. Prefer `<outcome> (<cmd> exits 0)`. Not hygiene. -->
+1. [Outcome-level success criterion]
+2. [Outcome-level success criterion]
+3. [Outcome-level success criterion]
 
 ## Workflow
 - Setup: [install command]
@@ -276,17 +281,15 @@ node scripts/task.js start "Implement auth middleware"
 node scripts/task.js done
 ```
 
-`start` rewrites NOW.md with the new focus; if a prior focus existed and
-PLAN.md is present, it's logged as `- [~] <prior> (switched away <date>)`.
-`done` marks NOW.md idle and appends `- [x] <focus> (done <date>)` to
-PLAN.md Progress.
+`start` rewrites NOW.md with the new focus; prior focus, if any, is logged
+to PLAN.md as `- [~] <prior> (switched away <date>)`. `done` marks NOW.md
+idle and appends `- [x] <focus> (done <date>)` to PLAN.md Progress.
 
 ---
 
 ## Non-Goals
 
-Decisions made so we don't re-litigate them. These keep the "3 files, 9
-rules, zero ceremony" contract intact:
+Decisions made so we don't re-litigate them:
 
 - **One skill, one agent, one harness.** No skill composition / subagent
   dispatch / multi-platform portability (SuperPowers / Trellis territory).

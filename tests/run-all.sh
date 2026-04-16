@@ -227,7 +227,7 @@ EOF
   it "emits Suggested Rules section"
   assert_contains "$output" "## Suggested Rules"
 
-  it "emits TS-flavored objective when TypeScript detected"
+  it "emits TS-flavored Always rule when TypeScript detected"
   setup_tmpdir
   cat > "$TMPDIR_ROOT/package.json" << 'EOF'
 { "name": "ts-app", "dependencies": {} }
@@ -236,16 +236,16 @@ EOF
   output=$(node "$CONTEXT_GEN" "$TMPDIR_ROOT" 2>&1)
   assert_contains "$output" "tsc --noEmit"
 
-  it "emits Python-flavored objective when Python detected"
+  it "emits Python-flavored Always rule when Python detected"
   setup_tmpdir
   cat > "$TMPDIR_ROOT/pyproject.toml" << 'EOF'
 [project]
 name = "lib"
 EOF
   output=$(node "$CONTEXT_GEN" "$TMPDIR_ROOT" 2>&1)
-  assert_contains "$output" "pytest exits 0"
+  assert_contains "$output" "pytest"
 
-  it "emits Go-flavored objective when Go detected"
+  it "emits Go-flavored Always rule when Go detected"
   setup_tmpdir
   cat > "$TMPDIR_ROOT/go.mod" << 'EOF'
 module example.com/svc
@@ -254,6 +254,10 @@ go 1.22
 EOF
   output=$(node "$CONTEXT_GEN" "$TMPDIR_ROOT" 2>&1)
   assert_contains "$output" "go test ./..."
+
+  it "does NOT auto-fill Objectives with hygiene checks"
+  # Objectives should be placeholder prompts, not "All tests pass" style.
+  assert_not_contains "$output" "All tests pass"
 
   cleanup_tmpdir
 fi

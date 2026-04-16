@@ -50,7 +50,17 @@ console.log("### Always");
 rules.always.forEach((r, i) => console.log(`${i + 1}. ${r}`));
 console.log("");
 console.log("### Objectives");
-rules.objectives.forEach((r, i) => console.log(`${i + 1}. ${r}`));
+console.log("");
+console.log("_Outcome-level goals that determine whether the project succeeds at its purpose._");
+console.log("_Not auto-filled — ask the user. Hygiene (tests pass, lint clean) belongs in Always._");
+console.log("_Prefer verifiable form: `<outcome> (<command> exits 0)`. Observable-only is OK if unavoidable._");
+console.log("");
+console.log("Examples of the right altitude:");
+rules.objectiveExamples.forEach((r) => console.log(`- _e.g._ ${r}`));
+console.log("");
+console.log("1. [Outcome — what does success look like for THIS project?]");
+console.log("2. [Outcome]");
+console.log("3. [Outcome]");
 
 // ---------------------------------------------------------------------------
 
@@ -99,20 +109,23 @@ function suggestedRules(stack) {
     "Never ignore failing tests",
   ];
   const commonAlways = ["Always handle errors explicitly (no silent catches)"];
-  const commonObj = ["Code follows existing patterns in the codebase"];
+
+  // Outcome-level examples shown to the user as altitude guides — not
+  // filled into the Objectives list. The user defines actual objectives.
+  const objectiveExamples = [
+    "Users can complete <core workflow> end-to-end on a fresh install (tests/smoke.sh exits 0)",
+    "Public API surface stays stable across minor versions (scripts/api-diff.js exits 0)",
+    "Docs cover every public entry point (scripts/doc-coverage.js exits 0)",
+  ];
 
   const tsLike = (testCmd) => ({
     never: ["Never weaken `strict` mode in tsconfig.json", ...commonNever],
     always: [
-      "Always run `tsc --noEmit` before committing",
+      `Always run \`${testCmd}\` and \`tsc --noEmit\` before committing`,
       "Always write tests for new public functions",
       ...commonAlways,
     ],
-    objectives: [
-      `All tests pass (${testCmd} exits 0)`,
-      "No type errors (npx tsc --noEmit exits 0)",
-      ...commonObj,
-    ],
+    objectiveExamples,
   });
 
   switch (stack.lang) {
@@ -125,74 +138,59 @@ function suggestedRules(stack) {
           ...commonNever,
         ],
         always: [
-          "Always run the linter before committing",
+          `Always run \`${testCmdForNode(stack)}\` and the linter before committing`,
           "Always write tests for new public functions",
           ...commonAlways,
         ],
-        objectives: [
-          `All tests pass (${testCmdForNode(stack)} exits 0)`,
-          ...commonObj,
-        ],
+        objectiveExamples,
       };
     case "Python":
       return {
         never: ["Never catch bare `Exception` without re-raising", ...commonNever],
         always: [
           "Always type-annotate public functions",
-          "Always run `ruff check` before committing",
+          "Always run `pytest` and `ruff check` before committing",
           ...commonAlways,
         ],
-        objectives: [
-          "All tests pass (pytest exits 0)",
-          "No lint errors (ruff check exits 0)",
-          ...commonObj,
-        ],
+        objectiveExamples,
       };
     case "Go":
       return {
         never: ["Never ignore returned errors", ...commonNever],
         always: [
-          "Always run `go vet` before committing",
+          "Always run `go test ./...` and `go vet ./...` before committing",
           "Always write table-driven tests",
           ...commonAlways,
         ],
-        objectives: [
-          "All tests pass (go test ./... exits 0)",
-          "No vet errors (go vet ./... exits 0)",
-          ...commonObj,
-        ],
+        objectiveExamples,
       };
     case "Rust":
       return {
         never: ["Never use `unwrap()` on untrusted input", ...commonNever],
         always: [
-          "Always run `cargo clippy` before committing",
+          "Always run `cargo test` and `cargo clippy -- -D warnings` before committing",
           ...commonAlways,
         ],
-        objectives: [
-          "All tests pass (cargo test exits 0)",
-          "No clippy warnings (cargo clippy -- -D warnings exits 0)",
-          ...commonObj,
-        ],
+        objectiveExamples,
       };
     case "Ruby":
       return {
         never: ["Never rescue `StandardError` without re-raising", ...commonNever],
-        always: ["Always run `rubocop` before committing", ...commonAlways],
-        objectives: [
-          "All tests pass (bundle exec rspec exits 0)",
-          ...commonObj,
+        always: [
+          "Always run `bundle exec rspec` and `rubocop` before committing",
+          ...commonAlways,
         ],
+        objectiveExamples,
       };
     default:
       return {
         never: [...commonNever, "Never disable or weaken type checking"],
         always: [
           ...commonAlways,
-          "Always run the linter before committing",
+          "Always run the test suite and linter before committing",
           "Always write tests for new public functions",
         ],
-        objectives: [...commonObj, "All tests pass", "Code compiles without errors"],
+        objectiveExamples,
       };
   }
 }

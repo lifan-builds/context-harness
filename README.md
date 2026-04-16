@@ -2,7 +2,11 @@
 
 3 files, 9 rules, zero ceremony.
 
-A lightweight Claude Code skill that gives AI agents the context they need — and nothing more. Inspired by [Karpathy's coding principles](https://github.com/forrestchang/andrej-karpathy-skills): behavioral guardrails beat heavy infrastructure.
+A portable context framework for AI coding agents. Generates `CONTEXT.md`,
+`NOW.md`, `PLAN.md` and ships Node.js scripts that do the mechanical work:
+stack detection, session stamping, eval loops. Inspired by
+[Karpathy's coding principles](https://github.com/forrestchang/andrej-karpathy-skills):
+behavioral guardrails beat heavy infrastructure.
 
 ## Philosophy
 
@@ -10,6 +14,22 @@ A lightweight Claude Code skill that gives AI agents the context they need — a
 - 4 behavioral principles > 50 process rules
 - User-defined constraints (3 Never + 3 Always + 3 Objectives) keep the agent aligned
 - Scripts do real work; markdown sets direction
+
+## Harness Compatibility
+
+The core (SKILL.md body + `scripts/`) is harness-agnostic — pure Node.js 18+,
+POSIX bash, no SDK dependencies. The `hooks:` block in SKILL.md frontmatter
+is Claude Code's native integration layer; other harnesses ignore unknown
+frontmatter keys.
+
+| Harness | Skill body | Scripts (manual or scheduled) | Automatic hooks |
+|---|---|---|---|
+| **Claude Code** | ✓ | ✓ | ✓ (via SKILL.md frontmatter) |
+| **Cursor** | ✓ | ✓ | Requires `hooks/hooks-cursor.json` (not included) |
+| **Google Antigravity** | ✓ | ✓ | Not supported by the harness |
+| **Anywhere with Node 18+** | — | ✓ | Wire up your own trigger |
+
+Scripts are invoked the same way on every platform: `node <skill-dir>/scripts/<name>.js`.
 
 ## What It Generates
 
@@ -30,9 +50,13 @@ project-root walk, stack detection, markdown section parsing, command runner).
 | `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware rule defaults |
 | `scripts/guard.js` | Security: block `--no-verify`, detect secrets, protect linter configs |
 | `scripts/format-on-edit.js` | Auto-format files after edits (Biome, Prettier, Ruff, gofmt) |
-| `scripts/session-end.js` | Stamp NOW.md, prune PLAN.md when >150 lines (Stop hook) |
+| `scripts/session-end.js` | Stamp NOW.md, prune PLAN.md when >150 lines |
 | `scripts/task.js` | Task switcher — rewrites NOW.md; logs to PLAN.md Progress |
 | `scripts/eval-loop.js` | GAN-style evaluator: check work against your 3 Objectives |
+
+`guard.js` and `format-on-edit.js` read their payload from the `TOOL_INPUT`
+env var (Claude Code) **or** from stdin (pipe-friendly for Cursor and custom
+harnesses).
 
 ## The 9 Rules Framework
 
@@ -59,42 +83,63 @@ You define up to 9 rules across 3 categories:
 3. Code follows existing patterns in the codebase
 ```
 
+`context-gen.js` prefills stack-specific defaults (TypeScript gets
+`tsc --noEmit`, Python gets `ruff check`, Go gets `go vet`, etc.) — you
+confirm or edit.
+
 ## Installation
 
-**Option 1: Plugin marketplace**
+Let `<skill-dir>` be wherever your harness loads skills from. Common paths:
+
+| Harness | Default skill dir |
+|---|---|
+| Claude Code | `~/.claude/skills/` |
+| Cursor | `~/.cursor/skills/` |
+| Antigravity | `~/.gemini/antigravity/skills/` |
+| [agent-nexus](https://github.com/lifan-builds/agent-nexus) | manages all three via `nexus sync` |
+
+**Option 1: agent-nexus (multi-IDE)**
+```yaml
+# nexus.yml
+packages:
+  - repo: fantasy-cc/context-harness
+    ref: main
 ```
-/plugin marketplace add https://github.com/anthropics/context-harness
+Then `nexus sync` deploys to every configured target.
+
+**Option 2: Claude Code plugin**
+```
+/plugin marketplace add https://github.com/fantasy-cc/context-harness
 ```
 
-**Option 2: Local symlink**
+**Option 3: Direct clone**
 ```bash
-git clone https://github.com/anthropics/context-harness ~/.claude/skills/context-harness
+git clone https://github.com/fantasy-cc/context-harness <skill-dir>/context-harness
 ```
 
 ## Usage
 
 **Initialize** — scaffolds CONTEXT.md + NOW.md for your project:
 ```
-/context-harness
+/context-harness             # Claude Code
 ```
+On harnesses without slash commands, ask the agent to read `SKILL.md` and
+follow the Init mode workflow.
 
-**Update** — re-syncs docs with codebase changes:
-```
-/context-harness update
-```
-
-**Evaluate** — run the GAN-style eval loop against your Objectives:
+**Evaluate** — run the eval loop against your Objectives:
 ```bash
-node ~/.claude/skills/context-harness/scripts/eval-loop.js
+node <skill-dir>/context-harness/scripts/eval-loop.js
 ```
 
 **Switch tasks** — rewrites NOW.md atomically:
 ```bash
-node ~/.claude/skills/context-harness/scripts/task.js start "New focus"
-node ~/.claude/skills/context-harness/scripts/task.js done
+node <skill-dir>/context-harness/scripts/task.js start "New focus"
+node <skill-dir>/context-harness/scripts/task.js done
 ```
 
-## Hooks
+## Hooks (Claude Code)
+
+SKILL.md frontmatter wires these into Claude Code automatically:
 
 | Hook | Trigger | What it does |
 |------|---------|-------------|
@@ -103,14 +148,20 @@ node ~/.claude/skills/context-harness/scripts/task.js done
 | PostToolUse (Write/Edit) | After edits | Auto-formats the edited file |
 | Stop | End of session | Stamps NOW.md timestamp, prunes PLAN.md if >150 lines |
 
+Other harnesses can wire the same scripts into their own hook systems —
+`guard.js` and `format-on-edit.js` accept payloads from either `TOOL_INPUT`
+or stdin.
+
 ## Migration from v1
 
-If you have existing v1 files (AGENTS.md, PLANS.md, FINDINGS.md, EVALUATION.md), invoke `/context-harness` and it will offer to migrate — pulling learned patterns, active tasks, and conventions into the new 3-file structure.
+If you have existing v1 files (AGENTS.md, PLANS.md, FINDINGS.md, EVALUATION.md),
+invoke the skill and it will offer to migrate — pulling learned patterns,
+active tasks, and conventions into the new 3-file structure.
 
 ## Token Budget
 
 | | v1 | v2 | Reduction |
 |---|---|---|---|
-| Instruction footprint | ~813 lines | ~200 lines | **75%** |
-| Files generated | 6 | 2-3 | **50-67%** |
+| Instruction footprint | ~813 lines | ~300 lines | **63%** |
+| Files generated | 6 | 2–3 | **50–67%** |
 | Per-prompt hook injection | ~30 lines + noise | ~25 lines, silent scripts | **cleaner** |

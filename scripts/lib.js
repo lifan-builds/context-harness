@@ -13,7 +13,17 @@ const path = require("path");
 // ---------------------------------------------------------------------------
 
 function readHookInput() {
-  const raw = process.env.TOOL_INPUT || "";
+  // Claude Code passes the payload in TOOL_INPUT; other harnesses (Cursor,
+  // custom wrappers) tend to pipe JSON on stdin. Try env first, fall back
+  // to a synchronous stdin read when stdin is non-TTY (i.e. piped).
+  let raw = process.env.TOOL_INPUT || "";
+  if (!raw && !process.stdin.isTTY) {
+    try {
+      raw = fs.readFileSync(0, "utf8");
+    } catch {
+      raw = "";
+    }
+  }
   try {
     return JSON.parse(raw);
   } catch {

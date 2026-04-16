@@ -1,80 +1,116 @@
 # context-harness
 
-Generate and maintain six core project context documents — `NOW.md`, `AGENTS.md`, `PLANS.md`, `FINDINGS.md`, `EVALUATION.md`, and `README.md` — with persistent file-based context management, auto-recovery hooks, and proactive compaction.
+3 files, 9 rules, zero ceremony.
+
+A lightweight Claude Code skill that gives AI agents the context they need — and nothing more. Inspired by [Karpathy's coding principles](https://github.com/forrestchang/andrej-karpathy-skills): behavioral guardrails beat heavy infrastructure.
+
+## Philosophy
+
+- Context window = volatile RAM. Filesystem = persistent storage.
+- 4 behavioral principles > 50 process rules
+- User-defined constraints (3 Never + 3 Always + 3 Objectives) keep the agent aligned
+- Scripts do real work; markdown sets direction
 
 ## What It Generates
 
-| Document       | Audience           | Purpose                                            |
-| -------------- | ------------------ | -------------------------------------------------- |
-| `NOW.md`       | AI coding agents   | Working memory: current focus, blockers, next step |
-| `AGENTS.md`    | AI coding agents   | Compact project guide optimized for agent context  |
-| `PLANS.md`     | Agents & humans    | Living execution plan (ExecPlan format)            |
-| `FINDINGS.md`  | Agents & humans    | Research log, discoveries, and error tracker       |
-| `EVALUATION.md`| AI coding agents   | Quality contracts and self-evaluation grading      |
-| `README.md`    | Human contributors | Standard project README for onboarding             |
+| File | Purpose | Max Lines |
+|------|---------|-----------|
+| `CONTEXT.md` | Project info + your 9 rules + learned patterns | 80 |
+| `NOW.md` | Working memory: current focus, blockers, next step | 20 |
+| `PLAN.md` | On-demand living plan for multi-step work | 150 |
 
-## Key Features
+## Companion Scripts
 
-- **Working memory (`NOW.md`)** — A max-20-line scratchpad that captures current focus, blockers, and next step. Always read first on recovery, written last before session end
-- **Self-learning (`AGENTS.md § Learned Patterns`)** — Agent automatically records project-specific gotchas and workarounds after debugging struggles, building permanent project intuition
-- **Adaptive auto-recovery hooks** — `UserPromptSubmit` hook injects NOW.md (full), active tasks (filtered), and compaction warnings. No more noisy `head -40` dumps
-- **Proactive compaction** — Hooks monitor file sizes and warn when PLANS.md > 200 lines or FINDINGS.md > 150 lines. Compaction protocol archives completed phases and garbage-collects stale findings
-- **Content separation** — External/untrusted content goes to FINDINGS.md, keeping PLANS.md clean and safe from prompt injection
-- **Generator-Evaluator loop** — Autonomous execution with self-grading against EVALUATION.md contracts
-- **Init & Update modes** — Bootstrap new projects or sync docs with codebase changes
+All scripts are Node.js and share helpers in `scripts/lib.js` (hook I/O,
+project-root walk, stack detection, markdown section parsing, command runner).
 
-## Architecture
+| Script | Purpose |
+|--------|---------|
+| `scripts/lib.js` | Shared helpers imported by everything else |
+| `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware rule defaults |
+| `scripts/guard.js` | Security: block `--no-verify`, detect secrets, protect linter configs |
+| `scripts/format-on-edit.js` | Auto-format files after edits (Biome, Prettier, Ruff, gofmt) |
+| `scripts/session-end.js` | Stamp NOW.md, prune PLAN.md when >150 lines (Stop hook) |
+| `scripts/task.js` | Task switcher — rewrites NOW.md; logs to PLAN.md Progress |
+| `scripts/eval-loop.js` | GAN-style evaluator: check work against your 3 Objectives |
 
+## The 9 Rules Framework
+
+You define up to 9 rules across 3 categories:
+
+**Never** (hard constraints the agent must not violate)
 ```
-┌─────────────────────────────────────────────────┐
-│                  Context Tiers                   │
-├─────────────────────────────────────────────────┤
-│                                                  │
-│  Tier 1: Working Memory (always injected)        │
-│  ┌──────────┐                                    │
-│  │  NOW.md   │ ← max 20 lines, rewritten often  │
-│  └──────────┘                                    │
-│                                                  │
-│  Tier 2: Active Context (filtered injection)     │
-│  ┌──────────┐  ┌──────────────┐                  │
-│  │ AGENTS.md │  │   PLANS.md   │ ← only [ ] items│
-│  └──────────┘  └──────────────┘                  │
-│                                                  │
-│  Tier 3: Reference (read on-demand)              │
-│  ┌──────────────┐  ┌────────────────┐            │
-│  │ FINDINGS.md   │  │ EVALUATION.md  │            │
-│  └──────────────┘  └────────────────┘            │
-│                                                  │
-│  Archive: Compacted history (searchable)         │
-│  ┌────────────────────────────────┐              │
-│  │ PLANS.md § Archive             │              │
-│  └────────────────────────────────┘              │
-└─────────────────────────────────────────────────┘
+1. Never commit directly to main without a PR
+2. Never disable or weaken type checking
+3. Never ignore failing tests
+```
+
+**Always** (habits the agent must follow)
+```
+1. Always write tests for new public functions
+2. Always handle errors explicitly
+3. Always run the linter before committing
+```
+
+**Objectives** (testable pass/fail criteria for the eval-loop)
+```
+1. All tests pass (npm test exits 0)
+2. No type errors (tsc --noEmit exits 0)
+3. Code follows existing patterns in the codebase
+```
+
+## Installation
+
+**Option 1: Plugin marketplace**
+```
+/plugin marketplace add https://github.com/anthropics/context-harness
+```
+
+**Option 2: Local symlink**
+```bash
+git clone https://github.com/anthropics/context-harness ~/.claude/skills/context-harness
 ```
 
 ## Usage
 
-Once installed, trigger the skill through your AI agent:
+**Initialize** — scaffolds CONTEXT.md + NOW.md for your project:
+```
+/context-harness
+```
 
-- **Init mode** — *"Initialize project docs"* — generates all six files from scratch
-- **Update mode** — *"Update project docs"* — reads existing docs, analyzes recent changes, and updates
+**Update** — re-syncs docs with codebase changes:
+```
+/context-harness update
+```
 
-## Context Management
+**Evaluate** — run the GAN-style eval loop against your Objectives:
+```bash
+node ~/.claude/skills/context-harness/scripts/eval-loop.js
+```
 
-| Rule | Description |
-|------|-------------|
-| **NOW.md Contract** | Update before session end; rewrite on task switch; max 20 lines |
-| **Learn After Struggle** | >2 attempts on a problem → distill lesson to AGENTS.md § Learned Patterns |
-| **2-Action Rule** | Save findings to FINDINGS.md every 2 research operations |
-| **Read Before Decide** | Re-read PLANS.md + Learned Patterns before major decisions |
-| **Update After Act** | Mark progress, update NOW.md, log errors, record surprises after each step |
-| **Compaction Protocol** | PLANS.md > 200 lines or FINDINGS.md > 150 lines → archive + garbage-collect |
-| **5-Attempt Verification** | Diagnose autonomously for 4 attempts → Escalate to user on 5th |
-| **Content Separation** | External content in FINDINGS.md only, never in PLANS.md |
+**Switch tasks** — rewrites NOW.md atomically:
+```bash
+node ~/.claude/skills/context-harness/scripts/task.js start "New focus"
+node ~/.claude/skills/context-harness/scripts/task.js done
+```
 
-## Files
+## Hooks
 
-| File                             | Description                                          |
-| -------------------------------- | ---------------------------------------------------- |
-| [`SKILL.md`](SKILL.md)          | Main skill instructions (read by the agent)          |
-| [`templates.md`](templates.md)  | ExecPlan skeleton, NOW.md template, compaction guide  |
+| Hook | Trigger | What it does |
+|------|---------|-------------|
+| UserPromptSubmit | Every prompt | Injects NOW.md + reminder to check rules |
+| PreToolUse (Bash) | Git commands | Blocks `--no-verify`, detects secrets |
+| PostToolUse (Write/Edit) | After edits | Auto-formats the edited file |
+| Stop | End of session | Stamps NOW.md timestamp, prunes PLAN.md if >150 lines |
+
+## Migration from v1
+
+If you have existing v1 files (AGENTS.md, PLANS.md, FINDINGS.md, EVALUATION.md), invoke `/context-harness` and it will offer to migrate — pulling learned patterns, active tasks, and conventions into the new 3-file structure.
+
+## Token Budget
+
+| | v1 | v2 | Reduction |
+|---|---|---|---|
+| Instruction footprint | ~813 lines | ~200 lines | **75%** |
+| Files generated | 6 | 2-3 | **50-67%** |
+| Per-prompt hook injection | ~30 lines + noise | ~25 lines, silent scripts | **cleaner** |

@@ -65,6 +65,12 @@ Follow these on every task. They are non-negotiable.
 4. **Goal-driven loops** — Transform vague goals into testable checkpoints.
    Write failing test, implement, verify, check regressions. Loop until done.
 
+## Core Rules
+
+Apply these before project-specific Never / Always / Objectives.
+
+1. **Tool-native first** — Prefer CLI, MCP tools, or skills over browser automation when they can do the job. Reserve browser automation for browser-specific workflows, visual verification, and web UIs with no better interface.
+
 ---
 
 ## Determine Mode
@@ -90,8 +96,7 @@ Fallback: scan package.json/pyproject.toml/Cargo.toml/go.mod manually.
 ### Step 2: Confirm user's 9 rules
 
 Present the `## Suggested Rules` block as a starting point; user confirms
-or edits. Never/Always defaults are stack-tailored. Fewer than 3 per
-category is fine.
+or edits. Always defaults include Core Rules plus stack-tailored habits.
 
 **Objectives are not auto-filled** — too project-specific. They are
 **outcome-level success criteria**: "if every Objective holds, has the
@@ -274,22 +279,17 @@ runner). Adding a new script? Import from `lib.js` — don't duplicate.
 | `scripts/task.js` | Task switcher — rewrites NOW.md; logs to PLAN.md Progress | Run on task start / done |
 | `scripts/eval-loop.js` | Evaluate against 3 Objectives | After completing a task or before committing |
 
-### `task.js` usage
-
 ```bash
 node scripts/task.js start "Implement auth middleware"
 node scripts/task.js done
 ```
 
-`start` rewrites NOW.md with the new focus; prior focus, if any, is logged
-to PLAN.md as `- [~] <prior> (switched away <date>)`. `done` marks NOW.md
-idle and appends `- [x] <focus> (done <date>)` to PLAN.md Progress.
+`start` rewrites NOW.md and logs prior focus to PLAN.md. `done` marks NOW.md
+idle and logs completion to PLAN.md Progress.
 
 ---
 
 ## Non-Goals
-
-Decisions made so we don't re-litigate them:
 
 - **One skill, one agent, one harness.** No skill composition / subagent
   dispatch / multi-platform portability (SuperPowers / Trellis territory).

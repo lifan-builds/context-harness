@@ -227,6 +227,9 @@ EOF
   it "emits Suggested Rules section"
   assert_contains "$output" "## Suggested Rules"
 
+  it "emits core Always rule for every project"
+  assert_contains "$output" "Always prefer CLI, MCP tools, or skills over browser automation"
+
   it "emits TS-flavored Always rule when TypeScript detected"
   setup_tmpdir
   cat > "$TMPDIR_ROOT/package.json" << 'EOF'

@@ -12,8 +12,19 @@ behavioral guardrails beat heavy infrastructure.
 
 - Context window = volatile RAM. Filesystem = persistent storage.
 - 4 behavioral principles > 50 process rules
+- Core rules apply everywhere before project-specific rules
 - User-defined constraints (3 Never + 3 Always + 3 Objectives) keep the agent aligned
 - Scripts do real work; markdown sets direction
+
+## Core Rules
+
+These rules apply to every project using context-harness. Project-specific
+Never / Always / Objectives add local constraints on top.
+
+1. **Tool-native first** — Prefer CLI, MCP tools, or skills over browser
+   automation whenever they can accomplish the task. Reserve browser automation
+   for browser-specific workflows, visual verification, and web UIs with no
+   better interface.
 
 ## Harness Compatibility
 
@@ -60,7 +71,9 @@ harnesses).
 
 ## The 9 Rules Framework
 
-You define up to 9 rules across 3 categories:
+You define project-specific rules across 3 categories. Suggested Always rules
+include the Core Rules, so some generated contexts may start with more than 9
+total rules when the global layer is counted.
 
 **Never** (hard constraints the agent must not violate)
 ```

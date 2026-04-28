@@ -108,7 +108,10 @@ function suggestedRules(stack) {
     "Never commit directly to main without a PR",
     "Never ignore failing tests",
   ];
-  const commonAlways = ["Always handle errors explicitly (no silent catches)"];
+  const commonAlways = [
+    "Always prefer CLI, MCP tools, or skills over browser automation when they can accomplish the task",
+    "Always handle errors explicitly (no silent catches)",
+  ];
 
   // Outcome-level examples shown to the user as altitude guides — not
   // filled into the Objectives list. The user defines actual objectives.

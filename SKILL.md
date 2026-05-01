@@ -53,8 +53,6 @@ Write anything important to disk before it scrolls away.
 
 ## Behavioral Principles
 
-Follow these on every task. They are non-negotiable.
-
 1. **Think before coding** — State assumptions explicitly. If ambiguous, ask.
    Don't guess scope, format, or intent.
 2. **Simplicity first** — If 200 lines could be 50, rewrite. No speculative
@@ -66,8 +64,6 @@ Follow these on every task. They are non-negotiable.
    Write failing test, implement, verify, check regressions. Loop until done.
 
 ## Core Rules
-
-Apply these before project-specific Never / Always / Objectives.
 
 1. **Tool-native first** — Prefer CLI, MCP tools, or skills over browser automation when they can do the job. Reserve browser automation for browser-specific workflows, visual verification, and web UIs with no better interface.
 
@@ -85,29 +81,18 @@ Apply these before project-specific Never / Always / Objectives.
 
 ## Init Mode
 
-### Step 1: Detect project info
-
-Run `node scripts/context-gen.js` to auto-detect project name, tech stack,
-directory structure, and stack-specific Suggested Rules. Output has three
-sections: `## Project`, `## Structure`, `## Suggested Rules`.
+Run `node scripts/context-gen.js` to auto-detect project info, structure,
+stack-specific Suggested Rules, and Memory Prompts.
 
 Fallback: scan package.json/pyproject.toml/Cargo.toml/go.mod manually.
-
-### Step 2: Confirm user's 9 rules
 
 Present the `## Suggested Rules` block as a starting point; user confirms
 or edits. Always defaults include Core Rules plus stack-tailored habits.
 
 **Objectives are not auto-filled** — too project-specific. They are
-**outcome-level success criteria**: "if every Objective holds, has the
-project achieved what it exists to achieve?" Hygiene (tests pass,
-type-check clean, lint clean) belongs in **Always**, not Objectives.
-Push for verifiable form (command / metric / scripted check) when feasible;
-observable-only is OK if automation isn't.
-
-- Right: `CLI users complete core workflow on fresh install (tests/smoke.sh exits 0)`
-- Right: `API p95 latency <200ms at expected load (scripts/perf.js exits 0)`
-- Wrong (move to Always): `All tests pass`, `No type errors`
+outcome-level success criteria: "if every Objective holds, has the project
+achieved what it exists to achieve?" Hygiene belongs in **Always**. Prefer
+verifiable form; observable-only is OK if automation isn't.
 
 ### Step 3: Generate CONTEXT.md + NOW.md
 
@@ -123,7 +108,8 @@ Ask: "Do you have a multi-step task to plan?" If yes, create PLAN.md.
 
 1. Re-scan project for changes (new deps, new directories, tech stack shifts)
 2. Update CONTEXT.md `## Project` and `## Structure` sections
-3. Append new Learned Patterns if the agent discovered any during work
+3. Capture durable memory: domain terms in `## Language`, process lessons in
+   Learned Patterns, hard-to-reverse trade-offs as ADRs in `docs/adr/`
 4. Prune Learned Patterns to max 10 entries (remove oldest)
 5. Update NOW.md with current state
 6. If PLAN.md exists and exceeds 150 lines: summarize completed items into
@@ -180,9 +166,21 @@ If `AGENTS.md` exists but `CONTEXT.md` does not:
 - Test: [test command]
 - Lint: [lint command]
 
+## Language
+<!-- Durable human input + agent discoveries. Keep concise. -->
+- **[Canonical term]**: [Definition]. Avoid: [ambiguous synonym].
+
+## Relationships
+- [Invariant or domain relationship worth preserving.]
+
+## Flagged Ambiguities
+- [Resolved naming or meaning conflict.]
+
 ## Learned Patterns
 [Max 10 entries. Prune oldest when full.]
 ```
+
+Optional: add `CONTEXT-MAP.md` only when one root context becomes ambiguous.
 
 ### NOW.md
 
@@ -235,6 +233,8 @@ append). First file read on recovery, last file written before session end.
 | Rule | Detail |
 |------|--------|
 | **NOW.md contract** | Update before session end. Rewrite on task switch. Max 20 lines. First read, last write. |
+| **Capture human input** | If the user teaches a term, invariant, workflow, or constraint, write it to CONTEXT.md before it scrolls away. |
+| **ADR threshold** | Hard to reverse + surprising later + real trade-off → create `docs/adr/NNNN-title.md` with `node scripts/adr.js "Title"`. |
 | **Learn after struggle** | >2 attempts on a problem → distill lesson to CONTEXT.md § Learned Patterns |
 | **Prune patterns** | Max 10 Learned Patterns. When full, remove the oldest entry. |
 | **PLAN.md pruning** | When >150 lines, summarize completed Progress into Archive and remove originals. |
@@ -278,6 +278,7 @@ runner). Adding a new script? Import from `lib.js` — don't duplicate.
 | `scripts/session-end.js` | Stamp NOW.md, prune PLAN.md when >150 lines | Runs automatically via Stop hook |
 | `scripts/task.js` | Task switcher — rewrites NOW.md; logs to PLAN.md Progress | Run on task start / done |
 | `scripts/eval-loop.js` | Evaluate against 3 Objectives | After completing a task or before committing |
+| `scripts/adr.js` | Create a tiny numbered ADR | When a decision meets the ADR threshold |
 
 ```bash
 node scripts/task.js start "Implement auth middleware"
@@ -291,9 +292,5 @@ idle and logs completion to PLAN.md Progress.
 
 ## Non-Goals
 
-- **One skill, one agent, one harness.** No skill composition / subagent
-  dispatch / multi-platform portability (SuperPowers / Trellis territory).
-- **Solo-dev, single-repo.** No per-developer journals.
-- **FIFO patterns, max 10.** No confidence scoring; if quality matters, add
-  a 1-line *why* per pattern.
-- **No worktree enforcement.** Users opt in via their own hooks if needed.
+No skill composition, subagent dispatch, mandatory worktrees, per-developer
+journals, or heavyweight knowledge base. Keep memory durable but small.

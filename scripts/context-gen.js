@@ -3,7 +3,7 @@
 
 // context-gen.js — auto-detect project metadata and emit CONTEXT.md sections.
 // Usage: node scripts/context-gen.js [project-root]
-// Output: Project + Structure + Suggested Rules markdown to stdout.
+// Output: Project + Structure + Suggested Rules + Memory Prompts markdown.
 
 const fs = require("fs");
 const path = require("path");
@@ -34,6 +34,8 @@ console.log("## Structure");
 console.log("```");
 for (const line of renderTree(root, 2)) console.log(line);
 console.log("```");
+const adrCount = countAdrs(root);
+if (adrCount > 0) console.log(`Existing ADRs: ${adrCount}`);
 console.log("");
 
 // --- Suggested Rules section ------------------------------------------------
@@ -61,6 +63,17 @@ console.log("");
 console.log("1. [Outcome — what does success look like for THIS project?]");
 console.log("2. [Outcome]");
 console.log("3. [Outcome]");
+console.log("");
+
+// --- Memory Prompts section -------------------------------------------------
+
+console.log("## Memory Prompts");
+console.log("");
+console.log("_Use these to capture durable human input and agent discoveries._");
+console.log("");
+console.log("- Add domain terms, canonical names, relationships, and resolved ambiguities to `CONTEXT.md` `## Language`.");
+console.log("- Add surprising or hard-to-reverse trade-off decisions as tiny ADRs in `docs/adr/`.");
+console.log("- For multi-context repositories, add `CONTEXT-MAP.md` only when one root `CONTEXT.md` becomes ambiguous.");
 
 // ---------------------------------------------------------------------------
 
@@ -100,6 +113,17 @@ function renderTree(dir, maxDepth) {
       lines.push(`${"  ".repeat(depth)}${name}/`);
       walk(path.join(current, name), depth + 1);
     }
+  }
+}
+
+function countAdrs(root) {
+  const adrDir = path.join(root, "docs", "adr");
+  try {
+    return fs
+      .readdirSync(adrDir, { withFileTypes: true })
+      .filter((e) => e.isFile() && /^\d{4}-.+\.md$/.test(e.name)).length;
+  } catch {
+    return 0;
   }
 }
 

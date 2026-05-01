@@ -4,7 +4,7 @@
 
 A portable context framework for AI coding agents. Generates `CONTEXT.md`,
 `NOW.md`, `PLAN.md` and ships Node.js scripts that do the mechanical work:
-stack detection, session stamping, eval loops. Inspired by
+stack detection, decision capture, session stamping, eval loops. Inspired by
 [Karpathy's coding principles](https://github.com/forrestchang/andrej-karpathy-skills):
 behavioral guardrails beat heavy infrastructure.
 
@@ -14,6 +14,7 @@ behavioral guardrails beat heavy infrastructure.
 - 4 behavioral principles > 50 process rules
 - Core rules apply everywhere before project-specific rules
 - User-defined constraints (3 Never + 3 Always + 3 Objectives) keep the agent aligned
+- Durable human input and agent discoveries belong on disk before they scroll away
 - Scripts do real work; markdown sets direction
 
 ## Core Rules
@@ -49,6 +50,18 @@ Scripts are invoked the same way on every platform: `node <skill-dir>/scripts/<n
 | `CONTEXT.md` | Project info + your 9 rules + learned patterns | 80 |
 | `NOW.md` | Working memory: current focus, blockers, next step | 20 |
 | `PLAN.md` | On-demand living plan for multi-step work | 150 |
+| `docs/adr/` | Optional tiny Architecture Decision Records | — |
+| `CONTEXT-MAP.md` | Optional map for multi-context repos | — |
+
+`CONTEXT.md` also includes optional durable memory sections:
+
+- `## Language` — canonical project terms, avoided aliases, and short definitions
+- `## Relationships` — domain invariants worth preserving
+- `## Flagged Ambiguities` — naming or meaning conflicts the agent/user resolved
+- `## Learned Patterns` — process lessons learned after struggle, capped at 10
+
+Create ADRs only when a decision is hard to reverse, surprising later, and has
+a real trade-off. Otherwise, keep the memory in `CONTEXT.md`.
 
 ## Companion Scripts
 
@@ -64,6 +77,7 @@ project-root walk, stack detection, markdown section parsing, command runner).
 | `scripts/session-end.js` | Stamp NOW.md, prune PLAN.md when >150 lines |
 | `scripts/task.js` | Task switcher — rewrites NOW.md; logs to PLAN.md Progress |
 | `scripts/eval-loop.js` | GAN-style evaluator: check work against your 3 Objectives |
+| `scripts/adr.js` | Create the next tiny numbered ADR in `docs/adr/` |
 
 `guard.js` and `format-on-edit.js` read their payload from the `TOOL_INPUT`
 env var (Claude Code) **or** from stdin (pipe-friendly for Cursor and custom
@@ -148,6 +162,11 @@ follow the Init mode workflow.
 **Evaluate** — run the eval loop against your Objectives:
 ```bash
 node <skill-dir>/context-harness/scripts/eval-loop.js
+```
+
+**Capture a decision** — create the next numbered ADR:
+```bash
+node <skill-dir>/context-harness/scripts/adr.js "Use SQLite for local storage"
 ```
 
 **Switch tasks** — rewrites NOW.md atomically:

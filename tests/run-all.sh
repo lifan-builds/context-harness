@@ -262,6 +262,52 @@ EOF
   # Objectives should be placeholder prompts, not "All tests pass" style.
   assert_not_contains "$output" "All tests pass"
 
+  it "detects existing ADR decision memory"
+  setup_tmpdir
+  cat > "$TMPDIR_ROOT/package.json" << 'EOF'
+{ "name": "adr-app", "dependencies": {} }
+EOF
+  mkdir -p "$TMPDIR_ROOT/docs/adr"
+  echo "# ADR" > "$TMPDIR_ROOT/docs/adr/0001-use-sql.md"
+  output=$(node "$CONTEXT_GEN" "$TMPDIR_ROOT" 2>&1)
+  assert_contains "$output" "Existing ADRs: 1"
+
+  it "emits durable memory prompts"
+  assert_contains "$output" "## Memory Prompts"
+
+  cleanup_tmpdir
+fi
+
+# =============================
+# Test: adr.js
+# =============================
+
+if should_run "adr"; then
+  suite "adr.js"
+  ADR="$REPO_ROOT/scripts/adr.js"
+
+  it "creates first numbered ADR from title"
+  setup_tmpdir
+  (cd "$TMPDIR_ROOT" && node "$ADR" "Use SQLite for local storage" >/dev/null 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && [ -f "$TMPDIR_ROOT/docs/adr/0001-use-sqlite-for-local-storage.md" ] && \
+    pass || fail "ADR file missing"
+
+  it "writes decision-record headings"
+  output=$(cat "$TMPDIR_ROOT/docs/adr/0001-use-sqlite-for-local-storage.md")
+  echo "$output" | grep -q "^# Use SQLite for local storage" && \
+    echo "$output" | grep -q "^## Context" && \
+    echo "$output" | grep -q "^## Decision" && \
+    echo "$output" | grep -q "^## Consequences" && \
+    pass || fail "ADR template incomplete"
+
+  it "increments ADR number"
+  (cd "$TMPDIR_ROOT" && node "$ADR" "Keep migrations manual" >/dev/null 2>&1)
+  [ -f "$TMPDIR_ROOT/docs/adr/0002-keep-migrations-manual.md" ] && pass || fail "second ADR missing"
+
+  it "errors when title is missing"
+  (cd "$TMPDIR_ROOT" && node "$ADR" >/dev/null 2>&1); rc=$?
+  assert_exit 1 "$rc"
+
   cleanup_tmpdir
 fi
 
@@ -653,6 +699,18 @@ if should_run "skill"; then
 
   it "contains PLAN.md template"
   assert_contains "$(cat "$SKILL")" "### PLAN.md"
+
+  it "contains durable memory sections"
+  content=$(cat "$SKILL")
+  assert_contains "$content" "## Language"
+
+  it "references ADR capture"
+  content=$(cat "$SKILL")
+  assert_contains "$content" "docs/adr"
+
+  it "references CONTEXT-MAP.md"
+  content=$(cat "$SKILL")
+  assert_contains "$content" "CONTEXT-MAP.md"
 
   it "is under 300 lines"
   lines=$(wc -l < "$SKILL" | tr -d ' ')

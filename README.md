@@ -60,6 +60,18 @@ Scripts are invoked the same way on every platform: `node <skill-dir>/scripts/<n
 - `## Flagged Ambiguities` — naming or meaning conflicts the agent/user resolved
 - `## Learned Patterns` — process lessons learned after struggle, capped at 10
 
+Reflection and correction memory is the highest-value context to carry over, but
+it has to land in the right place:
+
+| Learning | Destination |
+|---|---|
+| Task-local discovery, failed attempt, or low-confidence lesson | `PLAN.md` `## Findings` |
+| Durable process lesson after a loop, correction, or repeated mistake | `CONTEXT.md` `## Learned Patterns` |
+| New term or naming correction | `CONTEXT.md` `## Language` |
+| Domain invariant or relationship | `CONTEXT.md` `## Relationships` |
+| Hard-to-reverse trade-off | `docs/adr/` |
+| Correction to a skill workflow | That skill's `SKILL.md` |
+
 Create ADRs only when a decision is hard to reverse, surprising later, and has
 a real trade-off. Otherwise, keep the memory in `CONTEXT.md`.
 
@@ -119,6 +131,12 @@ observable-only is OK if automation isn't.
 `context-gen.js` prefills stack-specific Never/Always defaults (TypeScript
 gets `tsc --noEmit`, Python gets `ruff check`, Go gets `go vet`, etc.).
 Objectives are project-specific and are not auto-filled — you write them.
+
+## Companion Skills
+
+This repo also includes `reflect/`, a separate skill for recovery after repeated
+mistakes, loops, failed attempts, or human corrections. It turns feedback into a
+changed assumption, a next checkpoint, and the routing decision above.
 
 ## Installation
 

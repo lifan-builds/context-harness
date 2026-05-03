@@ -108,8 +108,8 @@ Ask: "Do you have a multi-step task to plan?" If yes, create PLAN.md.
 
 1. Re-scan project for changes (new deps, new directories, tech stack shifts)
 2. Update CONTEXT.md `## Project` and `## Structure` sections
-3. Capture durable memory: domain terms in `## Language`, process lessons in
-   Learned Patterns, hard-to-reverse trade-offs as ADRs in `docs/adr/`
+3. Route reflection memory: task-local findings in PLAN.md, durable lessons in
+   CONTEXT.md, hard-to-reverse trade-offs as ADRs, skill fixes in that skill
 4. Prune Learned Patterns to max 10 entries (remove oldest)
 5. Update NOW.md with current state
 6. If PLAN.md exists and exceeds 150 lines: summarize completed items into
@@ -177,7 +177,8 @@ If `AGENTS.md` exists but `CONTEXT.md` does not:
 - [Resolved naming or meaning conflict.]
 
 ## Learned Patterns
-[Max 10 entries. Prune oldest when full.]
+<!-- Reflection memory: lessons after corrections, loops, or failed attempts. -->
+[Max 10 entries. Use `- When [context], [do/avoid] because [evidence].`]
 ```
 
 Optional: add `CONTEXT-MAP.md` only when one root context becomes ambiguous.
@@ -217,7 +218,7 @@ append). First file read on recovery, last file written before session end.
 - [ ] Step 2
 
 ## Findings
-[Inline research, discoveries, errors. Replaces separate FINDINGS.md.]
+[Task-local research, discoveries, errors, and low-confidence lessons.]
 
 ## Decisions
 [Non-trivial decisions with rationale.]
@@ -234,6 +235,7 @@ append). First file read on recovery, last file written before session end.
 |------|--------|
 | **NOW.md contract** | Update before session end. Rewrite on task switch. Max 20 lines. First read, last write. |
 | **Capture human input** | If the user teaches a term, invariant, workflow, or constraint, write it to CONTEXT.md before it scrolls away. |
+| **Reflection routing** | Task-local → PLAN.md Findings; durable process lesson → CONTEXT.md Learned Patterns; term → Language; invariant → Relationships; trade-off → ADR; skill correction → that skill's SKILL.md. |
 | **ADR threshold** | Hard to reverse + surprising later + real trade-off → create `docs/adr/NNNN-title.md` with `node scripts/adr.js "Title"`. |
 | **Learn after struggle** | >2 attempts on a problem → distill lesson to CONTEXT.md § Learned Patterns |
 | **Prune patterns** | Max 10 Learned Patterns. When full, remove the oldest entry. |

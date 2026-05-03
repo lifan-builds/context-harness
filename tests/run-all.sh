@@ -279,6 +279,37 @@ EOF
 fi
 
 # =============================
+# Test: skill packaging
+# =============================
+
+if should_run "skill-packaging"; then
+  suite "skill packaging"
+
+  it "ships reflect as a separate skill"
+  [ -f "$REPO_ROOT/reflect/SKILL.md" ] && pass || fail "missing reflect/SKILL.md"
+
+  it "names the reflect skill in frontmatter"
+  output=$(sed -n '1,8p' "$REPO_ROOT/reflect/SKILL.md" 2>&1)
+  assert_contains "$output" "name: reflect"
+
+  it "keeps the reflect skill concise"
+  words=$(wc -w < "$REPO_ROOT/reflect/SKILL.md")
+  [ "$words" -le 900 ] && pass || fail "expected <= 900 words, got $words"
+
+  it "includes correction confidence guidance"
+  assert_contains "$(cat "$REPO_ROOT/reflect/SKILL.md")" "Confidence"
+
+  it "routes skill-specific corrections back to skills"
+  assert_contains "$(cat "$REPO_ROOT/reflect/SKILL.md")" "specific skill"
+
+  it "requires duplicate and conflict checks before durable memory"
+  assert_contains "$(cat "$REPO_ROOT/reflect/SKILL.md")" "duplicates or contradictions"
+
+  it "prevents private raw data from being stored as memory"
+  assert_contains "$(cat "$REPO_ROOT/reflect/SKILL.md")" "unredacted command output"
+fi
+
+# =============================
 # Test: adr.js
 # =============================
 
@@ -703,6 +734,10 @@ if should_run "skill"; then
   it "contains durable memory sections"
   content=$(cat "$SKILL")
   assert_contains "$content" "## Language"
+
+  it "contains reflection memory routing"
+  content=$(cat "$SKILL")
+  assert_contains "$content" "Reflection routing"
 
   it "references ADR capture"
   content=$(cat "$SKILL")

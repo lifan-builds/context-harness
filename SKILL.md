@@ -2,50 +2,16 @@
 name: context-harness
 description: >
   Initialize and maintain lightweight project context (CONTEXT.md, NOW.md,
-  PLAN.md) with behavioral principles for effective AI coding agents.
-  3 files, 9 rules, zero ceremony.
+  PLAN.md, AGENTS.md) with behavioral principles for effective AI coding
+  agents. Use on session start/resume, when durable project context exists,
+  or when human input should be saved before it scrolls away.
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
-hooks:
-  UserPromptSubmit:
-    - hooks:
-        - type: command
-          command: >
-            if [ -f CONTEXT.md ]; then
-              echo '[context-harness] Project context active.';
-              if [ -f NOW.md ]; then
-                echo '';
-                echo '=== NOW.md ===';
-                cat NOW.md;
-              fi;
-              echo '';
-              echo 'Read CONTEXT.md § Rules before proceeding. Respect Never/Always/Objectives.';
-            fi
-  PreToolUse:
-    - matcher: "Bash"
-      hooks:
-        - type: command
-          command: >
-            GUARD="$HOME/.claude/skills/context-harness/scripts/guard.js";
-            if [ -f "$GUARD" ]; then node "$GUARD" 2>/dev/null; fi
-  PostToolUse:
-    - matcher: "Write|Edit"
-      hooks:
-        - type: command
-          command: >
-            FMT="$HOME/.claude/skills/context-harness/scripts/format-on-edit.js";
-            if [ -f "$FMT" ]; then node "$FMT" 2>/dev/null; fi
-  Stop:
-    - hooks:
-        - type: command
-          command: >
-            END="$HOME/.claude/skills/context-harness/scripts/session-end.js";
-            if [ -f "$END" ] && [ -f CONTEXT.md ]; then node "$END" 2>/dev/null; fi
 ---
 
 # Context Harness
 
-3 files, 9 rules, zero ceremony.
+4 files, 9 rules, zero ceremony.
 Context window = volatile RAM. Filesystem = persistent storage.
 Write anything important to disk before it scrolls away.
 
@@ -75,7 +41,7 @@ Write anything important to disk before it scrolls away.
 |-----------|------|
 | No `CONTEXT.md` at project root | **Init** |
 | `CONTEXT.md` exists | **Update** |
-| v1 files exist (`AGENTS.md` without `CONTEXT.md`) | **Migrate** |
+| Legacy v1 files exist without `CONTEXT.md` | **Migrate** |
 
 ---
 
@@ -94,9 +60,10 @@ outcome-level success criteria: "if every Objective holds, has the project
 achieved what it exists to achieve?" Hygiene belongs in **Always**. Prefer
 verifiable form; observable-only is OK if automation isn't.
 
-### Step 3: Generate CONTEXT.md + NOW.md
+### Step 3: Generate CONTEXT.md + NOW.md + AGENTS.md
 
-Write both files to the project root using the templates below.
+Write the context files to the project root using the templates below.
+For Codex, `AGENTS.md` is the automatic activation layer.
 
 ### Step 4: Optionally create PLAN.md
 
@@ -111,21 +78,22 @@ Ask: "Do you have a multi-step task to plan?" If yes, create PLAN.md.
 3. Route reflection memory: task-local findings in PLAN.md, durable lessons in
    CONTEXT.md, hard-to-reverse trade-offs as ADRs, skill fixes in that skill
 4. Prune Learned Patterns to max 10 entries (remove oldest)
-5. Update NOW.md with current state
-6. If PLAN.md exists and exceeds 150 lines: summarize completed items into
+5. Ensure AGENTS.md contains the Context Contract below
+6. Update NOW.md with current state
+7. If PLAN.md exists and exceeds 150 lines: summarize completed items into
    `## Archive`, remove them from `## Progress`
 
 ---
 
 ## Migrate from v1
 
-If `AGENTS.md` exists but `CONTEXT.md` does not:
+If legacy files exist but `CONTEXT.md` does not:
 
 1. Run context-gen.js for fresh Project/Structure
-2. Copy Learned Patterns from AGENTS.md into CONTEXT.md
+2. Copy durable Learned Patterns into CONTEXT.md
 3. Ask user to distill conventions into 3 Never + 3 Always + 3 Objectives
 4. Merge active items from PLANS.md + FINDINGS.md into new PLAN.md
-5. Offer to remove old files (AGENTS.md, PLANS.md, FINDINGS.md, EVALUATION.md)
+5. Replace old agent instructions with the AGENTS.md Context Contract
 
 ---
 
@@ -204,6 +172,21 @@ Optional: add `CONTEXT-MAP.md` only when one root context becomes ambiguous.
 
 **NOW.md rules:** Max 20 lines. Rewrite entirely on task switch (never
 append). First file read on recovery, last file written before session end.
+
+### AGENTS.md
+
+```markdown
+# Agent Instructions
+
+## Context Contract
+- At session start/resume, read `NOW.md` first, then `CONTEXT.md`.
+- Before planning or editing, respect `CONTEXT.md` `## Rules`.
+- If the user teaches a durable term, invariant, workflow, constraint, or
+  correction, update `CONTEXT.md` before it scrolls away.
+- Route task-local findings to `PLAN.md`; hard-to-reverse trade-offs to ADRs.
+- Before ending, update `NOW.md` with current focus, blockers, next step, and
+  touched files.
+```
 
 ### PLAN.md (on-demand)
 

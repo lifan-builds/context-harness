@@ -71,6 +71,7 @@ console.log("## Memory Prompts");
 console.log("");
 console.log("_Use these to capture durable human input and agent discoveries._");
 console.log("");
+console.log("- Keep `AGENTS.md` as the always-read Context Contract for Codex and compatible agents.");
 console.log("- Add domain terms, canonical names, relationships, and resolved ambiguities to `CONTEXT.md` `## Language`.");
 console.log("- Add surprising or hard-to-reverse trade-off decisions as tiny ADRs in `docs/adr/`.");
 console.log("- For multi-context repositories, add `CONTEXT-MAP.md` only when one root `CONTEXT.md` becomes ambiguous.");
@@ -129,7 +130,7 @@ function countAdrs(root) {
 
 function suggestedRules(stack) {
   const commonNever = [
-    "Never commit directly to main without a PR",
+    "Never store secrets or credentials in the repo",
     "Never ignore failing tests",
   ];
   const commonAlways = [

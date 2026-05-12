@@ -275,6 +275,9 @@ EOF
   it "emits durable memory prompts"
   assert_contains "$output" "## Memory Prompts"
 
+  it "emits AGENTS.md contract prompt"
+  assert_contains "$output" "AGENTS.md"
+
   cleanup_tmpdir
 fi
 
@@ -709,14 +712,14 @@ if should_run "skill"; then
   it "is user-invocable"
   assert_contains "$(cat "$SKILL")" "user-invocable: true"
 
-  it "has UserPromptSubmit hook"
-  assert_contains "$(cat "$SKILL")" "UserPromptSubmit"
+  it "mentions session start activation"
+  assert_contains "$(cat "$SKILL")" "session start/resume"
 
-  it "has PreToolUse hook"
-  assert_contains "$(cat "$SKILL")" "PreToolUse"
+  it "contains AGENTS.md template"
+  assert_contains "$(cat "$SKILL")" "### AGENTS.md"
 
-  it "has PostToolUse hook"
-  assert_contains "$(cat "$SKILL")" "PostToolUse"
+  it "contains Context Contract"
+  assert_contains "$(cat "$SKILL")" "Context Contract"
 
   it "contains all 4 behavioral principles"
   content=$(cat "$SKILL")

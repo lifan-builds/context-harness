@@ -1,10 +1,10 @@
 # context-harness
 
-3 files, 9 rules, zero ceremony.
+4 files, 9 rules, zero ceremony.
 
-A portable context framework for AI coding agents. Generates `CONTEXT.md`,
-`NOW.md`, `PLAN.md` and ships Node.js scripts that do the mechanical work:
-stack detection, decision capture, session stamping, eval loops. Inspired by
+A portable context framework for AI coding agents. Generates `AGENTS.md`,
+`CONTEXT.md`, `NOW.md`, `PLAN.md` and ships Node.js scripts that do the
+mechanical work: stack detection, decision capture, session stamping, eval loops. Inspired by
 [Karpathy's coding principles](https://github.com/forrestchang/andrej-karpathy-skills):
 behavioral guardrails beat heavy infrastructure.
 
@@ -15,7 +15,7 @@ behavioral guardrails beat heavy infrastructure.
 - Core rules apply everywhere before project-specific rules
 - User-defined constraints (3 Never + 3 Always + 3 Objectives) keep the agent aligned
 - Durable human input and agent discoveries belong on disk before they scroll away
-- Scripts do real work; markdown sets direction
+- `AGENTS.md` activates the contract; scripts do real work; markdown sets direction
 
 ## Core Rules
 
@@ -29,17 +29,17 @@ Never / Always / Objectives add local constraints on top.
 
 ## Harness Compatibility
 
-The core (SKILL.md body + `scripts/`) is harness-agnostic — pure Node.js 18+,
-POSIX bash, no SDK dependencies. The `hooks:` block in SKILL.md frontmatter
-is Claude Code's native integration layer; other harnesses ignore unknown
-frontmatter keys.
+The core (`AGENTS.md` contract + SKILL.md body + `scripts/`) is
+harness-agnostic — Markdown, pure Node.js 18+, POSIX bash, no SDK dependencies.
+Codex uses `AGENTS.md` as the automatic activation layer; other harnesses can
+read the same file or wire scripts into their own hook systems.
 
-| Harness | Skill body | Scripts (manual or scheduled) | Automatic hooks |
-|---|---|---|---|
-| **Claude Code** | ✓ | ✓ | ✓ (via SKILL.md frontmatter) |
-| **Cursor** | ✓ | ✓ | Requires `hooks/hooks-cursor.json` (not included) |
-| **Google Antigravity** | ✓ | ✓ | Not supported by the harness |
-| **Anywhere with Node 18+** | — | ✓ | Wire up your own trigger |
+| Harness | Context contract | Skill body | Scripts | Automatic layer |
+|---|---|---|---|---|
+| **Codex** | `AGENTS.md` | ✓ | ✓ | `AGENTS.md` |
+| **Claude Code** | CLAUDE.md/AGENTS.md adapter | ✓ | ✓ | Optional hooks |
+| **Cursor** | rules/AGENTS.md adapter | ✓ | ✓ | Optional hooks |
+| **Anywhere with Node 18+** | Markdown contract | — | ✓ | Wire up your own trigger |
 
 Scripts are invoked the same way on every platform: `node <skill-dir>/scripts/<name>.js`.
 
@@ -47,6 +47,7 @@ Scripts are invoked the same way on every platform: `node <skill-dir>/scripts/<n
 
 | File | Purpose | Max Lines |
 |------|---------|-----------|
+| `AGENTS.md` | Always-read context contract for Codex and compatible agents | 30 |
 | `CONTEXT.md` | Project info + your 9 rules + learned patterns | 80 |
 | `NOW.md` | Working memory: current focus, blockers, next step | 20 |
 | `PLAN.md` | On-demand living plan for multi-step work | 150 |
@@ -92,7 +93,7 @@ project-root walk, stack detection, markdown section parsing, command runner).
 | `scripts/adr.js` | Create the next tiny numbered ADR in `docs/adr/` |
 
 `guard.js` and `format-on-edit.js` read their payload from the `TOOL_INPUT`
-env var (Claude Code) **or** from stdin (pipe-friendly for Cursor and custom
+env var or from stdin (pipe-friendly for Codex hooks, Cursor, Claude Code, and custom
 harnesses).
 
 ## The 9 Rules Framework
@@ -103,7 +104,7 @@ total rules when the global layer is counted.
 
 **Never** (hard constraints the agent must not violate)
 ```
-1. Never commit directly to main without a PR
+1. Never store secrets or credentials in the repo
 2. Never disable or weaken type checking
 3. Never ignore failing tests
 ```
@@ -170,9 +171,9 @@ git clone https://github.com/fantasy-cc/context-harness <skill-dir>/context-harn
 
 ## Usage
 
-**Initialize** — scaffolds CONTEXT.md + NOW.md for your project:
+**Initialize** — scaffolds AGENTS.md + CONTEXT.md + NOW.md for your project:
 ```
-/context-harness             # Claude Code
+/context-harness
 ```
 On harnesses without slash commands, ask the agent to read `SKILL.md` and
 follow the Init mode workflow.
@@ -193,20 +194,21 @@ node <skill-dir>/context-harness/scripts/task.js start "New focus"
 node <skill-dir>/context-harness/scripts/task.js done
 ```
 
-## Hooks (Claude Code)
+## Optional Hooks
 
-SKILL.md frontmatter wires these into Claude Code automatically:
+The portable baseline is the `AGENTS.md` Context Contract. Hooks are optional
+adapters for harnesses that can run scripts on prompt submit, tool use, stop, or
+compaction events.
 
 | Hook | Trigger | What it does |
 |------|---------|-------------|
-| UserPromptSubmit | Every prompt | Injects NOW.md + reminder to check rules |
+| Prompt submit / session start | Every prompt or resume | Injects NOW.md + reminder to check rules |
 | PreToolUse (Bash) | Git commands | Blocks `--no-verify`, detects secrets |
 | PostToolUse (Write/Edit) | After edits | Auto-formats the edited file |
-| Stop | End of session | Stamps NOW.md timestamp, prunes PLAN.md if >150 lines |
+| Stop / compact | End of session or compaction | Stamps NOW.md, prunes PLAN.md, reminds memory routing |
 
-Other harnesses can wire the same scripts into their own hook systems —
-`guard.js` and `format-on-edit.js` accept payloads from either `TOOL_INPUT`
-or stdin.
+Each harness should wire these scripts through its native plugin/config layer
+rather than depending on SKILL.md frontmatter.
 
 ## Migration from v1
 
@@ -219,5 +221,5 @@ active tasks, and conventions into the new 3-file structure.
 | | v1 | v2 | Reduction |
 |---|---|---|---|
 | Instruction footprint | ~813 lines | ~300 lines | **63%** |
-| Files generated | 6 | 2–3 | **50–67%** |
-| Per-prompt hook injection | ~30 lines + noise | ~25 lines, silent scripts | **cleaner** |
+| Files generated | 6 | 3–4 | **33–50%** |
+| Per-prompt instruction load | ~30 lines + noise | AGENTS.md contract + tiny context files | **cleaner** |

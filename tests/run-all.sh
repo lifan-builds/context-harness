@@ -288,28 +288,50 @@ fi
 if should_run "skill-packaging"; then
   suite "skill packaging"
 
-  it "ships reflect as a separate skill"
-  [ -f "$REPO_ROOT/reflect/SKILL.md" ] && pass || fail "missing reflect/SKILL.md"
+  it "ships context-reflect as a separate skill"
+  [ -f "$REPO_ROOT/context-reflect/SKILL.md" ] && pass || fail "missing context-reflect/SKILL.md"
 
-  it "names the reflect skill in frontmatter"
-  output=$(sed -n '1,8p' "$REPO_ROOT/reflect/SKILL.md" 2>&1)
-  assert_contains "$output" "name: reflect"
+  it "names the context-reflect skill in frontmatter"
+  output=$(sed -n '1,8p' "$REPO_ROOT/context-reflect/SKILL.md" 2>&1)
+  assert_contains "$output" "name: context-reflect"
 
-  it "keeps the reflect skill concise"
-  words=$(wc -w < "$REPO_ROOT/reflect/SKILL.md")
+  it "ships context-init as a separate skill"
+  [ -f "$REPO_ROOT/context-init/SKILL.md" ] && pass || fail "missing context-init/SKILL.md"
+
+  it "ships context-catch-up as a separate skill"
+  [ -f "$REPO_ROOT/context-catch-up/SKILL.md" ] && pass || fail "missing context-catch-up/SKILL.md"
+
+  it "ships context-grill as a separate skill"
+  [ -f "$REPO_ROOT/context-grill/SKILL.md" ] && pass || fail "missing context-grill/SKILL.md"
+
+  it "names the context-grill skill in frontmatter"
+  output=$(sed -n '1,8p' "$REPO_ROOT/context-grill/SKILL.md" 2>&1)
+  assert_contains "$output" "name: context-grill"
+
+  it "context-grill asks one question at a time"
+  assert_contains "$(cat "$REPO_ROOT/context-grill/SKILL.md")" "Ask one question at a time"
+
+  it "context-grill recommends answers"
+  assert_contains "$(cat "$REPO_ROOT/context-grill/SKILL.md")" "Recommended answer"
+
+  it "context-grill inspects code before asking"
+  assert_contains "$(cat "$REPO_ROOT/context-grill/SKILL.md")" "inspect instead"
+
+  it "keeps the context-reflect skill concise"
+  words=$(wc -w < "$REPO_ROOT/context-reflect/SKILL.md")
   [ "$words" -le 900 ] && pass || fail "expected <= 900 words, got $words"
 
   it "includes correction confidence guidance"
-  assert_contains "$(cat "$REPO_ROOT/reflect/SKILL.md")" "Confidence"
+  assert_contains "$(cat "$REPO_ROOT/context-reflect/SKILL.md")" "Confidence"
 
   it "routes skill-specific corrections back to skills"
-  assert_contains "$(cat "$REPO_ROOT/reflect/SKILL.md")" "specific skill"
+  assert_contains "$(cat "$REPO_ROOT/context-reflect/SKILL.md")" "specific skill"
 
   it "requires duplicate and conflict checks before durable memory"
-  assert_contains "$(cat "$REPO_ROOT/reflect/SKILL.md")" "duplicates or contradictions"
+  assert_contains "$(cat "$REPO_ROOT/context-reflect/SKILL.md")" "duplicates or contradictions"
 
   it "prevents private raw data from being stored as memory"
-  assert_contains "$(cat "$REPO_ROOT/reflect/SKILL.md")" "unredacted command output"
+  assert_contains "$(cat "$REPO_ROOT/context-reflect/SKILL.md")" "unredacted command output"
 fi
 
 # =============================
@@ -742,9 +764,9 @@ if should_run "skill"; then
   content=$(cat "$SKILL")
   assert_contains "$content" "Reflection routing"
 
-  it "references ADR capture"
+  it "does not require ADR capture"
   content=$(cat "$SKILL")
-  assert_contains "$content" "docs/adr"
+  assert_contains "$content" "PLAN.md Decisions"
 
   it "references CONTEXT-MAP.md"
   content=$(cat "$SKILL")

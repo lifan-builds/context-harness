@@ -1,10 +1,10 @@
 ---
 name: context-harness
 description: >
-  Initialize and maintain lightweight project context (CONTEXT.md, NOW.md,
-  PLAN.md, AGENTS.md) with behavioral principles for effective AI coding
-  agents. Use on session start/resume, when durable project context exists,
-  or when human input should be saved before it scrolls away.
+  Route lightweight project context work to the right companion skill:
+  context-init for new repositories, context-catch-up for session resume, and
+  context-grill for stress-testing plans, and context-reflect for corrections,
+  lessons, plans, and session closeout.
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
 ---
@@ -16,6 +16,20 @@ Context window = volatile RAM. Filesystem = persistent storage.
 Write anything important to disk before it scrolls away.
 
 ---
+
+## Companion Skills
+
+Use the smallest skill that matches the agent's intent:
+
+| Intent | Skill |
+|--------|-------|
+| New repo or missing context files | `context-init` |
+| New agent, resume, or "catch me up" | `context-catch-up` |
+| Stress-test a plan, taxonomy, workflow, or context model | `context-grill` |
+| Correction, repeated failure, lesson capture, plan/NOW updates, closeout | `context-reflect` |
+
+This root skill is the front door and reference. Prefer invoking a companion
+skill directly when the mode is obvious.
 
 ## Behavioral Principles
 
@@ -39,9 +53,11 @@ Write anything important to disk before it scrolls away.
 
 | Condition | Mode |
 |-----------|------|
-| No `CONTEXT.md` at project root | **Init** |
-| `CONTEXT.md` exists | **Update** |
-| Legacy v1 files exist without `CONTEXT.md` | **Migrate** |
+| No `CONTEXT.md` at project root | Use `context-init` |
+| `CONTEXT.md` exists and the agent is starting/resuming | Use `context-catch-up` |
+| The user wants a plan challenged against docs, terms, and code | Use `context-grill` |
+| The agent needs to preserve a lesson, correction, plan, or session state | Use `context-reflect` |
+| Legacy v1 files exist without `CONTEXT.md` | Use `context-init` migration flow |
 
 ---
 
@@ -68,20 +84,6 @@ For Codex, `AGENTS.md` is the automatic activation layer.
 ### Step 4: Optionally create PLAN.md
 
 Ask: "Do you have a multi-step task to plan?" If yes, create PLAN.md.
-
----
-
-## Update Mode
-
-1. Re-scan project for changes (new deps, new directories, tech stack shifts)
-2. Update CONTEXT.md `## Project` and `## Structure` sections
-3. Route reflection memory: task-local findings in PLAN.md, durable lessons in
-   CONTEXT.md, hard-to-reverse trade-offs as ADRs, skill fixes in that skill
-4. Prune Learned Patterns to max 10 entries (remove oldest)
-5. Ensure AGENTS.md contains the Context Contract below
-6. Update NOW.md with current state
-7. If PLAN.md exists and exceeds 150 lines: summarize completed items into
-   `## Archive`, remove them from `## Progress`
 
 ---
 
@@ -183,7 +185,8 @@ append). First file read on recovery, last file written before session end.
 - Before planning or editing, respect `CONTEXT.md` `## Rules`.
 - If the user teaches a durable term, invariant, workflow, constraint, or
   correction, update `CONTEXT.md` before it scrolls away.
-- Route task-local findings to `PLAN.md`; hard-to-reverse trade-offs to ADRs.
+- Route task-local findings and decisions to `PLAN.md`; durable lessons to
+  `CONTEXT.md`.
 - Before ending, update `NOW.md` with current focus, blockers, next step, and
   touched files.
 ```
@@ -218,8 +221,7 @@ append). First file read on recovery, last file written before session end.
 |------|--------|
 | **NOW.md contract** | Update before session end. Rewrite on task switch. Max 20 lines. First read, last write. |
 | **Capture human input** | If the user teaches a term, invariant, workflow, or constraint, write it to CONTEXT.md before it scrolls away. |
-| **Reflection routing** | Task-local → PLAN.md Findings; durable process lesson → CONTEXT.md Learned Patterns; term → Language; invariant → Relationships; trade-off → ADR; skill correction → that skill's SKILL.md. |
-| **ADR threshold** | Hard to reverse + surprising later + real trade-off → create `docs/adr/NNNN-title.md` with `node scripts/adr.js "Title"`. |
+| **Reflection routing** | Task-local → PLAN.md Findings; durable process lesson → CONTEXT.md Learned Patterns; term → Language; invariant → Relationships; decision → PLAN.md Decisions unless the project already uses ADRs; skill correction → that skill's SKILL.md. |
 | **Learn after struggle** | >2 attempts on a problem → distill lesson to CONTEXT.md § Learned Patterns |
 | **Prune patterns** | Max 10 Learned Patterns. When full, remove the oldest entry. |
 | **PLAN.md pruning** | When >150 lines, summarize completed Progress into Archive and remove originals. |
@@ -263,7 +265,6 @@ runner). Adding a new script? Import from `lib.js` — don't duplicate.
 | `scripts/session-end.js` | Stamp NOW.md, prune PLAN.md when >150 lines | Runs automatically via Stop hook |
 | `scripts/task.js` | Task switcher — rewrites NOW.md; logs to PLAN.md Progress | Run on task start / done |
 | `scripts/eval-loop.js` | Evaluate against 3 Objectives | After completing a task or before committing |
-| `scripts/adr.js` | Create a tiny numbered ADR | When a decision meets the ADR threshold |
 
 ```bash
 node scripts/task.js start "Implement auth middleware"

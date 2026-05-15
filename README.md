@@ -51,7 +51,6 @@ Scripts are invoked the same way on every platform: `node <skill-dir>/scripts/<n
 | `CONTEXT.md` | Project info + your 9 rules + learned patterns | 80 |
 | `NOW.md` | Working memory: current focus, blockers, next step | 20 |
 | `PLAN.md` | On-demand living plan for multi-step work | 150 |
-| `docs/adr/` | Optional tiny Architecture Decision Records | — |
 | `CONTEXT-MAP.md` | Optional map for multi-context repos | — |
 
 `CONTEXT.md` also includes optional durable memory sections:
@@ -70,11 +69,11 @@ it has to land in the right place:
 | Durable process lesson after a loop, correction, or repeated mistake | `CONTEXT.md` `## Learned Patterns` |
 | New term or naming correction | `CONTEXT.md` `## Language` |
 | Domain invariant or relationship | `CONTEXT.md` `## Relationships` |
-| Hard-to-reverse trade-off | `docs/adr/` |
+| Decision or trade-off | `PLAN.md` `## Decisions` |
 | Correction to a skill workflow | That skill's `SKILL.md` |
 
-Create ADRs only when a decision is hard to reverse, surprising later, and has
-a real trade-off. Otherwise, keep the memory in `CONTEXT.md`.
+Keep ordinary decisions in `PLAN.md`. Promote only durable terms,
+relationships, and repeated lessons into `CONTEXT.md`.
 
 ## Companion Scripts
 
@@ -90,7 +89,6 @@ project-root walk, stack detection, markdown section parsing, command runner).
 | `scripts/session-end.js` | Stamp NOW.md, prune PLAN.md when >150 lines |
 | `scripts/task.js` | Task switcher — rewrites NOW.md; logs to PLAN.md Progress |
 | `scripts/eval-loop.js` | GAN-style evaluator: check work against your 3 Objectives |
-| `scripts/adr.js` | Create the next tiny numbered ADR in `docs/adr/` |
 
 `guard.js` and `format-on-edit.js` read their payload from the `TOOL_INPUT`
 env var or from stdin (pipe-friendly for Codex hooks, Cursor, Claude Code, and custom
@@ -135,9 +133,24 @@ Objectives are project-specific and are not auto-filled — you write them.
 
 ## Companion Skills
 
-This repo also includes `reflect/`, a separate skill for recovery after repeated
-mistakes, loops, failed attempts, or human corrections. It turns feedback into a
-changed assumption, a next checkpoint, and the routing decision above.
+The root `context-harness` skill is the front door. The actual workflows are
+split by invocation intent:
+
+| Skill | Use when |
+|---|---|
+| `context-init` | A repo is new to context-harness or needs v1 migration |
+| `context-catch-up` | A new agent or resumed session needs to read durable context |
+| `context-grill` | A plan, taxonomy, workflow, or context model needs to be stress-tested against docs and code |
+| `context-reflect` | Work is already underway and the agent needs to capture corrections, lessons, plan state, or closeout |
+
+`context-grill` borrows the strongest idea from Matt Pocock's
+`grill-with-docs`: ask one sharp question at a time, include a recommended
+answer, inspect the code when the answer is discoverable, challenge fuzzy terms
+against `CONTEXT.md`, and update context as decisions crystallize.
+
+`context-reflect` includes the old reflection workflow for repeated mistakes,
+loops, failed attempts, and human corrections. Maintenance-like actions such as
+update, capture, plan, and end are intentionally not separate skills.
 
 ## Installation
 
@@ -181,11 +194,6 @@ follow the Init mode workflow.
 **Evaluate** — run the eval loop against your Objectives:
 ```bash
 node <skill-dir>/context-harness/scripts/eval-loop.js
-```
-
-**Capture a decision** — create the next numbered ADR:
-```bash
-node <skill-dir>/context-harness/scripts/adr.js "Use SQLite for local storage"
 ```
 
 **Switch tasks** — rewrites NOW.md atomically:

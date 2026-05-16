@@ -1,14 +1,14 @@
 # Now
 
 ## Current Focus
-Updated README and GitHub repo metadata to position context-harness as a self-iterating pattern harness for AI coding agents.
+README and GitHub repo metadata now position context-harness as a self-iterating pattern harness for AI coding agents.
 
 ## Active Blockers
 - None.
 
 ## Immediate Next Step
-Commit and push the README/context updates if the live GitHub README should reflect them immediately.
+Review or save the Twitter/X draft in the self-promoting repo if promotion work continues.
 
 ## Session State
-- Last modified: 2026-05-16T20:11:31Z
+- Last modified: 2026-05-16T20:12:30Z
 - Files touched: README.md, CONTEXT.md, NOW.md

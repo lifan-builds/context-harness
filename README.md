@@ -4,18 +4,44 @@
 
 A portable context framework for AI coding agents. Generates `AGENTS.md`,
 `CONTEXT.md`, `NOW.md`, `PLAN.md` and ships Node.js scripts that do the
-mechanical work: stack detection, decision capture, session stamping, eval loops. Inspired by
+mechanical work: stack detection, decision capture, session stamping, eval loops.
+
+context-harness is my answer to a simple lesson from studying serious agent
+skill systems: skills are compressed patterns. The best move is not to copy a
+big framework wholesale. It is to let your agent learn from those patterns,
+adapt them to your workflow, and keep improving its own context loop.
+
+Inspired by
 [Karpathy's coding principles](https://github.com/forrestchang/andrej-karpathy-skills):
 behavioral guardrails beat heavy infrastructure.
 
 ## Philosophy
 
 - Context window = volatile RAM. Filesystem = persistent storage.
+- Skills are reusable patterns, not templates you have to copy.
+- Your harness should teach your own agent to self-iterate inside your workflow.
 - 4 behavioral principles > 50 process rules
 - Core rules apply everywhere before project-specific rules
 - User-defined constraints (3 Never + 3 Always + 3 Objectives) keep the agent aligned
 - Durable human input and agent discoveries belong on disk before they scroll away
 - `AGENTS.md` activates the contract; scripts do real work; markdown sets direction
+
+## Recent Updates
+
+context-harness now ships as a small companion-skill set instead of one broad
+catch-all skill:
+
+| Skill | Intent |
+|---|---|
+| `context-init` | Initialize a new repo or migrate legacy v1 context files |
+| `context-catch-up` | Let a fresh or resumed agent recover current project state |
+| `context-grill` | Stress-test a plan, taxonomy, workflow, or context model against docs and code |
+| `context-maintain` | Maintain context during active work, including Reflect Mode after corrections or failed attempts |
+
+The important change is the shape: split by the agent's intent at invocation,
+not by every tiny maintenance action. Update, capture, plan, closeout, and
+reflection all live under `context-maintain` because they are part of the same
+ongoing memory workflow.
 
 ## Core Rules
 

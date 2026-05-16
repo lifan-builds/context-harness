@@ -1,14 +1,14 @@
 # Now
 
 ## Current Focus
-Renamed context-reflect to context-maintain with Reflect Mode inside it.
+Updated README and GitHub repo metadata to position context-harness as a self-iterating pattern harness for AI coding agents.
 
 ## Active Blockers
 - None.
 
 ## Immediate Next Step
-Commit, push, and resync agent-nexus with the renamed skill.
+Commit and push the README/context updates if the live GitHub README should reflect them immediately.
 
 ## Session State
-- Last modified: 2026-05-16T17:40:42Z
-- Files touched: SKILL.md, README.md, CONTEXT.md, NOW.md, tests/run-all.sh, context-maintain/SKILL.md, context-reflect/SKILL.md
+- Last modified: 2026-05-16T20:11:31Z
+- Files touched: README.md, CONTEXT.md, NOW.md

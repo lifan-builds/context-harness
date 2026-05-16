@@ -3,8 +3,8 @@ name: context-harness
 description: >
   Route lightweight project context work to the right companion skill:
   context-init for new repositories, context-catch-up for session resume, and
-  context-grill for stress-testing plans, and context-reflect for corrections,
-  lessons, plans, and session closeout.
+  context-grill for stress-testing plans, and context-maintain for updates,
+  lessons, plans, closeout, and reflection.
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
 ---
@@ -26,7 +26,7 @@ Use the smallest skill that matches the agent's intent:
 | New repo or missing context files | `context-init` |
 | New agent, resume, or "catch me up" | `context-catch-up` |
 | Stress-test a plan, taxonomy, workflow, or context model | `context-grill` |
-| Correction, repeated failure, lesson capture, plan/NOW updates, closeout | `context-reflect` |
+| Context updates, lesson capture, plan/NOW updates, closeout, reflection | `context-maintain` |
 
 This root skill is the front door and reference. Prefer invoking a companion
 skill directly when the mode is obvious.
@@ -56,7 +56,7 @@ skill directly when the mode is obvious.
 | No `CONTEXT.md` at project root | Use `context-init` |
 | `CONTEXT.md` exists and the agent is starting/resuming | Use `context-catch-up` |
 | The user wants a plan challenged against docs, terms, and code | Use `context-grill` |
-| The agent needs to preserve a lesson, correction, plan, or session state | Use `context-reflect` |
+| The agent needs to update context, preserve a lesson, correction, plan, or session state | Use `context-maintain` |
 | Legacy v1 files exist without `CONTEXT.md` | Use `context-init` migration flow |
 
 ---

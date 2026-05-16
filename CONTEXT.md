@@ -9,7 +9,7 @@ context-harness is a portable context framework for AI coding agents. It ships a
 context-catch-up/
 context-grill/
 context-init/
-context-reflect/
+context-maintain/
 scripts/
 ```
 
@@ -28,7 +28,7 @@ scripts/
 ### Objectives
 1. Agents can initialize lightweight project context in a new repo.
 2. Agents can catch up quickly from durable context files.
-3. Agents can improve durable context through reflection and plan grilling.
+3. Agents can improve durable context through maintenance, reflection, and plan grilling.
 
 ## Workflow
 - Setup: n/a
@@ -37,16 +37,16 @@ scripts/
 - Lint: n/a
 
 ## Language
-- **context-reflect**: The ongoing context skill for reflection, corrections, lessons, plan updates, and session closeout. Avoid: context-maintain.
+- **context-maintain**: The ongoing context skill for updates, lesson capture, plan state, session closeout, and Reflect Mode after corrections or failed attempts. Avoid: context-update.
 - **context-grill**: A focused interrogation mode for stress-testing plans, taxonomies, workflows, or context models against `CONTEXT.md`, task docs, and code reality.
 
 ## Relationships
-- The preferred companion skill set is `context-init`, `context-catch-up`, `context-grill`, and `context-reflect`.
-- `context-reflect` includes the old standalone reflection workflow.
+- The preferred companion skill set is `context-init`, `context-catch-up`, `context-grill`, and `context-maintain`.
+- `context-maintain` includes the old standalone reflection workflow as Reflect Mode.
 - Local agent-nexus deployment should use `context-grill` instead of Matt Pocock's `grill-with-docs`.
 
 ## Flagged Ambiguities
-- Maintenance/update/capture/plan/end are not separate skills; they belong under `context-reflect`.
+- Update/capture/plan/end are not separate skills; they belong under `context-maintain`.
 
 ## Learned Patterns
 - When splitting context-harness into companion skills, keep the split based on invocation intent because too many maintenance-like skills make the harness harder to choose.

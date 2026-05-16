@@ -1,14 +1,14 @@
 # Now
 
 ## Current Focus
-Pushed context-harness companion skills and synced agent-nexus from GitHub.
+Renamed context-reflect to context-maintain with Reflect Mode inside it.
 
 ## Active Blockers
 - None.
 
 ## Immediate Next Step
-Restart AI IDEs when convenient so they pick up the synced skill set.
+Commit, push, and resync agent-nexus with the renamed skill.
 
 ## Session State
-- Last modified: 2026-05-15T21:03:44Z
-- Files touched: AGENTS.md, SKILL.md, README.md, CONTEXT.md, NOW.md, tests/run-all.sh, context-init/SKILL.md, context-catch-up/SKILL.md, context-grill/SKILL.md, context-reflect/SKILL.md, reflect/SKILL.md, /Users/lfan/Project/agent-nexus/nexus.personal.yml
+- Last modified: 2026-05-16T17:40:42Z
+- Files touched: SKILL.md, README.md, CONTEXT.md, NOW.md, tests/run-all.sh, context-maintain/SKILL.md, context-reflect/SKILL.md

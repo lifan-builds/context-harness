@@ -141,16 +141,16 @@ split by invocation intent:
 | `context-init` | A repo is new to context-harness or needs v1 migration |
 | `context-catch-up` | A new agent or resumed session needs to read durable context |
 | `context-grill` | A plan, taxonomy, workflow, or context model needs to be stress-tested against docs and code |
-| `context-reflect` | Work is already underway and the agent needs to capture corrections, lessons, plan state, or closeout |
+| `context-maintain` | Work is underway and the agent needs to update context, capture lessons, maintain plan state, close out, or reflect after a correction |
 
 `context-grill` borrows the strongest idea from Matt Pocock's
 `grill-with-docs`: ask one sharp question at a time, include a recommended
 answer, inspect the code when the answer is discoverable, challenge fuzzy terms
 against `CONTEXT.md`, and update context as decisions crystallize.
 
-`context-reflect` includes the old reflection workflow for repeated mistakes,
-loops, failed attempts, and human corrections. Maintenance-like actions such as
-update, capture, plan, and end are intentionally not separate skills.
+`context-maintain` includes Reflect Mode for repeated mistakes, loops, failed
+attempts, and human corrections. Maintenance-like actions such as update,
+capture, plan, and end are intentionally not separate skills.
 
 ## Installation
 

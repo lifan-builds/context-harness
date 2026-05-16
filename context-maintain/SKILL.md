@@ -1,19 +1,23 @@
 ---
-name: context-reflect
-description: Reflect after corrections, failed attempts, loops, or context drift; preserve durable lessons and close out NOW.md/PLAN.md.
+name: context-maintain
+description: Maintain context-harness during active work: update context, capture lessons, keep PLAN.md/NOW.md current, and reflect after corrections or failed attempts.
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
 ---
 
-# Context Reflect
+# Context Maintain
 
-Use this for everything after init and catch-up: corrections, repeated failure,
-lesson capture, plan updates, task-local findings, and session closeout.
+Use this for everything after init, catch-up, and grill: update context, capture
+lessons, maintain `PLAN.md`, close out `NOW.md`, and run Reflect Mode after
+corrections or failed attempts.
 
 ## Trigger
 
 Use this skill when any of these happen:
 
+- The repo structure, workflow, dependency stack, or project rules changed.
+- The user teaches a durable term, invariant, workflow, or constraint.
+- You need to update task progress, findings, decisions, or closeout state.
 - The human corrects the same behavior more than once.
 - You have made two failed attempts at the same task.
 - Tool output contradicts your expectation.
@@ -25,6 +29,15 @@ Use this skill when any of these happen:
 
 For ordinary uncertainty before the first attempt, inspect or ask instead.
 
+## Maintain Loop
+
+1. Read `NOW.md`, then `CONTEXT.md`.
+2. Decide whether the information is durable project context or task-local
+   working state.
+3. Update the smallest appropriate section.
+4. Prune stale or duplicate entries instead of appending forever.
+5. Run the project's verification command when the change affects behavior.
+
 ## Confidence
 
 | Signal | Confidence |
@@ -35,7 +48,7 @@ For ordinary uncertainty before the first attempt, inspect or ask instead.
 
 Only high and repeated medium signals are durable-memory candidates.
 
-## Reflection Loop
+## Reflect Mode
 
 1. Stop the automatic retry.
 2. Reconstruct the trace from files, tests, tool output, or the human

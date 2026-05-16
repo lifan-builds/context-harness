@@ -288,12 +288,12 @@ fi
 if should_run "skill-packaging"; then
   suite "skill packaging"
 
-  it "ships context-reflect as a separate skill"
-  [ -f "$REPO_ROOT/context-reflect/SKILL.md" ] && pass || fail "missing context-reflect/SKILL.md"
+  it "ships context-maintain as a separate skill"
+  [ -f "$REPO_ROOT/context-maintain/SKILL.md" ] && pass || fail "missing context-maintain/SKILL.md"
 
-  it "names the context-reflect skill in frontmatter"
-  output=$(sed -n '1,8p' "$REPO_ROOT/context-reflect/SKILL.md" 2>&1)
-  assert_contains "$output" "name: context-reflect"
+  it "names the context-maintain skill in frontmatter"
+  output=$(sed -n '1,8p' "$REPO_ROOT/context-maintain/SKILL.md" 2>&1)
+  assert_contains "$output" "name: context-maintain"
 
   it "ships context-init as a separate skill"
   [ -f "$REPO_ROOT/context-init/SKILL.md" ] && pass || fail "missing context-init/SKILL.md"
@@ -317,21 +317,21 @@ if should_run "skill-packaging"; then
   it "context-grill inspects code before asking"
   assert_contains "$(cat "$REPO_ROOT/context-grill/SKILL.md")" "inspect instead"
 
-  it "keeps the context-reflect skill concise"
-  words=$(wc -w < "$REPO_ROOT/context-reflect/SKILL.md")
+  it "keeps the context-maintain skill concise"
+  words=$(wc -w < "$REPO_ROOT/context-maintain/SKILL.md")
   [ "$words" -le 900 ] && pass || fail "expected <= 900 words, got $words"
 
   it "includes correction confidence guidance"
-  assert_contains "$(cat "$REPO_ROOT/context-reflect/SKILL.md")" "Confidence"
+  assert_contains "$(cat "$REPO_ROOT/context-maintain/SKILL.md")" "Confidence"
 
   it "routes skill-specific corrections back to skills"
-  assert_contains "$(cat "$REPO_ROOT/context-reflect/SKILL.md")" "specific skill"
+  assert_contains "$(cat "$REPO_ROOT/context-maintain/SKILL.md")" "specific skill"
 
   it "requires duplicate and conflict checks before durable memory"
-  assert_contains "$(cat "$REPO_ROOT/context-reflect/SKILL.md")" "duplicates or contradictions"
+  assert_contains "$(cat "$REPO_ROOT/context-maintain/SKILL.md")" "duplicates or contradictions"
 
   it "prevents private raw data from being stored as memory"
-  assert_contains "$(cat "$REPO_ROOT/context-reflect/SKILL.md")" "unredacted command output"
+  assert_contains "$(cat "$REPO_ROOT/context-maintain/SKILL.md")" "unredacted command output"
 fi
 
 # =============================

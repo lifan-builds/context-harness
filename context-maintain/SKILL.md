@@ -1,6 +1,9 @@
 ---
 name: context-maintain
-description: Maintain context-harness during active work: update context, capture lessons, keep PLAN.md/NOW.md current, and reflect after corrections or failed attempts.
+description: >
+  Maintain context-harness during active work: update context, capture lessons,
+  keep PLAN.md/NOW.md current, and reflect after corrections or failed
+  attempts.
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
 ---

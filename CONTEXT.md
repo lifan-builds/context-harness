@@ -51,3 +51,4 @@ scripts/
 ## Learned Patterns
 - When splitting context-harness into companion skills, keep the split based on invocation intent because too many maintenance-like skills make the harness harder to choose.
 - When learning from external skill systems like Superpowers or metaprompting skills, treat them as reusable patterns to adapt through our own agent workflow, not templates to copy directly.
+- When writing skill frontmatter, use quoted or block scalar descriptions if the text contains colon-space because Codex may skip skills whose YAML metadata fails to parse.

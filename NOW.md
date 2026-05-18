@@ -1,14 +1,14 @@
 # Now
 
 ## Current Focus
-README and GitHub repo metadata now position context-harness as a self-iterating pattern harness for AI coding agents.
+`context-maintain` frontmatter is fixed in source and hot-redeployed into the local Codex skill cache.
 
 ## Active Blockers
-- None.
+- The hot redeploy is local-only; publish/sync the source fix for durable deployment.
 
 ## Immediate Next Step
-Review or save the Twitter/X draft in the self-promoting repo if promotion work continues.
+Restart Codex and confirm `context-maintain` appears in the available skills list.
 
 ## Session State
-- Last modified: 2026-05-16T20:12:30Z
-- Files touched: README.md, CONTEXT.md, NOW.md
+- Last modified: 2026-05-18T03:57:41Z
+- Files touched: context-maintain/SKILL.md, CONTEXT.md, NOW.md

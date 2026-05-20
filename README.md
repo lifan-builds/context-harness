@@ -15,6 +15,28 @@ Inspired by
 [Karpathy's coding principles](https://github.com/forrestchang/andrej-karpathy-skills):
 behavioral guardrails beat heavy infrastructure.
 
+## Quick Start
+
+Use `context-harness` when a repo needs durable agent memory without adopting a
+large framework.
+
+```bash
+git clone https://github.com/lifan-builds/context-harness.git
+```
+
+Then ask your coding agent to initialize context in a target repository using
+the `context-harness` skill. On harnesses without slash commands, have the agent
+read `SKILL.md` and follow Init mode.
+
+The generated repo-level contract is small:
+
+```text
+AGENTS.md   # always-read rules for agents
+CONTEXT.md  # durable project facts, terms, constraints, learned patterns
+NOW.md      # current focus, blockers, next step
+PLAN.md     # optional living plan for multi-step work
+```
+
 ## Philosophy
 
 - Context window = volatile RAM. Filesystem = persistent storage.

@@ -31,7 +31,7 @@ read `SKILL.md` and follow Init mode.
 The generated repo-level contract is small:
 
 ```text
-AGENTS.md   # always-read rules for agents
+AGENTS.md   # small always-read contract + generated CONTEXT.md index
 CONTEXT.md  # durable project facts, terms, constraints, learned patterns
 NOW.md      # current focus, blockers, next step
 PLAN.md     # optional living plan for multi-step work
@@ -46,7 +46,7 @@ PLAN.md     # optional living plan for multi-step work
 - Core rules apply everywhere before project-specific rules
 - User-defined constraints (3 Never + 3 Always + 3 Objectives) keep the agent aligned
 - Durable human input and agent discoveries belong on disk before they scroll away
-- `AGENTS.md` activates the contract; scripts do real work; markdown sets direction
+- `AGENTS.md` activates the contract and indexes `CONTEXT.md`; scripts do real work
 
 ## Recent Updates
 
@@ -58,12 +58,14 @@ catch-all skill:
 | `context-init` | Initialize a new repo or migrate legacy v1 context files |
 | `context-catch-up` | Let a fresh or resumed agent recover current project state |
 | `context-grill` | Stress-test a plan, taxonomy, workflow, or context model against docs and code |
+| `context-handoff` | Prepare a fresh agent to start the next substantial goal with context, quality bar, and checkpoints |
 | `context-maintain` | Maintain context during active work, including Reflect Mode after corrections or failed attempts |
 
 The important change is the shape: split by the agent's intent at invocation,
 not by every tiny maintenance action. Update, capture, plan, closeout, and
 reflection all live under `context-maintain` because they are part of the same
-ongoing memory workflow.
+ongoing memory workflow. Handoff is separate because its purpose is to launch
+the next big goal for a fresh long-running agent, not maintain completed work.
 
 ## Core Rules
 
@@ -95,7 +97,7 @@ Scripts are invoked the same way on every platform: `node <skill-dir>/scripts/<n
 
 | File | Purpose | Max Lines |
 |------|---------|-----------|
-| `AGENTS.md` | Always-read context contract for Codex and compatible agents | 30 |
+| `AGENTS.md` | Always-read contract plus generated `CONTEXT.md` index | 40 |
 | `CONTEXT.md` | Project info + your 9 rules + learned patterns | 80 |
 | `NOW.md` | Working memory: current focus, blockers, next step | 20 |
 | `PLAN.md` | On-demand living plan for multi-step work | 150 |
@@ -131,7 +133,9 @@ project-root walk, stack detection, markdown section parsing, command runner).
 | Script | Purpose |
 |--------|---------|
 | `scripts/lib.js` | Shared helpers imported by everything else |
+| `scripts/install-project.js` | Copy context-harness runtime scripts into a target repo |
 | `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware rule defaults |
+| `scripts/context-index.js` | Refresh AGENTS.md index; list/query/print CONTEXT.md sections |
 | `scripts/guard.js` | Security: block `--no-verify`, detect secrets, protect linter configs |
 | `scripts/format-on-edit.js` | Auto-format files after edits (Biome, Prettier, Ruff, gofmt) |
 | `scripts/session-end.js` | Stamp NOW.md, prune PLAN.md when >150 lines |
@@ -189,16 +193,24 @@ split by invocation intent:
 | `context-init` | A repo is new to context-harness or needs v1 migration |
 | `context-catch-up` | A new agent or resumed session needs to read durable context |
 | `context-grill` | A plan, taxonomy, workflow, or context model needs to be stress-tested against docs and code |
+| `context-handoff` | A fresh agent needs a long-run brief for the next substantial goal |
 | `context-maintain` | Work is underway and the agent needs to update context, capture lessons, maintain plan state, close out, or reflect after a correction |
 
-`context-grill` borrows the strongest idea from Matt Pocock's
-`grill-with-docs`: ask one sharp question at a time, include a recommended
-answer, inspect the code when the answer is discoverable, challenge fuzzy terms
-against `CONTEXT.md`, and update context as decisions crystallize.
+`context-grill` borrows the strongest idea from Matt Pocock's `grill-me`: walk
+the decision tree one sharp question at a time, include a recommended answer,
+and inspect the code when the answer is discoverable. The context-harness
+version adds a stricter filter: ask the user only where human judgment changes
+the agent's direction, then route resolved terms, constraints, and decisions to
+the right context file.
 
 `context-maintain` includes Reflect Mode for repeated mistakes, loops, failed
 attempts, and human corrections. Maintenance-like actions such as update,
 capture, plan, and end are intentionally not separate skills.
+
+`context-handoff` is different from maintenance: it produces an ephemeral launch
+brief for the next substantial task. It should include the high-level goal,
+definition of done, source-of-truth context links, quality bar, execution
+checkpoints, risks, open human-judgment questions, and suggested skills.
 
 ## Installation
 
@@ -237,7 +249,16 @@ git clone https://github.com/fantasy-cc/context-harness <skill-dir>/context-harn
 /context-harness
 ```
 On harnesses without slash commands, ask the agent to read `SKILL.md` and
-follow the Init mode workflow.
+follow the Init mode workflow. Init also copies the runtime scripts into the
+target repo so `AGENTS.md` can use project-local commands such as
+`node scripts/context-index.js update`.
+
+**Refresh the index** — after changing durable context:
+```bash
+node scripts/context-index.js update
+node scripts/context-index.js query "term"
+node scripts/context-index.js section "Rules"
+```
 
 **Evaluate** — run the eval loop against your Objectives:
 ```bash

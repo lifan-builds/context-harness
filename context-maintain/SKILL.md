@@ -38,8 +38,10 @@ For ordinary uncertainty before the first attempt, inspect or ask instead.
 2. Decide whether the information is durable project context or task-local
    working state.
 3. Update the smallest appropriate section.
-4. Prune stale or duplicate entries instead of appending forever.
-5. Run the project's verification command when the change affects behavior.
+4. If `CONTEXT.md` changed, run `node scripts/context-index.js update` to keep
+   the `AGENTS.md` index current.
+5. Prune stale or duplicate entries instead of appending forever.
+6. Run the project's verification command when the change affects behavior.
 
 ## Confidence
 
@@ -107,9 +109,11 @@ Before ending work in a context-harness repo:
 
 1. Rewrite `NOW.md` with current focus, blockers, immediate next step, ISO
    timestamp, and touched files.
-2. If `PLAN.md` exists and exceeds 150 lines, summarize completed items into
+2. If `CONTEXT.md` changed, refresh the `AGENTS.md` index with
+   `node scripts/context-index.js update`.
+3. If `PLAN.md` exists and exceeds 150 lines, summarize completed items into
    `## Archive` and remove them from `## Progress`.
-3. Keep `NOW.md` under 20 lines.
+4. Keep `NOW.md` under 20 lines.
 
 You may use:
 

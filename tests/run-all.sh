@@ -282,6 +282,92 @@ EOF
 fi
 
 # =============================
+# Test: install-project.js
+# =============================
+
+if should_run "install-project"; then
+  suite "install-project.js"
+  INSTALL_PROJECT="$REPO_ROOT/scripts/install-project.js"
+
+  it "copies runtime scripts into a target repo"
+  setup_tmpdir
+  node "$INSTALL_PROJECT" "$TMPDIR_ROOT" >/dev/null 2>&1
+  [ -f "$TMPDIR_ROOT/scripts/context-index.js" ] && pass || fail "missing copied context-index.js"
+
+  it "copies shared lib dependency"
+  [ -f "$TMPDIR_ROOT/scripts/lib.js" ] && pass || fail "missing copied lib.js"
+
+  it "refuses to overwrite non-context-harness scripts"
+  setup_tmpdir
+  mkdir -p "$TMPDIR_ROOT/scripts"
+  echo "console.log('project script');" > "$TMPDIR_ROOT/scripts/context-index.js"
+  node "$INSTALL_PROJECT" "$TMPDIR_ROOT" >/dev/null 2>&1; rc=$?
+  assert_exit 1 "$rc"
+
+  cleanup_tmpdir
+fi
+
+# =============================
+# Test: context-index.js
+# =============================
+
+if should_run "context-index"; then
+  suite "context-index.js"
+  CONTEXT_INDEX="$REPO_ROOT/scripts/context-index.js"
+
+  setup_tmpdir
+  cat > "$TMPDIR_ROOT/CONTEXT.md" << 'EOF'
+# Context
+
+## Project
+index-app is a test project.
+
+## Rules
+
+### Never
+1. Never ignore the index.
+
+### Always
+1. Always refresh AGENTS.md after durable context changes.
+
+## Language
+- **Canonical term**: A durable term that should be queryable.
+EOF
+  cat > "$TMPDIR_ROOT/AGENTS.md" << 'EOF'
+# Agent Instructions
+
+## Context Contract
+- Existing contract line.
+EOF
+
+  it "updates AGENTS.md with a managed context index"
+  (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
+  output=$(cat "$TMPDIR_ROOT/AGENTS.md")
+  assert_contains "$output" "Context Index"
+
+  it "indexes CONTEXT.md sections without duplicating full context"
+  assert_contains "$output" "CONTEXT.md#rules"
+
+  it "preserves existing AGENTS.md contract text"
+  assert_contains "$output" "Existing contract line"
+
+  it "is idempotent when updating AGENTS.md repeatedly"
+  (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
+  count=$(grep -c "## Context Index" "$TMPDIR_ROOT/AGENTS.md")
+  [ "$count" -eq 1 ] && pass || fail "expected one Context Index heading, got $count"
+
+  it "queries matching context sections"
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" query "canonical" 2>&1)
+  assert_contains "$output" "Language"
+
+  it "prints a named context section"
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" section "Rules" 2>&1)
+  assert_contains "$output" "Never ignore the index"
+
+  cleanup_tmpdir
+fi
+
+# =============================
 # Test: skill packaging
 # =============================
 
@@ -304,9 +390,16 @@ if should_run "skill-packaging"; then
   it "ships context-grill as a separate skill"
   [ -f "$REPO_ROOT/context-grill/SKILL.md" ] && pass || fail "missing context-grill/SKILL.md"
 
+  it "ships context-handoff as a separate skill"
+  [ -f "$REPO_ROOT/context-handoff/SKILL.md" ] && pass || fail "missing context-handoff/SKILL.md"
+
   it "names the context-grill skill in frontmatter"
   output=$(sed -n '1,8p' "$REPO_ROOT/context-grill/SKILL.md" 2>&1)
   assert_contains "$output" "name: context-grill"
+
+  it "names the context-handoff skill in frontmatter"
+  output=$(sed -n '1,8p' "$REPO_ROOT/context-handoff/SKILL.md" 2>&1)
+  assert_contains "$output" "name: context-handoff"
 
   it "context-grill asks one question at a time"
   assert_contains "$(cat "$REPO_ROOT/context-grill/SKILL.md")" "Ask one question at a time"
@@ -316,6 +409,13 @@ if should_run "skill-packaging"; then
 
   it "context-grill inspects code before asking"
   assert_contains "$(cat "$REPO_ROOT/context-grill/SKILL.md")" "inspect instead"
+
+  it "context-handoff includes long-run quality guidance"
+  output=$(cat "$REPO_ROOT/context-handoff/SKILL.md")
+  assert_contains "$output" "Quality Bar"
+
+  it "context-handoff saves outside the workspace by default"
+  assert_contains "$(cat "$REPO_ROOT/context-handoff/SKILL.md")" "OS temp directory"
 
   it "keeps the context-maintain skill concise"
   words=$(wc -w < "$REPO_ROOT/context-maintain/SKILL.md")

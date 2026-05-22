@@ -1,14 +1,14 @@
 # Now
 
 ## Current Focus
-`context-maintain` frontmatter is fixed, pushed, and synced through Nexus into Codex.
+Preparing committed `main` deploy for context-harness index and installer changes.
 
 ## Active Blockers
 - None.
 
 ## Immediate Next Step
-Restart Codex and confirm `context-maintain` appears in the available skills list.
+Push to GitHub, then run normal Agent Nexus sync from GitHub `main` and verify Codex.
 
 ## Session State
-- Last modified: 2026-05-18T04:01:02Z
-- Files touched: context-maintain/SKILL.md, CONTEXT.md, NOW.md
+- Last modified: 2026-05-22T03:23:50Z
+- Files touched: AGENTS.md, CONTEXT.md, NOW.md, PLAN.md, README.md, SKILL.md, context-init/SKILL.md, context-maintain/SKILL.md, scripts/context-index.js, scripts/install-project.js, tests/run-all.sh

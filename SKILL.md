@@ -3,8 +3,9 @@ name: context-harness
 description: >
   Route lightweight project context work to the right companion skill:
   context-init for new repositories, context-catch-up for session resume, and
-  context-grill for stress-testing plans, and context-maintain for updates,
-  lessons, plans, closeout, and reflection.
+  context-grill for stress-testing plans, context-handoff for next-goal
+  handoffs, and context-maintain for updates, lessons, plans, closeout, and
+  reflection.
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
 ---
@@ -26,6 +27,7 @@ Use the smallest skill that matches the agent's intent:
 | New repo or missing context files | `context-init` |
 | New agent, resume, or "catch me up" | `context-catch-up` |
 | Stress-test a plan, taxonomy, workflow, or context model | `context-grill` |
+| Prepare a fresh agent for the next substantial goal | `context-handoff` |
 | Context updates, lesson capture, plan/NOW updates, closeout, reflection | `context-maintain` |
 
 This root skill is the front door and reference. Prefer invoking a companion
@@ -56,6 +58,7 @@ skill directly when the mode is obvious.
 | No `CONTEXT.md` at project root | Use `context-init` |
 | `CONTEXT.md` exists and the agent is starting/resuming | Use `context-catch-up` |
 | The user wants a plan challenged against docs, terms, and code | Use `context-grill` |
+| The user wants a long-run brief for the next big goal | Use `context-handoff` |
 | The agent needs to update context, preserve a lesson, correction, plan, or session state | Use `context-maintain` |
 | Legacy v1 files exist without `CONTEXT.md` | Use `context-init` migration flow |
 
@@ -78,8 +81,11 @@ verifiable form; observable-only is OK if automation isn't.
 
 ### Step 3: Generate CONTEXT.md + NOW.md + AGENTS.md
 
-Write the context files to the project root using the templates below.
-For Codex, `AGENTS.md` is the automatic activation layer.
+Write the context files to the project root using the templates below, then run
+`node <context-harness-skill-dir>/scripts/install-project.js`. For Codex,
+`AGENTS.md` is the automatic activation layer. Keep it small: after writing or
+changing `CONTEXT.md`, run `node scripts/context-index.js update` so
+`AGENTS.md` contains only the contract plus a generated index.
 
 ### Step 4: Optionally create PLAN.md
 
@@ -181,14 +187,22 @@ append). First file read on recovery, last file written before session end.
 # Agent Instructions
 
 ## Context Contract
-- At session start/resume, read `NOW.md` first, then `CONTEXT.md`.
+- At session start/resume, read `NOW.md` first, then use the Context Index
+  below to choose relevant `CONTEXT.md` sections.
 - Before planning or editing, respect `CONTEXT.md` `## Rules`.
 - If the user teaches a durable term, invariant, workflow, constraint, or
   correction, update `CONTEXT.md` before it scrolls away.
 - Route task-local findings and decisions to `PLAN.md`; durable lessons to
   `CONTEXT.md`.
+- After updating `CONTEXT.md`, run `node scripts/context-index.js update`.
 - Before ending, update `NOW.md` with current focus, blockers, next step, and
   touched files.
+
+## Context Index
+<!-- context-harness:index:start -->
+Generated from `CONTEXT.md` by `node scripts/context-index.js update`.
+Use this index to open only the `CONTEXT.md` sections relevant to the task.
+<!-- context-harness:index:end -->
 ```
 
 ### PLAN.md (on-demand)
@@ -259,7 +273,9 @@ runner). Adding a new script? Import from `lib.js` — don't duplicate.
 | Script | Purpose | When to use |
 |--------|---------|-------------|
 | `scripts/lib.js` | Shared helpers (hook input, stack detect, section read, runCheck) | Imported by every other script |
+| `scripts/install-project.js` | Copy context-harness runtime scripts into a target repo | Init mode |
 | `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware rule defaults | Init mode, Update mode |
+| `scripts/context-index.js` | Update AGENTS.md index; list/query/print CONTEXT.md sections | After CONTEXT.md changes |
 | `scripts/guard.js` | Block --no-verify, detect secrets, protect linter configs | Runs automatically via PreToolUse hook |
 | `scripts/format-on-edit.js` | Auto-format files after edits | Runs automatically via PostToolUse hook |
 | `scripts/session-end.js` | Stamp NOW.md, prune PLAN.md when >150 lines | Runs automatically via Stop hook |

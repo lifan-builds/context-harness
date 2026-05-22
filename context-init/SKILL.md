@@ -37,7 +37,15 @@ Create the smallest durable context layer that lets future agents catch up:
 3. Ask the user to confirm or edit `Never`, `Always`, and `Objectives`.
 4. Write `CONTEXT.md`, `NOW.md`, and `AGENTS.md` from the templates in the root
    `context-harness` skill.
-5. Ask whether there is a multi-step task. If yes, create `PLAN.md`.
+5. Install context-harness runtime scripts into the target repo:
+
+   ```bash
+   node <context-harness-skill-dir>/scripts/install-project.js
+   ```
+
+6. Run `node scripts/context-index.js update` so `AGENTS.md` has a generated
+   high-level index into `CONTEXT.md`.
+7. Ask whether there is a multi-step task. If yes, create `PLAN.md`.
 
 ## Migration Flow
 
@@ -54,5 +62,7 @@ If legacy v1 files exist but `CONTEXT.md` does not:
 
 - Objectives are never auto-filled. They are outcome-level success criteria.
 - Keep generated files short enough to be read every session.
+- Keep `AGENTS.md` small: contract plus generated `CONTEXT.md` index.
+- Runtime scripts are project-local after init, so `AGENTS.md` can refer to
+  `node scripts/context-index.js update`.
 - Do not create ADRs unless the target project already has an ADR workflow.
-

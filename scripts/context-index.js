@@ -113,6 +113,7 @@ function replaceManagedBlock(text, block) {
 
 function defaultAgents() {
   return `# Agent Instructions
+<!-- context-harness:schema v2 -->
 
 ## Context Contract
 - At session start/resume, read \`NOW.md\` first, then use the Context Index below to choose relevant \`CONTEXT.md\` sections.

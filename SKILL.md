@@ -87,8 +87,7 @@ Write the context files to the project root using the templates below, then run
 changing `CONTEXT.md`, run `node scripts/context-index.js update` so
 `AGENTS.md` contains only the contract plus a generated index.
 
-### Step 4: Optionally create PLAN.md
-
+### Step 4: Optional PLAN.md
 Ask: "Do you have a multi-step task to plan?" If yes, create PLAN.md.
 
 ---
@@ -111,6 +110,7 @@ If legacy files exist but `CONTEXT.md` does not:
 
 ```markdown
 # Context
+<!-- context-harness:schema v2 -->
 
 ## Project
 [Auto-generated: name, tech stack, description. One paragraph.]
@@ -185,6 +185,7 @@ append). First file read on recovery, last file written before session end.
 
 ```markdown
 # Agent Instructions
+<!-- context-harness:schema v2 -->
 
 ## Context Contract
 - At session start/resume, read `NOW.md` first, then use the Context Index
@@ -200,8 +201,7 @@ append). First file read on recovery, last file written before session end.
 
 ## Context Index
 <!-- context-harness:index:start -->
-Generated from `CONTEXT.md` by `node scripts/context-index.js update`.
-Use this index to open only the `CONTEXT.md` sections relevant to the task.
+Generated from `CONTEXT.md`; open only task-relevant sections.
 <!-- context-harness:index:end -->
 ```
 
@@ -274,6 +274,7 @@ runner). Adding a new script? Import from `lib.js` — don't duplicate.
 |--------|---------|-------------|
 | `scripts/lib.js` | Shared helpers (hook input, stack detect, section read, runCheck) | Imported by every other script |
 | `scripts/install-project.js` | Copy context-harness runtime scripts into a target repo | Init mode |
+| `scripts/codex-context-hook.js` | Codex lifecycle hook dispatcher for catch-up, init, and maintain nudges | Codex hooks |
 | `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware rule defaults | Init mode, Update mode |
 | `scripts/context-index.js` | Update AGENTS.md index; list/query/print CONTEXT.md sections | After CONTEXT.md changes |
 | `scripts/guard.js` | Block --no-verify, detect secrets, protect linter configs | Runs automatically via PreToolUse hook |

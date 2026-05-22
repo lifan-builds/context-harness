@@ -297,6 +297,9 @@ if should_run "install-project"; then
   it "copies shared lib dependency"
   [ -f "$TMPDIR_ROOT/scripts/lib.js" ] && pass || fail "missing copied lib.js"
 
+  it "copies Codex context hook dispatcher"
+  [ -f "$TMPDIR_ROOT/scripts/codex-context-hook.js" ] && pass || fail "missing copied codex-context-hook.js"
+
   it "refuses to overwrite non-context-harness scripts"
   setup_tmpdir
   mkdir -p "$TMPDIR_ROOT/scripts"
@@ -305,6 +308,27 @@ if should_run "install-project"; then
   assert_exit 1 "$rc"
 
   cleanup_tmpdir
+fi
+
+# =============================
+# Test: lib.js
+# =============================
+
+if should_run "lib"; then
+  suite "lib.js"
+  LIB="$REPO_ROOT/scripts/lib.js"
+
+  it "normalizes Codex Bash stdin payload"
+  output=$(printf '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"git status"},"cwd":"/tmp/project"}' | node -e "const { readHookInput } = require('$LIB'); const input = readHookInput(); console.log(input.command + '|' + input.cwd + '|' + input.tool_name);")
+  [ "$output" = "git status|/tmp/project|Bash" ] && pass || fail "unexpected normalized payload: $output"
+
+  it "normalizes Codex file payload"
+  output=$(printf '{"tool_name":"apply_patch","tool_input":{"file_path":"src/app.ts"}}' | node -e "const { readHookInput } = require('$LIB'); console.log(readHookInput().file_path);")
+  [ "$output" = "src/app.ts" ] && pass || fail "unexpected file_path: $output"
+
+  it "handles malformed hook input"
+  output=$(printf 'not json' | node -e "const { readHookInput } = require('$LIB'); console.log(readHookInput().command);")
+  [ "$output" = "not json" ] && pass || fail "unexpected malformed payload: $output"
 fi
 
 # =============================
@@ -363,6 +387,18 @@ EOF
   it "prints a named context section"
   output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" section "Rules" 2>&1)
   assert_contains "$output" "Never ignore the index"
+
+  it "creates default AGENTS.md with schema marker"
+  setup_tmpdir
+  cat > "$TMPDIR_ROOT/CONTEXT.md" << 'EOF'
+# Context
+
+## Project
+schema-app is a test project.
+EOF
+  (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
+  output=$(cat "$TMPDIR_ROOT/AGENTS.md")
+  assert_contains "$output" "context-harness:schema v2"
 
   cleanup_tmpdir
 fi
@@ -813,6 +849,68 @@ if should_run "format-on-edit"; then
   echo "hello" > "$TMPDIR_ROOT/test.txt"
   TOOL_INPUT="{\"file_path\":\"$TMPDIR_ROOT/test.txt\"}" node "$FMT" >/dev/null 2>&1; rc=$?
   assert_exit 0 "$rc"
+
+  cleanup_tmpdir
+fi
+
+# =============================
+# Test: codex-context-hook.js
+# =============================
+
+if should_run "codex-context-hook"; then
+  suite "codex-context-hook.js"
+  CODEX_HOOK="$REPO_ROOT/scripts/codex-context-hook.js"
+
+  it "emits catch-up context when context-harness files exist"
+  setup_tmpdir
+  cat > "$TMPDIR_ROOT/AGENTS.md" << 'EOF'
+# Agents
+<!-- context-harness:schema v2 -->
+<!-- context-harness:index:start -->
+<!-- context-harness:index:end -->
+EOF
+  cat > "$TMPDIR_ROOT/CONTEXT.md" << 'EOF'
+# Context
+<!-- context-harness:schema v2 -->
+EOF
+  cat > "$TMPDIR_ROOT/NOW.md" << 'EOF'
+# Now
+
+## Current Focus
+Ship hooks
+EOF
+  output=$(cd "$TMPDIR_ROOT" && printf '{"cwd":"%s"}' "$TMPDIR_ROOT" | node "$CODEX_HOOK" --mode catch-up)
+  assert_contains "$output" "context-catch-up"
+
+  it "includes current NOW.md in catch-up context"
+  assert_contains "$output" "Ship hooks"
+
+  it "nudges compatibility upgrade for old context-harness files"
+  setup_tmpdir
+  echo "# Agents" > "$TMPDIR_ROOT/AGENTS.md"
+  echo "# Context" > "$TMPDIR_ROOT/CONTEXT.md"
+  echo "# Now" > "$TMPDIR_ROOT/NOW.md"
+  output=$(cd "$TMPDIR_ROOT" && printf '{"cwd":"%s"}' "$TMPDIR_ROOT" | node "$CODEX_HOOK" --mode catch-up)
+  assert_contains "$output" "Compatibility Upgrade"
+
+  it "emits init context when project lacks context files"
+  setup_tmpdir
+  echo '{"name":"demo"}' > "$TMPDIR_ROOT/package.json"
+  output=$(cd "$TMPDIR_ROOT" && printf '{"cwd":"%s"}' "$TMPDIR_ROOT" | node "$CODEX_HOOK" --mode init)
+  assert_contains "$output" "context-init"
+
+  it "does not emit init context outside a project"
+  setup_tmpdir
+  output=$(cd "$TMPDIR_ROOT" && printf '{"cwd":"%s"}' "$TMPDIR_ROOT" | node "$CODEX_HOOK" --mode init)
+  [ -z "$output" ] && pass || fail "unexpected output: $output"
+
+  it "emits maintain context when context-harness files exist"
+  setup_tmpdir
+  echo "# Agents" > "$TMPDIR_ROOT/AGENTS.md"
+  echo "# Context" > "$TMPDIR_ROOT/CONTEXT.md"
+  echo "# Now" > "$TMPDIR_ROOT/NOW.md"
+  output=$(cd "$TMPDIR_ROOT" && printf '{"cwd":"%s"}' "$TMPDIR_ROOT" | node "$CODEX_HOOK" --mode maintain)
+  assert_contains "$output" "context-maintain"
 
   cleanup_tmpdir
 fi

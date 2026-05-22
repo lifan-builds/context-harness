@@ -37,6 +37,11 @@ NOW.md      # current focus, blockers, next step
 PLAN.md     # optional living plan for multi-step work
 ```
 
+Generated `AGENTS.md` and `CONTEXT.md` include
+`<!-- context-harness:schema v2 -->`. Newer context-harness skills use that
+marker to detect older or partial layouts and run a model-led Compatibility
+Upgrade on first catch-up.
+
 ## Philosophy
 
 - Context window = volatile RAM. Filesystem = persistent storage.
@@ -134,6 +139,7 @@ project-root walk, stack detection, markdown section parsing, command runner).
 |--------|---------|
 | `scripts/lib.js` | Shared helpers imported by everything else |
 | `scripts/install-project.js` | Copy context-harness runtime scripts into a target repo |
+| `scripts/codex-context-hook.js` | Codex lifecycle hook dispatcher for catch-up, init, and maintain nudges |
 | `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware rule defaults |
 | `scripts/context-index.js` | Refresh AGENTS.md index; list/query/print CONTEXT.md sections |
 | `scripts/guard.js` | Security: block `--no-verify`, detect secrets, protect linter configs |
@@ -142,9 +148,8 @@ project-root walk, stack detection, markdown section parsing, command runner).
 | `scripts/task.js` | Task switcher — rewrites NOW.md; logs to PLAN.md Progress |
 | `scripts/eval-loop.js` | GAN-style evaluator: check work against your 3 Objectives |
 
-`guard.js` and `format-on-edit.js` read their payload from the `TOOL_INPUT`
-env var or from stdin (pipe-friendly for Codex hooks, Cursor, Claude Code, and custom
-harnesses).
+Hook scripts read their payload from the `TOOL_INPUT` env var or from stdin
+(pipe-friendly for Codex hooks, Cursor, Claude Code, and custom harnesses).
 
 ## The 9 Rules Framework
 
@@ -206,6 +211,11 @@ the right context file.
 `context-maintain` includes Reflect Mode for repeated mistakes, loops, failed
 attempts, and human corrections. Maintenance-like actions such as update,
 capture, plan, and end are intentionally not separate skills.
+
+`context-catch-up` includes Compatibility Upgrade for existing repos. It
+preserves project-specific context, replaces only old harness boilerplate,
+installs project-local runtime scripts, and refreshes the generated
+`AGENTS.md` index.
 
 `context-handoff` is different from maintenance: it produces an ephemeral launch
 brief for the next substantial task. It should include the high-level goal,
@@ -273,16 +283,15 @@ node <skill-dir>/context-harness/scripts/task.js done
 
 ## Optional Hooks
 
-The portable baseline is the `AGENTS.md` Context Contract. Hooks are optional
-adapters for harnesses that can run scripts on prompt submit, tool use, stop, or
-compaction events.
+The portable baseline is the `AGENTS.md` Context Contract. Codex hooks are
+optional lifecycle nudges into the companion skills, not a replacement for the
+skills.
 
 | Hook | Trigger | What it does |
 |------|---------|-------------|
-| Prompt submit / session start | Every prompt or resume | Injects NOW.md + reminder to check rules |
-| PreToolUse (Bash) | Git commands | Blocks `--no-verify`, detects secrets |
-| PostToolUse (Write/Edit) | After edits | Auto-formats the edited file |
-| Stop / compact | End of session or compaction | Stamps NOW.md, prunes PLAN.md, reminds memory routing |
+| SessionStart | Existing context-harness project | Points the agent to `context-catch-up` and includes current `NOW.md` |
+| UserPromptSubmit | Project without context-harness files | Points the agent to `context-init` before substantial project work |
+| Stop | Existing context-harness project | Points the agent to `context-maintain` before ending substantial work |
 
 Each harness should wire these scripts through its native plugin/config layer
 rather than depending on SKILL.md frontmatter.

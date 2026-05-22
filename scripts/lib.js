@@ -13,9 +13,9 @@ const path = require("path");
 // ---------------------------------------------------------------------------
 
 function readHookInput() {
-  // Claude Code passes the payload in TOOL_INPUT; other harnesses (Cursor,
-  // custom wrappers) tend to pipe JSON on stdin. Try env first, fall back
-  // to a synchronous stdin read when stdin is non-TTY (i.e. piped).
+  // Claude Code passes the payload in TOOL_INPUT. Codex and other harnesses
+  // tend to pipe JSON on stdin. Try env first, fall back to a synchronous stdin
+  // read when stdin is non-TTY (i.e. piped).
   let raw = process.env.TOOL_INPUT || "";
   if (!raw && !process.stdin.isTTY) {
     try {
@@ -25,10 +25,42 @@ function readHookInput() {
     }
   }
   try {
-    return JSON.parse(raw);
+    return normalizeHookInput(JSON.parse(raw));
   } catch {
     return { command: raw, file_path: raw };
   }
+}
+
+function normalizeHookInput(input) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return {};
+
+  const normalized = { ...input };
+  const toolInput =
+    input.tool_input && typeof input.tool_input === "object" && !Array.isArray(input.tool_input)
+      ? input.tool_input
+      : {};
+
+  normalized.command = firstString(input.command, toolInput.command);
+  normalized.file_path = firstString(
+    input.file_path,
+    input.filePath,
+    input.path,
+    input.filename,
+    toolInput.file_path,
+    toolInput.filePath,
+    toolInput.path,
+    toolInput.filename
+  );
+  normalized.cwd = firstString(input.cwd, input.working_dir, input.working_directory, toolInput.cwd);
+
+  return normalized;
+}
+
+function firstString(...values) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) return value;
+  }
+  return "";
 }
 
 function block(reason) {
@@ -263,6 +295,7 @@ function today() {
 
 module.exports = {
   readHookInput,
+  normalizeHookInput,
   block,
   readJSONSafe,
   readTextSafe,

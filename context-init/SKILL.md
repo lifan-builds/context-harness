@@ -19,6 +19,10 @@ Create the smallest durable context layer that lets future agents catch up:
 - `NOW.md` for the current focus
 - `PLAN.md` only when there is an active multi-step task
 
+Generated `AGENTS.md` and `CONTEXT.md` must include
+`<!-- context-harness:schema v2 -->` so future skill versions can detect and
+upgrade older layouts.
+
 ## Init Flow
 
 1. Run the generator:
@@ -57,6 +61,9 @@ If legacy v1 files exist but `CONTEXT.md` does not:
    `Objectives`.
 4. Merge active items from `PLANS.md` and `FINDINGS.md` into `PLAN.md`.
 5. Replace old agent instructions with the `AGENTS.md` Context Contract.
+
+If context-harness files exist but are old, empty, partial, or missing the
+schema marker, use `context-catch-up` Compatibility Upgrade instead of init.
 
 ## Guardrails
 

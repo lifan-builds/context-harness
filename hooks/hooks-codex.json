@@ -1,0 +1,34 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{package_root}}/scripts/codex-context-hook.js\" --mode catch-up --nexus-package context-harness"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{package_root}}/scripts/codex-context-hook.js\" --mode init --nexus-package context-harness"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{package_root}}/scripts/codex-context-hook.js\" --mode maintain --nexus-package context-harness"
+          }
+        ]
+      }
+    ]
+  }
+}

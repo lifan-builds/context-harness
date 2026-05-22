@@ -1,4 +1,5 @@
 # Agent Instructions
+<!-- context-harness:schema v2 -->
 
 ## Context Contract
 - At session start/resume, read `NOW.md` first, then use the Context Index

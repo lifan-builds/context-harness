@@ -1,4 +1,5 @@
 # Context
+<!-- context-harness:schema v2 -->
 
 ## Project
 context-harness is a portable context framework for AI coding agents. It ships a root skill, companion skills, markdown context files, and Node.js scripts for keeping project memory lightweight and durable.
@@ -60,3 +61,6 @@ scripts/
 - `context-grill` should ask the user only high-leverage questions where human judgment materially helps the agent; details that can be inferred from context, inspected in files, or verified by dry run should be handled by the agent instead of pushed to the user.
 - When adapting context-harness to Codex, treat hooks as the active lifecycle path for enforcing context habits; keep plugin hooks optional until `plugin_hooks` support is stable and trusted.
 - When `context-maintain` changes durable project context, refresh the generated `AGENTS.md` index so future agents can navigate `CONTEXT.md` selectively instead of loading the full file by default.
+- Codex hooks should stay simple lifecycle nudges: session start points to `context-catch-up`, missing project context points to `context-init`, and substantial task completion points to `context-maintain`.
+- When migrating existing projects to a new context-harness contract, prefer model-led edits over bulk migration scripts because each repo may have local AGENTS.md conventions that need judgment.
+- For backward compatibility, generated context files should carry a lightweight schema/version marker and new skills should model-led upgrade older or partial context files instead of assuming the latest AGENTS.md contract is already present.

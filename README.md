@@ -222,7 +222,8 @@ brief for the next substantial task. It should include the high-level goal,
 definition of done, source-of-truth context links, quality bar, execution
 checkpoints, risks, open human-judgment questions, and suggested skills. By
 default, it prints the brief directly in chat as a fenced Markdown block instead
-of writing a temp file.
+of writing a temp file. The chat handoff should stay at or below 4,000
+characters and favor concise bullets over exhaustive chronology.
 
 ## Installation
 

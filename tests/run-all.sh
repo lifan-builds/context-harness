@@ -454,6 +454,8 @@ if should_run "skill-packaging"; then
   output=$(cat "$REPO_ROOT/context-handoff/SKILL.md")
   assert_contains "$output" "fenced \`markdown\` block"
   assert_contains "$output" "do not create a temp file"
+  assert_contains "$output" "4,000 characters"
+  assert_contains "$output" "Be concise"
 
   it "keeps the context-maintain skill concise"
   words=$(wc -w < "$REPO_ROOT/context-maintain/SKILL.md")

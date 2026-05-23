@@ -18,16 +18,20 @@ a maintenance note and not a new durable memory store.
    only on conversation memory.
 3. Output the handoff directly in the chat as a fenced `markdown` block by
    default; do not create a temp file.
-4. Create a workspace artifact only when the user explicitly asks for a file.
-5. Reference existing artifacts by path or URL instead of duplicating them.
-6. Redact secrets, credentials, private raw data, and unnecessary personal
+4. Keep the fenced handoff at or below 4,000 characters.
+5. Be concise: prefer tight bullets, omit routine chronology, and link to
+   source artifacts instead of summarizing everything.
+6. Create a workspace artifact only when the user explicitly asks for a file.
+7. Reference existing artifacts by path or URL instead of duplicating them.
+8. Redact secrets, credentials, private raw data, and unnecessary personal
    detail.
-7. Ask only for missing goal, scope, or quality-bar decisions that the next
+9. Ask only for missing goal, scope, or quality-bar decisions that the next
    agent cannot infer.
 
 ## Handoff Shape
 
-Write enough context for the next agent to work autonomously for a long stretch:
+Write a compact launch brief that gives the next agent enough context to start
+autonomously:
 
 ```markdown
 # Handoff: [next big goal]

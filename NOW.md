@@ -1,14 +1,14 @@
 # Now
 
 ## Current Focus
-Changed context-handoff to output handoff briefs directly in chat as fenced Markdown by default.
+Pushed and redeployed context-handoff chat-output behavior.
 
 ## Active Blockers
 - None.
 
 ## Immediate Next Step
-Commit and push context-handoff chat-output behavior, then redeploy context-harness with Agent Nexus.
+None.
 
 ## Session State
-- Last modified: 2026-05-22T04:03:55Z
+- Last modified: 2026-05-23T22:21:49Z
 - Files touched: CONTEXT.md, NOW.md, README.md, context-handoff/SKILL.md, tests/run-all.sh

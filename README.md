@@ -220,7 +220,9 @@ installs project-local runtime scripts, and refreshes the generated
 `context-handoff` is different from maintenance: it produces an ephemeral launch
 brief for the next substantial task. It should include the high-level goal,
 definition of done, source-of-truth context links, quality bar, execution
-checkpoints, risks, open human-judgment questions, and suggested skills.
+checkpoints, risks, open human-judgment questions, and suggested skills. By
+default, it prints the brief directly in chat as a fenced Markdown block instead
+of writing a temp file.
 
 ## Installation
 

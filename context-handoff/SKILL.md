@@ -16,12 +16,13 @@ a maintenance note and not a new durable memory store.
 1. Read `NOW.md`, then `CONTEXT.md`, and `PLAN.md` if it exists.
 2. Inspect relevant files, diffs, tests, and command output instead of relying
    only on conversation memory.
-3. Save the handoff to the OS temp directory unless the user explicitly asks for
-   a workspace artifact.
-4. Reference existing artifacts by path or URL instead of duplicating them.
-5. Redact secrets, credentials, private raw data, and unnecessary personal
+3. Output the handoff directly in the chat as a fenced `markdown` block by
+   default; do not create a temp file.
+4. Create a workspace artifact only when the user explicitly asks for a file.
+5. Reference existing artifacts by path or URL instead of duplicating them.
+6. Redact secrets, credentials, private raw data, and unnecessary personal
    detail.
-6. Ask only for missing goal, scope, or quality-bar decisions that the next
+7. Ask only for missing goal, scope, or quality-bar decisions that the next
    agent cannot infer.
 
 ## Handoff Shape
@@ -61,5 +62,5 @@ other source-of-truth artifacts.]
 ```
 
 If the user gives a next-session focus, organize the handoff around that goal
-rather than around the current conversation chronology. At the end, report the
-handoff path and the most important next checkpoint.
+rather than around the current conversation chronology. At the end, briefly name
+the most important next checkpoint outside the fenced block.

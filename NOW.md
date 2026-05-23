@@ -1,14 +1,14 @@
 # Now
 
 ## Current Focus
-Finalized schema-marker compatibility upgrade behavior and Ergatta migration test.
+Changed context-handoff to output handoff briefs directly in chat as fenced Markdown by default.
 
 ## Active Blockers
 - None.
 
 ## Immediate Next Step
-Commit and push context-harness plus Ergatta, then redeploy context-harness with Agent Nexus.
+Commit and push context-handoff chat-output behavior, then redeploy context-harness with Agent Nexus.
 
 ## Session State
-- Last modified: 2026-05-22T03:43:49Z
-- Files touched: AGENTS.md, CONTEXT.md, NOW.md, README.md, SKILL.md, context-catch-up/SKILL.md, context-init/SKILL.md, scripts/context-index.js, scripts/codex-context-hook.js, tests/run-all.sh
+- Last modified: 2026-05-22T04:03:55Z
+- Files touched: CONTEXT.md, NOW.md, README.md, context-handoff/SKILL.md, tests/run-all.sh

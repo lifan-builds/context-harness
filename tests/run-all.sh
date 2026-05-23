@@ -450,8 +450,10 @@ if should_run "skill-packaging"; then
   output=$(cat "$REPO_ROOT/context-handoff/SKILL.md")
   assert_contains "$output" "Quality Bar"
 
-  it "context-handoff saves outside the workspace by default"
-  assert_contains "$(cat "$REPO_ROOT/context-handoff/SKILL.md")" "OS temp directory"
+  it "context-handoff prints markdown in chat by default"
+  output=$(cat "$REPO_ROOT/context-handoff/SKILL.md")
+  assert_contains "$output" "fenced \`markdown\` block"
+  assert_contains "$output" "do not create a temp file"
 
   it "keeps the context-maintain skill concise"
   words=$(wc -w < "$REPO_ROOT/context-maintain/SKILL.md")

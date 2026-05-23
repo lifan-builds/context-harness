@@ -64,3 +64,4 @@ scripts/
 - Codex hooks should stay simple lifecycle nudges: session start points to `context-catch-up`, missing project context points to `context-init`, and substantial task completion points to `context-maintain`.
 - When migrating existing projects to a new context-harness contract, prefer model-led edits over bulk migration scripts because each repo may have local AGENTS.md conventions that need judgment.
 - For backward compatibility, generated context files should carry a lightweight schema/version marker and new skills should model-led upgrade older or partial context files instead of assuming the latest AGENTS.md contract is already present.
+- `context-handoff` should return its launch brief directly in chat as a fenced Markdown block by default; only create a file when the user explicitly asks for a workspace artifact.

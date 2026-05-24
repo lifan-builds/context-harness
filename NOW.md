@@ -1,7 +1,7 @@
 # Now
 
 ## Current Focus
-Pushed and redeployed concise context-handoff behavior.
+Pushed and redeployed context-handoff deprecation.
 
 ## Active Blockers
 - None.
@@ -10,5 +10,5 @@ Pushed and redeployed concise context-handoff behavior.
 None.
 
 ## Session State
-- Last modified: 2026-05-23T22:29:33Z
-- Files touched: CONTEXT.md, NOW.md, README.md, context-handoff/SKILL.md, tests/run-all.sh
+- Last modified: 2026-05-24T05:52:34Z
+- Files touched: CONTEXT.md, NOW.md, README.md, SKILL.md, context-handoff/SKILL.md, tests/run-all.sh

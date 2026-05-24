@@ -426,7 +426,7 @@ if should_run "skill-packaging"; then
   it "ships context-grill as a separate skill"
   [ -f "$REPO_ROOT/context-grill/SKILL.md" ] && pass || fail "missing context-grill/SKILL.md"
 
-  it "ships context-handoff as a separate skill"
+  it "keeps deprecated context-handoff compatibility stub"
   [ -f "$REPO_ROOT/context-handoff/SKILL.md" ] && pass || fail "missing context-handoff/SKILL.md"
 
   it "names the context-grill skill in frontmatter"
@@ -436,6 +436,7 @@ if should_run "skill-packaging"; then
   it "names the context-handoff skill in frontmatter"
   output=$(sed -n '1,8p' "$REPO_ROOT/context-handoff/SKILL.md" 2>&1)
   assert_contains "$output" "name: context-handoff"
+  assert_contains "$output" "user-invocable: false"
 
   it "context-grill asks one question at a time"
   assert_contains "$(cat "$REPO_ROOT/context-grill/SKILL.md")" "Ask one question at a time"
@@ -446,16 +447,11 @@ if should_run "skill-packaging"; then
   it "context-grill inspects code before asking"
   assert_contains "$(cat "$REPO_ROOT/context-grill/SKILL.md")" "inspect instead"
 
-  it "context-handoff includes long-run quality guidance"
+  it "context-handoff is deprecated in favor of context-maintain"
   output=$(cat "$REPO_ROOT/context-handoff/SKILL.md")
-  assert_contains "$output" "Quality Bar"
-
-  it "context-handoff prints markdown in chat by default"
-  output=$(cat "$REPO_ROOT/context-handoff/SKILL.md")
-  assert_contains "$output" "fenced \`markdown\` block"
-  assert_contains "$output" "do not create a temp file"
+  assert_contains "$output" "deprecated"
+  assert_contains "$output" "Use \`context-maintain\` instead"
   assert_contains "$output" "4,000 characters"
-  assert_contains "$output" "Be concise"
 
   it "keeps the context-maintain skill concise"
   words=$(wc -w < "$REPO_ROOT/context-maintain/SKILL.md")

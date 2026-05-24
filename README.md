@@ -63,14 +63,12 @@ catch-all skill:
 | `context-init` | Initialize a new repo or migrate legacy v1 context files |
 | `context-catch-up` | Let a fresh or resumed agent recover current project state |
 | `context-grill` | Stress-test a plan, taxonomy, workflow, or context model against docs and code |
-| `context-handoff` | Prepare a fresh agent to start the next substantial goal with context, quality bar, and checkpoints |
 | `context-maintain` | Maintain context during active work, including Reflect Mode after corrections or failed attempts |
 
 The important change is the shape: split by the agent's intent at invocation,
 not by every tiny maintenance action. Update, capture, plan, closeout, and
 reflection all live under `context-maintain` because they are part of the same
-ongoing memory workflow. Handoff is separate because its purpose is to launch
-the next big goal for a fresh long-running agent, not maintain completed work.
+ongoing memory workflow.
 
 ## Core Rules
 
@@ -198,7 +196,6 @@ split by invocation intent:
 | `context-init` | A repo is new to context-harness or needs v1 migration |
 | `context-catch-up` | A new agent or resumed session needs to read durable context |
 | `context-grill` | A plan, taxonomy, workflow, or context model needs to be stress-tested against docs and code |
-| `context-handoff` | A fresh agent needs a long-run brief for the next substantial goal |
 | `context-maintain` | Work is underway and the agent needs to update context, capture lessons, maintain plan state, close out, or reflect after a correction |
 
 `context-grill` borrows the strongest idea from Matt Pocock's `grill-me`: walk
@@ -217,13 +214,9 @@ preserves project-specific context, replaces only old harness boilerplate,
 installs project-local runtime scripts, and refreshes the generated
 `AGENTS.md` index.
 
-`context-handoff` is different from maintenance: it produces an ephemeral launch
-brief for the next substantial task. It should include the high-level goal,
-definition of done, source-of-truth context links, quality bar, execution
-checkpoints, risks, open human-judgment questions, and suggested skills. By
-default, it prints the brief directly in chat as a fenced Markdown block instead
-of writing a temp file. The chat handoff should stay at or below 4,000
-characters and favor concise bullets over exhaustive chronology.
+`context-handoff` is deprecated. It remains only as a compatibility stub for
+explicit requests; new session closeout and transfer notes should use
+`context-maintain`.
 
 ## Installation
 

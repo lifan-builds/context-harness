@@ -9,7 +9,7 @@ context-harness is a portable context framework for AI coding agents. It ships a
 .
 context-catch-up/
 context-grill/
-context-handoff/
+context-handoff/ (deprecated compatibility stub)
 context-init/
 context-maintain/
 scripts/
@@ -42,17 +42,17 @@ scripts/
 ## Language
 - **context-maintain**: The ongoing context skill for maintaining context after or during work: updates, lesson capture, plan state, session closeout, and Reflect Mode after corrections or failed attempts. Avoid: context-update.
 - **context-grill**: A focused interrogation mode for stress-testing plans, taxonomies, workflows, or context models against `CONTEXT.md`, task docs, and code reality.
-- **context-handoff**: A long-run launch brief for the next substantial goal after current work completes; it prepares a fresh agent with goal, context, quality bar, checkpoints, and suggested skills.
+- **context-handoff**: Deprecated compatibility stub. Avoid for new work; use `context-maintain` for closeout, transfer notes, next steps, and durable context updates.
 
 ## Relationships
-- The preferred companion skill set is `context-init`, `context-catch-up`, `context-grill`, `context-handoff`, and `context-maintain`.
+- The preferred companion skill set is `context-init`, `context-catch-up`, `context-grill`, and `context-maintain`.
 - `context-maintain` includes the old standalone reflection workflow as Reflect Mode.
 - Local agent-nexus deployment should use `context-grill` instead of Matt Pocock's `grill-with-docs`.
 - `AGENTS.md` is the small activation layer; `CONTEXT.md` is the durable source of truth, indexed into `AGENTS.md` by `scripts/context-index.js`.
 
 ## Flagged Ambiguities
 - Update/capture/plan/end are not separate skills; they belong under `context-maintain`.
-- Maintain and handoff have different invocation intents: use `context-maintain` to preserve completed or active work context; use `context-handoff` to launch the next big goal for a fresh long-running agent.
+- Handoff is deprecated because it was not useful enough as a separate workflow; use `context-maintain` for closeout and next-step context.
 
 ## Learned Patterns
 - When splitting context-harness into companion skills, keep the split based on invocation intent because too many maintenance-like skills make the harness harder to choose.
@@ -64,4 +64,4 @@ scripts/
 - Codex hooks should stay simple lifecycle nudges: session start points to `context-catch-up`, missing project context points to `context-init`, and substantial task completion points to `context-maintain`.
 - When migrating existing projects to a new context-harness contract, prefer model-led edits over bulk migration scripts because each repo may have local AGENTS.md conventions that need judgment.
 - For backward compatibility, generated context files should carry a lightweight schema/version marker and new skills should model-led upgrade older or partial context files instead of assuming the latest AGENTS.md contract is already present.
-- `context-handoff` should return its launch brief directly in chat as a fenced Markdown block by default; keep the brief at or below 4,000 characters, be concise, and only create a file when the user explicitly asks for a workspace artifact.
+- When a workflow feels like low-value process, deprecate it instead of keeping it in the preferred skill path; `context-handoff` now remains only as a compatibility stub.

@@ -63,6 +63,7 @@ catch-all skill:
 | `context-init` | Initialize a new repo or migrate legacy v1 context files |
 | `context-catch-up` | Let a fresh or resumed agent recover current project state |
 | `context-grill` | Stress-test a plan, taxonomy, workflow, or context model against docs and code |
+| `context-launch` | Convert the current conversation into a long-running Codex task brief |
 | `context-maintain` | Maintain context during active work, including Reflect Mode after corrections or failed attempts |
 
 The important change is the shape: split by the agent's intent at invocation,
@@ -196,6 +197,7 @@ split by invocation intent:
 | `context-init` | A repo is new to context-harness or needs v1 migration |
 | `context-catch-up` | A new agent or resumed session needs to read durable context |
 | `context-grill` | A plan, taxonomy, workflow, or context model needs to be stress-tested against docs and code |
+| `context-launch` | The current conversation should become a long-running Codex goal for a fresh agent |
 | `context-maintain` | Work is underway and the agent needs to update context, capture lessons, maintain plan state, close out, or reflect after a correction |
 
 `context-grill` borrows the strongest idea from Matt Pocock's `grill-me`: walk
@@ -213,6 +215,11 @@ capture, plan, and end are intentionally not separate skills.
 preserves project-specific context, replaces only old harness boilerplate,
 installs project-local runtime scripts, and refreshes the generated
 `AGENTS.md` index.
+
+`context-launch` produces a model-led launch brief for long-running Codex work:
+goal, done criteria, files to read, constraints, checkpoints, verification, and
+closeout. It is separate from closeout because the output is an execution prompt
+for a fresh agent, not a memory artifact.
 
 `context-handoff` is deprecated. It remains only as a compatibility stub for
 explicit requests; new session closeout and transfer notes should use

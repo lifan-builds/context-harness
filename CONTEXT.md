@@ -30,7 +30,7 @@ scripts/
 ### Objectives
 1. Agents can initialize lightweight project context in a new repo.
 2. Agents can catch up quickly from durable context files.
-3. Agents can improve durable context through maintenance, reflection, and plan grilling.
+3. Agents can improve durable context through maintenance, reflection, plan grilling, and long-running task launch briefs.
 
 ## Workflow
 - Setup: n/a
@@ -42,17 +42,20 @@ scripts/
 ## Language
 - **context-maintain**: The ongoing context skill for maintaining context after or during work: updates, lesson capture, plan state, session closeout, and Reflect Mode after corrections or failed attempts. Avoid: context-update.
 - **context-grill**: A focused interrogation mode for stress-testing plans, taxonomies, workflows, or context models against `CONTEXT.md`, task docs, and code reality.
+- **context-launch**: The skill for converting the current conversation and project context into a long-running Codex task brief or `/goal` for a fresh agent. Avoid: context-handoff.
 - **context-handoff**: Deprecated compatibility stub. Avoid for new work; use `context-maintain` for closeout, transfer notes, next steps, and durable context updates.
 
 ## Relationships
-- The preferred companion skill set is `context-init`, `context-catch-up`, `context-grill`, and `context-maintain`.
+- The preferred companion skill set is `context-init`, `context-catch-up`, `context-grill`, `context-launch`, and `context-maintain`.
 - `context-maintain` includes the old standalone reflection workflow as Reflect Mode.
+- `context-launch` is separate from `context-maintain` because its output is a ready-to-run task prompt for another agent, not ordinary context preservation.
 - Local agent-nexus deployment should use `context-grill` instead of Matt Pocock's `grill-with-docs`.
 - `AGENTS.md` is the small activation layer; `CONTEXT.md` is the durable source of truth, indexed into `AGENTS.md` by `scripts/context-index.js`.
 
 ## Flagged Ambiguities
 - Update/capture/plan/end are not separate skills; they belong under `context-maintain`.
 - Handoff is deprecated because it was not useful enough as a separate workflow; use `context-maintain` for closeout and next-step context.
+- Launch is not handoff revival; use `context-launch` only when the desired artifact is a long-running agent task brief.
 
 ## Learned Patterns
 - When splitting context-harness into companion skills, keep the split based on invocation intent because too many maintenance-like skills make the harness harder to choose.

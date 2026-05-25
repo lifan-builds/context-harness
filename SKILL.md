@@ -3,8 +3,9 @@ name: context-harness
 description: >
   Route lightweight project context work to the right companion skill:
   context-init for new repositories, context-catch-up for session resume, and
-  context-grill for stress-testing plans, and context-maintain for updates,
-  lessons, plans, closeout, and reflection.
+  context-grill for stress-testing plans, context-launch for long-running task
+  briefs, and context-maintain for updates, lessons, plans, closeout, and
+  reflection.
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
 ---
@@ -26,6 +27,7 @@ Use the smallest skill that matches the agent's intent:
 | New repo or missing context files | `context-init` |
 | New agent, resume, or "catch me up" | `context-catch-up` |
 | Stress-test a plan, taxonomy, workflow, or context model | `context-grill` |
+| Convert conversation into a long-running Codex task brief | `context-launch` |
 | Context updates, lesson capture, plan/NOW updates, closeout, reflection | `context-maintain` |
 
 This root skill is the front door and reference. Prefer invoking a companion
@@ -56,6 +58,7 @@ skill directly when the mode is obvious.
 | No `CONTEXT.md` at project root | Use `context-init` |
 | `CONTEXT.md` exists and the agent is starting/resuming | Use `context-catch-up` |
 | The user wants a plan challenged against docs, terms, and code | Use `context-grill` |
+| The user wants a long-running task brief or `/goal` for a fresh agent | Use `context-launch` |
 | The agent needs to update context, preserve a lesson, correction, plan, or session state | Use `context-maintain` |
 | Legacy v1 files exist without `CONTEXT.md` | Use `context-init` migration flow |
 
@@ -95,7 +98,7 @@ If legacy files exist but `CONTEXT.md` does not:
 
 1. Run context-gen.js for fresh Project/Structure
 2. Copy durable Learned Patterns into CONTEXT.md
-3. Ask user to distill conventions into 3 Never + 3 Always + 3 Objectives
+3. Ask user to distill 3 Never + 3 Always + 3 Objectives
 4. Merge active items from PLANS.md + FINDINGS.md into new PLAN.md
 5. Replace old agent instructions with the AGENTS.md Context Contract
 
@@ -110,7 +113,7 @@ If legacy files exist but `CONTEXT.md` does not:
 <!-- context-harness:schema v2 -->
 
 ## Project
-[Auto-generated: name, tech stack, description. One paragraph.]
+[Auto-generated: name, tech stack, description.]
 
 ## Structure
 [Auto-generated: directory tree, 5-10 lines.]
@@ -128,7 +131,7 @@ If legacy files exist but `CONTEXT.md` does not:
 3. [User-defined]
 
 ### Objectives
-<!-- Outcome-level project success. Prefer `<outcome> (<cmd> exits 0)`. Not hygiene. -->
+<!-- Outcome-level success. Prefer `<outcome> (<cmd> exits 0)`. Not hygiene. -->
 1. [Outcome-level success criterion]
 2. [Outcome-level success criterion]
 3. [Outcome-level success criterion]
@@ -140,7 +143,7 @@ If legacy files exist but `CONTEXT.md` does not:
 - Lint: [lint command]
 
 ## Language
-<!-- Durable human input + agent discoveries. Keep concise. -->
+<!-- Durable terms and agent discoveries. Keep concise. -->
 - **[Canonical term]**: [Definition]. Avoid: [ambiguous synonym].
 
 ## Relationships
@@ -150,7 +153,7 @@ If legacy files exist but `CONTEXT.md` does not:
 - [Resolved naming or meaning conflict.]
 
 ## Learned Patterns
-<!-- Reflection memory: lessons after corrections, loops, or failed attempts. -->
+<!-- Lessons after corrections, loops, or failed attempts. -->
 [Max 10 entries. Use `- When [context], [do/avoid] because [evidence].`]
 ```
 
@@ -263,13 +266,13 @@ Environment variables: `MAX_ITERATIONS=5`, `PASS_THRESHOLD=all`,
 
 ## Companion Scripts
 
-All scripts are Node.js and share helpers in `scripts/lib.js` (hook I/O,
-project-root walk, stack detection, markdown section parsing, command
-runner). Adding a new script? Import from `lib.js` — don't duplicate.
+All scripts are Node.js and share helpers in `scripts/lib.js`. Adding a script?
+Import from `lib.js`; don't duplicate hook I/O, root walk, stack detection, or
+markdown helpers.
 
 | Script | Purpose | When to use |
 |--------|---------|-------------|
-| `scripts/lib.js` | Shared helpers (hook input, stack detect, section read, runCheck) | Imported by every other script |
+| `scripts/lib.js` | Shared helpers | Imported by every other script |
 | `scripts/install-project.js` | Copy context-harness runtime scripts into a target repo | Init mode |
 | `scripts/codex-context-hook.js` | Codex lifecycle hook dispatcher for catch-up, init, and maintain nudges | Codex hooks |
 | `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware rule defaults | Init mode, Update mode |

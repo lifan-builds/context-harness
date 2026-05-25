@@ -426,12 +426,19 @@ if should_run "skill-packaging"; then
   it "ships context-grill as a separate skill"
   [ -f "$REPO_ROOT/context-grill/SKILL.md" ] && pass || fail "missing context-grill/SKILL.md"
 
+  it "ships context-launch as a separate skill"
+  [ -f "$REPO_ROOT/context-launch/SKILL.md" ] && pass || fail "missing context-launch/SKILL.md"
+
   it "keeps deprecated context-handoff compatibility stub"
   [ -f "$REPO_ROOT/context-handoff/SKILL.md" ] && pass || fail "missing context-handoff/SKILL.md"
 
   it "names the context-grill skill in frontmatter"
   output=$(sed -n '1,8p' "$REPO_ROOT/context-grill/SKILL.md" 2>&1)
   assert_contains "$output" "name: context-grill"
+
+  it "names the context-launch skill in frontmatter"
+  output=$(sed -n '1,8p' "$REPO_ROOT/context-launch/SKILL.md" 2>&1)
+  assert_contains "$output" "name: context-launch"
 
   it "names the context-handoff skill in frontmatter"
   output=$(sed -n '1,8p' "$REPO_ROOT/context-handoff/SKILL.md" 2>&1)
@@ -446,6 +453,12 @@ if should_run "skill-packaging"; then
 
   it "context-grill inspects code before asking"
   assert_contains "$(cat "$REPO_ROOT/context-grill/SKILL.md")" "inspect instead"
+
+  it "context-launch produces ready-to-paste Codex goals"
+  output=$(cat "$REPO_ROOT/context-launch/SKILL.md")
+  assert_contains "$output" "ready-to-paste Codex goal block"
+  assert_contains "$output" "Done Means"
+  assert_contains "$output" "Autonomy And Escalation"
 
   it "context-handoff is deprecated in favor of context-maintain"
   output=$(cat "$REPO_ROOT/context-handoff/SKILL.md")

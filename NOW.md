@@ -1,7 +1,7 @@
 # Now
 
 ## Current Focus
-Pushed and redeployed `context-launch` from GitHub main with Agent Nexus.
+Reduced repeated context-harness token surface without changing behavior.
 
 ## Active Blockers
 - None.
@@ -10,5 +10,5 @@ Pushed and redeployed `context-launch` from GitHub main with Agent Nexus.
 None.
 
 ## Session State
-- Last modified: 2026-05-26T02:18:24Z
-- Files touched: CONTEXT.md, NOW.md, README.md, SKILL.md, context-launch/SKILL.md, tests/run-all.sh
+- Last modified: 2026-05-26T17:29:24Z
+- Files touched: AGENTS.md, PLAN.md, NOW.md, context-maintain/SKILL.md, scripts/codex-context-hook.js, scripts/context-index.js

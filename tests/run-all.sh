@@ -476,6 +476,16 @@ if should_run "skill-packaging"; then
   it "routes skill-specific corrections back to skills"
   assert_contains "$(cat "$REPO_ROOT/context-maintain/SKILL.md")" "specific skill"
 
+  it "stages skill workflow corrections before mutation"
+  output=$(cat "$REPO_ROOT/context-maintain/SKILL.md")
+  assert_contains "$output" "skill patch candidate"
+  assert_contains "$output" "Do not edit \`SKILL.md\` directly from reflection"
+
+  it "requires approval before skill mutation"
+  output=$(cat "$REPO_ROOT/context-maintain/SKILL.md")
+  assert_contains "$output" "explicit approval"
+  assert_contains "$output" "canonical skill source"
+
   it "requires duplicate and conflict checks before durable memory"
   assert_contains "$(cat "$REPO_ROOT/context-maintain/SKILL.md")" "duplicates or contradictions"
 

@@ -51,6 +51,8 @@ scripts/
 - `context-launch` is separate from `context-maintain` because its output is a ready-to-run task prompt for another agent, not ordinary context preservation.
 - Local agent-nexus deployment should use `context-grill` instead of Matt Pocock's `grill-with-docs`.
 - `AGENTS.md` is the small activation layer; `CONTEXT.md` is the durable source of truth, indexed into `AGENTS.md` by `scripts/context-index.js`.
+- Skill self-improvement may propose and validate candidate patches, but modifying a skill requires explicit user approval.
+- The source copy in this repository is canonical for context-harness skills; installed/local copies are deployment targets or user-private forks, not the default place for accepted upstream improvements.
 
 ## Flagged Ambiguities
 - Update/capture/plan/end are not separate skills; they belong under `context-maintain`.
@@ -68,3 +70,4 @@ scripts/
 - When migrating existing projects to a new context-harness contract, prefer model-led edits over bulk migration scripts because each repo may have local AGENTS.md conventions that need judgment.
 - For backward compatibility, generated context files should carry a lightweight schema/version marker and new skills should model-led upgrade older or partial context files instead of assuming the latest AGENTS.md contract is already present.
 - When a workflow feels like low-value process, deprecate it instead of keeping it in the preferred skill path; `context-handoff` now remains only as a compatibility stub.
+- When using SkillOpt-style self-improvement, separate proposal from mutation: collect evidence and validation, ask the user for approval, then update the canonical skill source rather than silently editing installed copies.

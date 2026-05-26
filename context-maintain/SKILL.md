@@ -10,36 +10,25 @@ allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
 
 # Context Maintain
 
-Use this for everything after init, catch-up, and grill: update context, capture
-lessons, maintain `PLAN.md`, close out `NOW.md`, and run Reflect Mode after
-corrections or failed attempts.
+Use this after init, catch-up, and grill to update context, capture lessons,
+maintain `PLAN.md`, close `NOW.md`, or reflect after corrections/failures.
 
 ## Trigger
 
-Use this skill when any of these happen:
-
-- The repo structure, workflow, dependency stack, or project rules changed.
-- The user teaches a durable term, invariant, workflow, or constraint.
-- You need to update task progress, findings, decisions, or closeout state.
-- The human corrects the same behavior more than once.
-- You have made two failed attempts at the same task.
-- Tool output contradicts your expectation.
-- You realize you ignored `CONTEXT.md`, `NOW.md`, `PLAN.md`, or an explicit user
-  instruction.
-- The user says "remember this", "don't do that again", "always", "never",
-  "use X instead", or "that's wrong."
-- You are ending a session and need to update `NOW.md`.
+Use this when structure, workflow, dependencies, rules, progress, findings,
+decisions, or closeout state changed; the user teaches durable context; repeated
+correction/failure happens; tool output contradicts expectations; you ignored
+context or instructions; the user says "remember", "always", "never", "use X",
+or "that's wrong"; or you are ending and need to update `NOW.md`.
 
 For ordinary uncertainty before the first attempt, inspect or ask instead.
 
 ## Maintain Loop
 
 1. Read `NOW.md`, then `CONTEXT.md`.
-2. Decide whether the information is durable project context or task-local
-   working state.
+2. Classify information as durable context or task-local state.
 3. Update the smallest appropriate section.
-4. If `CONTEXT.md` changed, run `node scripts/context-index.js update` to keep
-   the `AGENTS.md` index current.
+4. If `CONTEXT.md` changed, run `node scripts/context-index.js update`.
 5. Prune stale or duplicate entries instead of appending forever.
 6. Run the project's verification command when the change affects behavior.
 
@@ -56,8 +45,7 @@ Only high and repeated medium signals are durable-memory candidates.
 ## Reflect Mode
 
 1. Stop the automatic retry.
-2. Reconstruct the trace from files, tests, tool output, or the human
-   correction.
+2. Reconstruct the trace from files, tests, tools, or the correction.
 3. Name the bad assumption in one sentence.
 4. Classify the signal: explicit rule, direct correction, repeated pattern,
    strong approval, or low-confidence observation.
@@ -76,20 +64,16 @@ Only high and repeated medium signals are durable-memory candidates.
 | Durable process lesson | `CONTEXT.md` `## Learned Patterns` |
 | New term or naming correction | `CONTEXT.md` `## Language` |
 | Domain invariant or relationship | `CONTEXT.md` `## Relationships` |
-| Correction to a specific skill workflow | That skill's `SKILL.md` |
+| Correction to a specific skill workflow | `PLAN.md` skill patch candidate first; after approval, that skill's `SKILL.md` |
 | Personal/global preference | Ask; this repo has no global memory target |
 
 Only use ADR files when the target project already has an ADR convention.
 
 ## Durable Lessons
 
-Write a lesson down only when it is likely to matter later:
-
-- Missed project convention
-- Repeated failure pattern
-- New human preference or constraint
-- Surprising tool, framework, or domain behavior
-- Skill workflow correction
+Write lessons only for missed conventions, repeated failures, new preferences
+or constraints, surprising tool/framework/domain behavior, or skill workflow
+corrections.
 
 Do not record routine mistakes, temporary errors, secrets, private emotional
 color, or unredacted command output.
@@ -103,26 +87,32 @@ Preferred format:
 - When [context], [do/avoid action] because [evidence or failure prevented].
 ```
 
+## Skill Improvement Mode
+
+Use only when evidence points at the skill workflow itself: repeated confusion,
+direct correction, two failed attempts, or validation showing skill-caused bad
+behavior.
+
+1. Do not edit `SKILL.md` directly from reflection.
+2. Write a `PLAN.md` skill patch candidate: target skill, problem, evidence,
+   edit operations (`append`, `insert_after`, `replace`, `delete`), checks,
+   status.
+3. Validate with the narrowest checks. In this repo include `tests/run-all.sh`
+   and skill packaging checks.
+4. Ask the user for explicit approval before mutating any skill file.
+5. If approved upstream, update the canonical skill source in this repository.
+   Edit an installed/local copy only when the user explicitly asks for a local
+   override.
+6. Record accepted or rejected candidates in `PLAN.md` so future attempts do
+   not repeat bad patches.
+
 ## Session Closeout
 
-Before ending work in a context-harness repo:
-
-1. Rewrite `NOW.md` with current focus, blockers, immediate next step, ISO
-   timestamp, and touched files.
-2. If `CONTEXT.md` changed, refresh the `AGENTS.md` index with
-   `node scripts/context-index.js update`.
-3. If `PLAN.md` exists and exceeds 150 lines, summarize completed items into
-   `## Archive` and remove them from `## Progress`.
-4. Keep `NOW.md` under 20 lines.
-
-You may use:
+Before ending: rewrite `NOW.md` with focus, blockers, next step, ISO timestamp,
+and touched files; refresh the `AGENTS.md` index if `CONTEXT.md` changed; prune
+completed `PLAN.md` progress into `## Archive` when over 150 lines; keep
+`NOW.md` under 20 lines.
 
 ```bash
 node scripts/session-end.js
-```
-
-or, from an installed companion skill directory:
-
-```bash
-node ../scripts/session-end.js
 ```

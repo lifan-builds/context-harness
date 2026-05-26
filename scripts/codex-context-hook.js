@@ -38,8 +38,8 @@ function runCatchUp(startDir) {
     [
       "context-harness detected.",
       needsUpgrade
-        ? "Before planning or editing, use context-catch-up Compatibility Upgrade. Preserve local context, add the current schema marker, install runtime scripts, and refresh the AGENTS.md Context Index."
-        : "Before planning or editing, use context-catch-up: read NOW.md first, then read relevant CONTEXT.md sections from AGENTS.md.",
+        ? "Before planning/editing: use context-catch-up Compatibility Upgrade; preserve context, add schema marker, install scripts, refresh AGENTS index."
+        : "Before planning/editing: use context-catch-up; read NOW.md, then relevant AGENTS-indexed CONTEXT.md sections.",
       now ? `Current NOW.md:\n${now}` : "",
     ]
       .filter(Boolean)
@@ -56,8 +56,8 @@ function runInit(startDir) {
   emitAdditionalContext(
     [
       "No context-harness files were found for this project.",
-      "Before substantial project work, use context-init to create AGENTS.md, CONTEXT.md, NOW.md, and optional PLAN.md.",
-      "If the user only asked for a tiny one-off command, continue without initialization.",
+      "Before substantial work: use context-init to create AGENTS.md, CONTEXT.md, NOW.md, optional PLAN.md.",
+      "For tiny one-off commands, continue without initialization.",
     ].join("\n")
   );
 }
@@ -68,10 +68,9 @@ function runMaintain(startDir) {
 
   emitAdditionalContext(
     [
-      "Before ending after a substantial task, use context-maintain.",
-      "Update NOW.md with current focus, blockers, next step, and touched files.",
-      "Route durable terms, rules, relationships, and repeated lessons to CONTEXT.md; route task-local findings and decisions to PLAN.md.",
-      "If CONTEXT.md changed, refresh AGENTS.md with `node scripts/context-index.js update`.",
+      "Before ending substantial work: use context-maintain.",
+      "Update NOW.md; route durable info to CONTEXT.md and task-local info to PLAN.md.",
+      "If CONTEXT.md changed, run `node scripts/context-index.js update`.",
     ].join("\n")
   );
 }

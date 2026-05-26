@@ -1,14 +1,14 @@
 # Now
 
 ## Current Focus
-Deployed `context-launch` locally to Codex with Agent Nexus.
+Pushed and redeployed `context-launch` from GitHub main with Agent Nexus.
 
 ## Active Blockers
 - None.
 
 ## Immediate Next Step
-Commit and push the new skill when ready.
+None.
 
 ## Session State
-- Last modified: 2026-05-24T18:49:58Z
+- Last modified: 2026-05-26T02:18:24Z
 - Files touched: CONTEXT.md, NOW.md, README.md, SKILL.md, context-launch/SKILL.md, tests/run-all.sh

@@ -172,12 +172,12 @@ function checkHarness(context) {
 
   if (now.trim()) {
     const nowLines = now.trimEnd().split("\n").length;
-    if (nowLines > 20) failures.push(`NOW.md has ${nowLines} lines; keep it under 20.`);
+    if (nowLines > 20) warnings.push(`NOW.md has ${nowLines} lines; consider a Dream/Compact pass.`);
   }
 
   if (plan.trim()) {
     const planLines = plan.trimEnd().split("\n").length;
-    if (planLines > 150) failures.push(`PLAN.md has ${planLines} lines; prune or archive completed work.`);
+    if (planLines > 150) warnings.push(`PLAN.md has ${planLines} lines; consider a Dream/Compact pass.`);
   }
 
   for (const warning of warnings) console.log(`WARN ${warning}`);

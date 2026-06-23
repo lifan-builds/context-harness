@@ -72,6 +72,7 @@ console.log("- Keep `AGENTS.md` as the always-read Context Contract for Codex an
 console.log("- Add domain terms, canonical names, relationships, and resolved ambiguities to `CONTEXT.md` `## Language`.");
 console.log("- Keep ordinary decisions in `PLAN.md`; use ADRs only when the project already has an ADR workflow.");
 console.log("- For multi-context repositories, add `CONTEXT-MAP.md` only when one root `CONTEXT.md` becomes ambiguous.");
+console.log("- Treat `.context-harness/DREAM.md` as an audit log only; do not read it during normal catch-up or task work.");
 
 // ---------------------------------------------------------------------------
 

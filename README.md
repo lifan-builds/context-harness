@@ -65,7 +65,7 @@ catch-all skill:
 | `context-init` | Initialize a new repo or migrate legacy v1 context files |
 | `context-catch-up` | Let a fresh or resumed agent recover current project state |
 | `context-launch` | Convert the current conversation into a long-running Codex task brief |
-| `context-maintain` | Maintain context during active work, including plan stress-tests, Reflect Mode, and Dream/Compact Mode |
+| `context-maintain` | Maintain context during active work, including plan stress-tests, Reflect Mode, and automatic Dream/Compact consideration |
 
 `context-grill` is deprecated. Its useful pressure-testing behavior now lives in
 `context-maintain`, and the old skill remains only as a compatibility stub.
@@ -103,12 +103,12 @@ Scripts are invoked the same way on every platform: `node <skill-dir>/scripts/<n
 
 ## What It Generates
 
-| File | Purpose | Max Lines |
+| File | Purpose | Hygiene Target |
 |------|---------|-----------|
 | `AGENTS.md` | Always-read contract plus generated `CONTEXT.md` index | 40 |
 | `CONTEXT.md` | Project info, rules, workflow, terms, learned patterns | 80 |
-| `NOW.md` | Working memory: current focus, blockers, next step | 20 |
-| `PLAN.md` | On-demand living plan for multi-step work | 150 |
+| `NOW.md` | Working memory: current focus, blockers, next step | concise |
+| `PLAN.md` | On-demand living plan for multi-step work | active state only |
 | `CONTEXT-MAP.md` | Optional map for multi-context repos | — |
 
 `CONTEXT.md` also includes optional durable memory sections:
@@ -148,7 +148,7 @@ project-root walk, stack detection, markdown section parsing, command runner).
 | `scripts/migrate-project.js` | Batch migrate schema v2 projects to v3; not installed into target repos |
 | `scripts/guard.js` | Security: block `--no-verify`, detect secrets, protect linter configs |
 | `scripts/format-on-edit.js` | Auto-format files after edits (Biome, Prettier, Ruff, gofmt) |
-| `scripts/session-end.js` | Stamp NOW.md, prune PLAN.md when >150 lines |
+| `scripts/session-end.js` | Stamp NOW.md; best-effort prune of completed PLAN.md items when very long |
 | `scripts/task.js` | Task switcher — rewrites NOW.md; logs to PLAN.md Progress |
 | `scripts/eval-loop.js` | Deprecated legacy v2 evaluator; install with `--profile legacy` |
 
@@ -210,9 +210,27 @@ stub for explicit legacy requests. Its useful behavior moved into
 agent's direction, then route resolved terms, constraints, and decisions to the
 right context file.
 
-`context-maintain` includes Reflect Mode for repeated mistakes and
-Dream/Compact Mode for post-task consolidation. Maintenance-like actions such
-as update, capture, plan, and end are intentionally not separate skills.
+`context-maintain` includes Reflect Mode for repeated mistakes and automatic
+Dream/Compact consideration after maintenance events. Every maintain run asks
+whether future catch-up would be materially easier after consolidation. If yes,
+the agent edits context files directly, compacts active state, promotes only
+durable lessons, and writes an audit entry to `.context-harness/DREAM.md`.
+Skipped checks are not logged. Maintenance-like actions such as update,
+capture, plan, and end are intentionally not separate skills.
+
+### Dream Log
+
+`.context-harness/DREAM.md` is created lazily only after a Dream/Compact pass
+actually edits context files. It is an intent log, not a patch transcript:
+trigger, changed files, what was compacted, what was promoted, what was removed
+or archived, and uncertainty.
+
+Dream logs are intended to be git-tracked unless the project explicitly treats
+operational logs as private. They must not contain secrets, raw transcripts,
+raw web/API output, or large copied sections.
+
+Agents must not read `.context-harness/DREAM.md` during normal catch-up or task
+work. Use it only for debugging context drift or later human review.
 
 `context-catch-up` includes Compatibility Upgrade for existing repos. It
 preserves project-specific context, replaces only old harness boilerplate,

@@ -53,6 +53,8 @@ scripts/
 - `context-maintain` includes the old standalone reflection workflow as Reflect Mode.
 - `context-maintain` includes the old `context-grill` pressure-testing workflow as Plan Stress-Test.
 - `context-launch` is separate from `context-maintain` because its output is a ready-to-run task prompt for another agent, not ordinary context preservation.
+- `context-maintain` owns automatic Dream/Compact consideration after maintenance events; Dream edits context directly when useful and logs intent to `.context-harness/DREAM.md`.
+- `.context-harness/DREAM.md` is a non-operational audit log for debugging context drift or human review; agents must not read it during normal catch-up or task work.
 - Local agent-nexus deployment should use this repository's canonical source and `context-maintain` instead of Matt Pocock's `grill-with-docs`.
 - `AGENTS.md` is the small activation layer; `CONTEXT.md` is the durable source of truth, indexed into `AGENTS.md` by `scripts/context-index.js`.
 - Skill self-improvement may propose and validate candidate patches, but modifying a skill requires explicit user approval.
@@ -78,3 +80,4 @@ scripts/
 - When a workflow feels like low-value process, deprecate it instead of keeping it in the preferred skill path; `context-handoff` now remains only as a compatibility stub.
 - When a workflow feels like low-value process, fold its useful behavior into an existing skill and leave only a compatibility stub; `context-grill` now routes to `context-maintain` Plan Stress-Test.
 - When using SkillOpt-style self-improvement, separate proposal from mutation: collect evidence and validation, ask the user for approval, then update the canonical skill source rather than silently editing installed copies.
+- When adapting Claude Code-style auto memory, use semantic model judgment inside `context-maintain` instead of hard counters or line limits; keep the result visible in markdown and keep audit history separate from operational context.

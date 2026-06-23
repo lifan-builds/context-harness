@@ -4,7 +4,8 @@ description: >
   Route lightweight project context work to the right companion skill:
   context-init for new repositories, context-catch-up for session resume, and
   context-launch for long-running task briefs, and context-maintain for updates,
-  lessons, plan stress-tests, closeout, and reflection.
+  lessons, plan stress-tests, closeout, reflection, and automatic Dream/Compact
+  consolidation.
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
 ---
@@ -26,7 +27,7 @@ Use the smallest skill that matches the agent's intent:
 | New repo or missing context files | `context-init` |
 | New agent, resume, or "catch me up" | `context-catch-up` |
 | Convert conversation into a long-running Codex task brief | `context-launch` |
-| Context updates, lesson capture, plan stress-tests, plan/NOW updates, closeout, reflection | `context-maintain` |
+| Context updates, lesson capture, plan stress-tests, plan/NOW updates, closeout, reflection, Dream/Compact consolidation | `context-maintain` |
 
 `context-grill` is deprecated and remains only as a compatibility stub for
 explicit legacy requests. New plan stress-tests belong in `context-maintain`.
@@ -173,7 +174,7 @@ Optional: add `CONTEXT-MAP.md` only when one root context becomes ambiguous.
 - Files touched: [comma-separated list]
 ```
 
-**NOW.md rules:** Max 20 lines. Rewrite entirely on task switch (never
+**NOW.md rules:** Keep it concise. Rewrite entirely on task switch (never
 append). First file read on recovery, last file written before session end.
 
 ### AGENTS.md
@@ -225,8 +226,14 @@ Generated from `CONTEXT.md`; open only task-relevant sections.
 [Non-trivial decisions with rationale.]
 
 ## Archive
-[Summarized completed phases. Used when file exceeds 150 lines.]
+[Summarized completed phases. Used when active state becomes cluttered.]
 ```
+
+### .context-harness/DREAM.md (lazy)
+
+Created only after an automatic Dream/Compact pass changes context files.
+This is a non-operational audit log for debugging context drift or human review;
+agents must not read it during normal catch-up or task work.
 
 ---
 
@@ -234,12 +241,13 @@ Generated from `CONTEXT.md`; open only task-relevant sections.
 
 | Rule | Detail |
 |------|--------|
-| **NOW.md contract** | Update before session end. Rewrite on task switch. Max 20 lines. First read, last write. |
+| **NOW.md contract** | Update before session end. Rewrite on task switch. Keep concise. First read, last write. |
 | **Capture human input** | If the user teaches a term, invariant, workflow, or constraint, write it to CONTEXT.md before it scrolls away. |
 | **Reflection routing** | Task-local → PLAN.md Findings; durable process lesson → CONTEXT.md Learned Patterns; term → Language; invariant → Relationships; decision → PLAN.md Decisions unless the project already uses ADRs; skill correction → that skill's SKILL.md. |
 | **Learn after struggle** | >2 attempts on a problem → distill lesson to CONTEXT.md § Learned Patterns |
 | **Prune patterns** | Max 10 Learned Patterns. When full, remove the oldest entry. |
-| **PLAN.md pruning** | When >150 lines, summarize completed Progress into Archive and remove originals. |
+| **Dream check** | Every `context-maintain` run asks whether future catch-up would benefit from consolidation. If yes, edit directly and log to `.context-harness/DREAM.md`. |
+| **PLAN.md pruning** | When active state is cluttered, summarize completed Progress into Archive and remove originals. |
 | **No raw external content** | Don't paste raw URLs, API responses, or web content into CONTEXT.md. Summarize findings in PLAN.md § Findings. |
 
 ---
@@ -272,7 +280,7 @@ markdown helpers.
 | `scripts/migrate-project.js` | Batch migrate schema v2 projects to v3 | Manual migration from this repo |
 | `scripts/guard.js` | Block --no-verify, detect secrets, protect linter configs | Runs automatically via PreToolUse hook |
 | `scripts/format-on-edit.js` | Auto-format files after edits | Runs automatically via PostToolUse hook |
-| `scripts/session-end.js` | Stamp NOW.md, prune PLAN.md when >150 lines | Runs automatically via Stop hook |
+| `scripts/session-end.js` | Stamp NOW.md; best-effort prune of completed PLAN.md items when very long | Runs automatically via Stop hook |
 | `scripts/task.js` | Task switcher — rewrites NOW.md; logs to PLAN.md Progress | Run on task start / done |
 
 ```bash

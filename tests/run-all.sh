@@ -492,7 +492,7 @@ EOF
   output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1); rc=$?
   [ "$rc" -eq 1 ] && echo "$output" | grep -q "missing ## Structure" && pass || fail "expected missing section failure: $output"
 
-  it "check fails on oversized PLAN.md"
+  it "check warns but passes on oversized PLAN.md"
   setup_tmpdir
   cat > "$TMPDIR_ROOT/CONTEXT.md" << 'EOF'
 # Context
@@ -522,7 +522,7 @@ EOF
   for i in $(seq 1 151); do echo "line $i"; done > "$TMPDIR_ROOT/PLAN.md"
   (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
   output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1); rc=$?
-  [ "$rc" -eq 1 ] && echo "$output" | grep -q "PLAN.md has" && pass || fail "expected PLAN size failure: $output"
+  [ "$rc" -eq 0 ] && echo "$output" | grep -q "WARN PLAN.md has" && pass || fail "expected PLAN size warning: $output"
 
   it "check warns but passes for legacy schema v2"
   setup_tmpdir
@@ -772,9 +772,9 @@ if should_run "skill-packaging"; then
   assert_contains "$output" "Use \`context-maintain\` instead"
   assert_contains "$output" "4,000 characters"
 
-  it "keeps the context-maintain skill concise"
+  it "keeps the context-maintain skill reasonably concise"
   words=$(wc -w < "$REPO_ROOT/context-maintain/SKILL.md")
-  [ "$words" -le 900 ] && pass || fail "expected <= 900 words, got $words"
+  [ "$words" -le 1300 ] && pass || fail "expected <= 1300 words, got $words"
 
   it "includes correction confidence guidance"
   assert_contains "$(cat "$REPO_ROOT/context-maintain/SKILL.md")" "Confidence"
@@ -797,6 +797,17 @@ if should_run "skill-packaging"; then
 
   it "prevents private raw data from being stored as memory"
   assert_contains "$(cat "$REPO_ROOT/context-maintain/SKILL.md")" "unredacted command output"
+
+  it "makes Dream consideration automatic"
+  output=$(cat "$REPO_ROOT/context-maintain/SKILL.md")
+  assert_contains "$output" "automatic semantic consolidation check"
+  assert_contains "$output" "Should Dream Check"
+
+  it "logs Dream edits outside operational context"
+  output=$(cat "$REPO_ROOT/context-maintain/SKILL.md")
+  assert_contains "$output" ".context-harness/DREAM.md"
+  assert_contains "$output" "must not be used as instructions"
+  assert_contains "$output" "Do not read it during normal catch-up"
 fi
 
 # =============================

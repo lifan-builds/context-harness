@@ -1,10 +1,11 @@
 # context-harness
 
-4 files, 9 rules, zero ceremony.
+4 files, lean rules, zero ceremony.
 
 A portable context framework for AI coding agents. Generates `AGENTS.md`,
 `CONTEXT.md`, `NOW.md`, `PLAN.md` and ships Node.js scripts that do the
-mechanical work: stack detection, decision capture, session stamping, eval loops.
+mechanical work: stack detection, decision capture, session stamping, checks,
+and migration.
 
 context-harness is my answer to a simple lesson from studying serious agent
 skill systems: skills are compressed patterns. The best move is not to copy a
@@ -38,7 +39,7 @@ PLAN.md     # optional living plan for multi-step work
 ```
 
 Generated `AGENTS.md` and `CONTEXT.md` include
-`<!-- context-harness:schema v2 -->`. Newer context-harness skills use that
+`<!-- context-harness:schema v3 -->`. Newer context-harness skills use that
 marker to detect older or partial layouts and run a model-led Compatibility
 Upgrade on first catch-up.
 
@@ -49,7 +50,8 @@ Upgrade on first catch-up.
 - Your harness should teach your own agent to self-iterate inside your workflow.
 - 4 behavioral principles > 50 process rules
 - Core rules apply everywhere before project-specific rules
-- User-defined constraints (3 Never + 3 Always + 3 Objectives) keep the agent aligned
+- User-defined Never/Always rules keep the agent aligned
+- Verification belongs in Workflow and task-local PLAN.md Done Criteria
 - Durable human input and agent discoveries belong on disk before they scroll away
 - `AGENTS.md` activates the contract and indexes `CONTEXT.md`; scripts do real work
 
@@ -62,9 +64,11 @@ catch-all skill:
 |---|---|
 | `context-init` | Initialize a new repo or migrate legacy v1 context files |
 | `context-catch-up` | Let a fresh or resumed agent recover current project state |
-| `context-grill` | Stress-test a plan, taxonomy, workflow, or context model against docs and code |
 | `context-launch` | Convert the current conversation into a long-running Codex task brief |
-| `context-maintain` | Maintain context during active work, including Reflect Mode after corrections or failed attempts |
+| `context-maintain` | Maintain context during active work, including plan stress-tests, Reflect Mode, and Dream/Compact Mode |
+
+`context-grill` is deprecated. Its useful pressure-testing behavior now lives in
+`context-maintain`, and the old skill remains only as a compatibility stub.
 
 The important change is the shape: split by the agent's intent at invocation,
 not by every tiny maintenance action. Update, capture, plan, closeout, and
@@ -74,7 +78,7 @@ ongoing memory workflow.
 ## Core Rules
 
 These rules apply to every project using context-harness. Project-specific
-Never / Always / Objectives add local constraints on top.
+Never / Always rules add local constraints on top.
 
 1. **Tool-native first** — Prefer CLI, MCP tools, or skills over browser
    automation whenever they can accomplish the task. Reserve browser automation
@@ -102,7 +106,7 @@ Scripts are invoked the same way on every platform: `node <skill-dir>/scripts/<n
 | File | Purpose | Max Lines |
 |------|---------|-----------|
 | `AGENTS.md` | Always-read contract plus generated `CONTEXT.md` index | 40 |
-| `CONTEXT.md` | Project info + your 9 rules + learned patterns | 80 |
+| `CONTEXT.md` | Project info, rules, workflow, terms, learned patterns | 80 |
 | `NOW.md` | Working memory: current focus, blockers, next step | 20 |
 | `PLAN.md` | On-demand living plan for multi-step work | 150 |
 | `CONTEXT-MAP.md` | Optional map for multi-context repos | — |
@@ -137,24 +141,25 @@ project-root walk, stack detection, markdown section parsing, command runner).
 | Script | Purpose |
 |--------|---------|
 | `scripts/lib.js` | Shared helpers imported by everything else |
-| `scripts/install-project.js` | Copy context-harness runtime scripts into a target repo |
+| `scripts/install-project.js` | Copy default runtime scripts; `--profile legacy` includes ADR/eval tools |
 | `scripts/codex-context-hook.js` | Codex lifecycle hook dispatcher for catch-up, init, and maintain nudges |
 | `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware rule defaults |
-| `scripts/context-index.js` | Refresh AGENTS.md index; list/query/print CONTEXT.md sections |
+| `scripts/context-index.js` | Refresh AGENTS.md index; list/query/print/check CONTEXT.md sections |
+| `scripts/migrate-project.js` | Batch migrate schema v2 projects to v3; not installed into target repos |
 | `scripts/guard.js` | Security: block `--no-verify`, detect secrets, protect linter configs |
 | `scripts/format-on-edit.js` | Auto-format files after edits (Biome, Prettier, Ruff, gofmt) |
 | `scripts/session-end.js` | Stamp NOW.md, prune PLAN.md when >150 lines |
 | `scripts/task.js` | Task switcher — rewrites NOW.md; logs to PLAN.md Progress |
-| `scripts/eval-loop.js` | GAN-style evaluator: check work against your 3 Objectives |
+| `scripts/eval-loop.js` | Deprecated legacy v2 evaluator; install with `--profile legacy` |
 
 Hook scripts read their payload from the `TOOL_INPUT` env var or from stdin
 (pipe-friendly for Codex hooks, Cursor, Claude Code, and custom harnesses).
 
-## The 9 Rules Framework
+## Rules And Verification
 
-You define project-specific rules across 3 categories. Suggested Always rules
-include the Core Rules, so some generated contexts may start with more than 9
-total rules when the global layer is counted.
+You define project-specific rules across two durable categories. Suggested
+Always rules include the Core Rules, so generated contexts may start with more
+than six total rules when the global layer is counted.
 
 **Never** (hard constraints the agent must not violate)
 ```
@@ -170,22 +175,22 @@ total rules when the global layer is counted.
 3. Always run the linter before committing
 ```
 
-**Objectives** (mid-to-high level outcomes — what "done" means for the project)
+**Workflow Verification** (commands or checks the agent should run when
+relevant)
 ```
-1. CLI users complete the core workflow on a fresh install (tests/smoke.sh exits 0)
-2. API p95 latency stays under 200ms at expected load (scripts/perf-check.js exits 0)
-3. Docs cover every public entry point (scripts/doc-coverage.js exits 0)
+- Test command exits 0
+- Lint/typecheck command exits 0
+- Changed UI or CLI workflow is manually smoke checked when automation is absent
 ```
 
-Objectives are **outcome-level**, not dev hygiene. "All tests pass" or
-"no type errors" belong in **Always** (process habits). An Objective should
-answer: "if all of these hold, has the project succeeded at its purpose?"
-Push for verifiable form (a command, metric, or check) whenever feasible —
-observable-only is OK if automation isn't.
+Task-specific outcomes live in `PLAN.md` `## Done Criteria`, not in durable
+project-wide Objectives. Schema v2 Objectives are preserved as legacy context
+during migration; command-based Objectives are moved into Workflow
+Verification.
 
 `context-gen.js` prefills stack-specific Never/Always defaults (TypeScript
 gets `tsc --noEmit`, Python gets `ruff check`, Go gets `go vet`, etc.).
-Objectives are project-specific and are not auto-filled — you write them.
+It also suggests verification commands for `CONTEXT.md` `## Workflow`.
 
 ## Companion Skills
 
@@ -196,20 +201,18 @@ split by invocation intent:
 |---|---|
 | `context-init` | A repo is new to context-harness or needs v1 migration |
 | `context-catch-up` | A new agent or resumed session needs to read durable context |
-| `context-grill` | A plan, taxonomy, workflow, or context model needs to be stress-tested against docs and code |
 | `context-launch` | The current conversation should become a long-running Codex goal for a fresh agent |
-| `context-maintain` | Work is underway and the agent needs to update context, capture lessons, maintain plan state, close out, or reflect after a correction |
+| `context-maintain` | Work is underway and the agent needs to update context, capture lessons, stress-test a plan, maintain plan state, close out, or reflect after a correction |
 
-`context-grill` borrows the strongest idea from Matt Pocock's `grill-me`: walk
-the decision tree one sharp question at a time, include a recommended answer,
-and inspect the code when the answer is discoverable. The context-harness
-version adds a stricter filter: ask the user only where human judgment changes
-the agent's direction, then route resolved terms, constraints, and decisions to
-the right context file.
+`context-grill` is deprecated. It remains only as a non-invocable compatibility
+stub for explicit legacy requests. Its useful behavior moved into
+`context-maintain`: inspect first, ask only where human judgment changes the
+agent's direction, then route resolved terms, constraints, and decisions to the
+right context file.
 
-`context-maintain` includes Reflect Mode for repeated mistakes, loops, failed
-attempts, and human corrections. Maintenance-like actions such as update,
-capture, plan, and end are intentionally not separate skills.
+`context-maintain` includes Reflect Mode for repeated mistakes and
+Dream/Compact Mode for post-task consolidation. Maintenance-like actions such
+as update, capture, plan, and end are intentionally not separate skills.
 
 `context-catch-up` includes Compatibility Upgrade for existing repos. It
 preserves project-specific context, replaces only old harness boilerplate,
@@ -271,11 +274,19 @@ target repo so `AGENTS.md` can use project-local commands such as
 node scripts/context-index.js update
 node scripts/context-index.js query "term"
 node scripts/context-index.js section "Rules"
+node scripts/context-index.js check
 ```
 
-**Evaluate** — run the eval loop against your Objectives:
+**Legacy eval loop** — only for schema v2 repos that still use Objectives:
 ```bash
-node <skill-dir>/context-harness/scripts/eval-loop.js
+node <skill-dir>/context-harness/scripts/install-project.js --profile legacy
+node scripts/eval-loop.js
+```
+
+**Batch migrate** — dry-run first, then apply:
+```bash
+node <skill-dir>/context-harness/scripts/migrate-project.js --root /Users/lfan/Project
+node <skill-dir>/context-harness/scripts/migrate-project.js --root /Users/lfan/Project --write
 ```
 
 **Switch tasks** — rewrites NOW.md atomically:
@@ -299,16 +310,22 @@ skills.
 Each harness should wire these scripts through its native plugin/config layer
 rather than depending on SKILL.md frontmatter.
 
-## Migration from v1
+## Migration
 
 If you have existing v1 files (AGENTS.md, PLANS.md, FINDINGS.md, EVALUATION.md),
 invoke the skill and it will offer to migrate — pulling learned patterns,
 active tasks, and conventions into the new 3-file structure.
 
+For schema v2 repos, `migrate-project.js` upgrades schema markers, moves
+command Objectives into Workflow Verification, preserves manual Objectives as
+Legacy Objectives, refreshes `AGENTS.md`, and installs the default lean script
+profile. Dirty git worktrees are skipped unless `--include-dirty` is passed.
+
 ## Token Budget
 
-| | v1 | v2 | Reduction |
+| | v1 | v3 | Reduction |
 |---|---|---|---|
 | Instruction footprint | ~813 lines | ~300 lines | **63%** |
 | Files generated | 6 | 3–4 | **33–50%** |
 | Per-prompt instruction load | ~30 lines + noise | AGENTS.md contract + tiny context files | **cleaner** |
+| Default installed scripts | — | 9 | **lean default** |

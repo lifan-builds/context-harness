@@ -14,7 +14,8 @@ context-harness files.
 
 Before ordinary catch-up, inspect `AGENTS.md`, `CONTEXT.md`, and `NOW.md` for:
 
-- `<!-- context-harness:schema v2 -->` in generated context files.
+- `<!-- context-harness:schema v2 -->` or
+  `<!-- context-harness:schema v3 -->` in generated context files.
 - A small `AGENTS.md` Context Contract plus generated Context Index.
 - Required `CONTEXT.md` sections: Project, Structure, Rules, Workflow,
   Language, Relationships, Flagged Ambiguities, Learned Patterns.
@@ -44,7 +45,9 @@ Upgrade through model-led edits, not bulk rewrite:
 6. Run `node scripts/context-index.js update`.
 7. Show the user a short upgrade summary before continuing.
 
-Ask only when project intent, durable rules, or Objectives cannot be inferred.
+Ask only when project intent or durable rules cannot be inferred. For legacy
+Objectives, preserve the content; migrate command checks to Workflow
+Verification only when explicitly upgrading to schema v3.
 
 ## Read Order
 

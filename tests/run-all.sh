@@ -258,9 +258,12 @@ EOF
   output=$(node "$CONTEXT_GEN" "$TMPDIR_ROOT" 2>&1)
   assert_contains "$output" "go test ./..."
 
-  it "does NOT auto-fill Objectives with hygiene checks"
-  # Objectives should be placeholder prompts, not "All tests pass" style.
-  assert_not_contains "$output" "All tests pass"
+  it "does not emit an Objectives section"
+  assert_not_contains "$output" "### Objectives"
+
+  it "emits Suggested Workflow verification"
+  assert_contains "$output" "## Suggested Workflow"
+  assert_contains "$output" "### Verification"
 
   it "detects existing ADR decision memory"
   setup_tmpdir
@@ -299,6 +302,21 @@ if should_run "install-project"; then
 
   it "copies Codex context hook dispatcher"
   [ -f "$TMPDIR_ROOT/scripts/codex-context-hook.js" ] && pass || fail "missing copied codex-context-hook.js"
+
+  it "installs 9 default scripts"
+  count=$(find "$TMPDIR_ROOT/scripts" -type f | wc -l | tr -d ' ')
+  [ "$count" -eq 9 ] && pass || fail "expected 9 scripts, got $count"
+
+  it "does not install legacy eval-loop by default"
+  [ ! -f "$TMPDIR_ROOT/scripts/eval-loop.js" ] && pass || fail "unexpected eval-loop.js"
+
+  it "does not install ADR helper by default"
+  [ ! -f "$TMPDIR_ROOT/scripts/adr.js" ] && pass || fail "unexpected adr.js"
+
+  it "installs legacy scripts with legacy profile"
+  setup_tmpdir
+  node "$INSTALL_PROJECT" --profile legacy "$TMPDIR_ROOT" >/dev/null 2>&1
+  [ -f "$TMPDIR_ROOT/scripts/eval-loop.js" ] && [ -f "$TMPDIR_ROOT/scripts/adr.js" ] && pass || fail "legacy scripts missing"
 
   it "refuses to overwrite non-context-harness scripts"
   setup_tmpdir
@@ -388,7 +406,7 @@ EOF
   output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" section "Rules" 2>&1)
   assert_contains "$output" "Never ignore the index"
 
-  it "creates default AGENTS.md with schema marker"
+  it "creates default AGENTS.md with schema v3 marker"
   setup_tmpdir
   cat > "$TMPDIR_ROOT/CONTEXT.md" << 'EOF'
 # Context
@@ -398,7 +416,290 @@ schema-app is a test project.
 EOF
   (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
   output=$(cat "$TMPDIR_ROOT/AGENTS.md")
-  assert_contains "$output" "context-harness:schema v2"
+  assert_contains "$output" "context-harness:schema v3"
+
+  it "check passes for a valid v3 harness"
+  setup_tmpdir
+  cat > "$TMPDIR_ROOT/CONTEXT.md" << 'EOF'
+# Context
+<!-- context-harness:schema v3 -->
+
+## Project
+check-app is a test project.
+
+## Structure
+```
+.
+```
+
+## Rules
+
+### Never
+1. Never ignore checks.
+
+### Always
+1. Always refresh the index.
+
+## Workflow
+- Test: true
+
+## Language
+- **Check**: Harness validation.
+
+## Relationships
+- AGENTS indexes CONTEXT.
+
+## Flagged Ambiguities
+- None.
+
+## Learned Patterns
+- None yet.
+EOF
+  cat > "$TMPDIR_ROOT/NOW.md" << 'EOF'
+# Now
+
+## Current Focus
+Check harness.
+
+## Active Blockers
+- None.
+
+## Immediate Next Step
+Run check.
+
+## Session State
+- Last modified: 2026-06-09T00:00:00.000Z
+- Files touched: CONTEXT.md
+EOF
+  (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && echo "$output" | grep -q "OK" && pass || fail "check failed: $output"
+
+  it "check fails on stale AGENTS.md index"
+  printf '\n## Extra\nnew\n' >> "$TMPDIR_ROOT/CONTEXT.md"
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1); rc=$?
+  [ "$rc" -eq 1 ] && echo "$output" | grep -q "stale" && pass || fail "expected stale failure: $output"
+
+  it "check fails on missing required sections"
+  setup_tmpdir
+  cat > "$TMPDIR_ROOT/CONTEXT.md" << 'EOF'
+# Context
+<!-- context-harness:schema v3 -->
+
+## Project
+too-small
+EOF
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1); rc=$?
+  [ "$rc" -eq 1 ] && echo "$output" | grep -q "missing ## Structure" && pass || fail "expected missing section failure: $output"
+
+  it "check fails on oversized PLAN.md"
+  setup_tmpdir
+  cat > "$TMPDIR_ROOT/CONTEXT.md" << 'EOF'
+# Context
+<!-- context-harness:schema v3 -->
+
+## Project
+check-app
+
+## Structure
+.
+
+## Rules
+
+## Workflow
+
+## Language
+
+## Relationships
+
+## Flagged Ambiguities
+
+## Learned Patterns
+EOF
+  cat > "$TMPDIR_ROOT/NOW.md" << 'EOF'
+# Now
+EOF
+  for i in $(seq 1 151); do echo "line $i"; done > "$TMPDIR_ROOT/PLAN.md"
+  (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1); rc=$?
+  [ "$rc" -eq 1 ] && echo "$output" | grep -q "PLAN.md has" && pass || fail "expected PLAN size failure: $output"
+
+  it "check warns but passes for legacy schema v2"
+  setup_tmpdir
+  cat > "$TMPDIR_ROOT/CONTEXT.md" << 'EOF'
+# Context
+<!-- context-harness:schema v2 -->
+
+## Project
+legacy-app
+
+## Structure
+.
+
+## Rules
+
+## Workflow
+
+## Language
+
+## Relationships
+
+## Flagged Ambiguities
+
+## Learned Patterns
+EOF
+  (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && echo "$output" | grep -q "WARN" && pass || fail "expected legacy warning: $output"
+
+  cleanup_tmpdir
+fi
+
+# =============================
+# Test: migrate-project.js
+# =============================
+
+if should_run "migrate-project"; then
+  suite "migrate-project.js"
+  MIGRATE="$REPO_ROOT/scripts/migrate-project.js"
+
+  write_v2_context() {
+    local dir="$1"
+    local objectives="$2"
+    mkdir -p "$dir"
+    cat > "$dir/CONTEXT.md" << EOF
+# Context
+<!-- context-harness:schema v2 -->
+
+## Project
+migrate-app is a test project.
+
+## Structure
+\`\`\`
+.
+\`\`\`
+
+## Rules
+
+### Never
+1. Never lose context.
+
+### Always
+1. Always preserve user edits.
+
+${objectives}
+## Workflow
+- Test: npm test
+
+## Language
+- **Term**: Definition.
+
+## Relationships
+- AGENTS indexes CONTEXT.
+
+## Flagged Ambiguities
+- None.
+
+## Learned Patterns
+- None yet.
+EOF
+    cat > "$dir/AGENTS.md" << 'EOF'
+# Agent Instructions
+<!-- context-harness:schema v2 -->
+
+## Context Contract
+- Existing contract.
+
+## Context Index
+<!-- context-harness:index:start -->
+stale
+<!-- context-harness:index:end -->
+EOF
+    cat > "$dir/NOW.md" << 'EOF'
+# Now
+
+## Current Focus
+Migration fixture.
+EOF
+  }
+
+  it "dry-runs without writing changes"
+  setup_tmpdir
+  write_v2_context "$TMPDIR_ROOT/repo" "### Objectives
+1. CLI works (npm test exits 0)
+
+"
+  output=$(node "$MIGRATE" --root "$TMPDIR_ROOT" 2>&1)
+  assert_contains "$output" "DRY-RUN"
+  assert_contains "$(cat "$TMPDIR_ROOT/repo/CONTEXT.md")" "context-harness:schema v2"
+
+  it "migrates command Objectives into Workflow Verification"
+  setup_tmpdir
+  write_v2_context "$TMPDIR_ROOT/repo" "### Objectives
+1. CLI works (npm test exits 0)
+
+"
+  node "$MIGRATE" --root "$TMPDIR_ROOT" --write >/dev/null 2>&1
+  output=$(cat "$TMPDIR_ROOT/repo/CONTEXT.md")
+  assert_contains "$output" "context-harness:schema v3"
+  assert_contains "$output" "### Verification"
+  assert_contains "$output" "CLI works (\`npm test\` exits 0)"
+
+  it "removes command Objectives after migration"
+  assert_not_contains "$output" "### Objectives"
+
+  it "preserves manual Objectives as Legacy Objectives"
+  setup_tmpdir
+  write_v2_context "$TMPDIR_ROOT/repo" "### Objectives
+1. Users can understand the docs.
+
+"
+  node "$MIGRATE" --root "$TMPDIR_ROOT" --write >/dev/null 2>&1
+  output=$(cat "$TMPDIR_ROOT/repo/CONTEXT.md")
+  assert_contains "$output" "### Legacy Objectives"
+  assert_contains "$output" "Users can understand the docs."
+
+  it "migrates mixed Objectives without losing either kind"
+  setup_tmpdir
+  write_v2_context "$TMPDIR_ROOT/repo" "### Objectives
+1. CLI works (npm test exits 0)
+2. Users can understand the docs.
+
+"
+  node "$MIGRATE" --root "$TMPDIR_ROOT" --write >/dev/null 2>&1
+  output=$(cat "$TMPDIR_ROOT/repo/CONTEXT.md")
+  assert_contains "$output" "CLI works (\`npm test\` exits 0)"
+  assert_contains "$output" "### Legacy Objectives"
+
+  it "refreshes AGENTS.md during write migration"
+  assert_contains "$(cat "$TMPDIR_ROOT/repo/AGENTS.md")" "context-harness:schema v3"
+  assert_contains "$(cat "$TMPDIR_ROOT/repo/AGENTS.md")" "CONTEXT.md#workflow"
+
+  it "leaves local non-context-harness scripts untouched"
+  setup_tmpdir
+  write_v2_context "$TMPDIR_ROOT/repo" "### Objectives
+1. CLI works (npm test exits 0)
+
+"
+  mkdir -p "$TMPDIR_ROOT/repo/scripts"
+  echo "console.log('custom');" > "$TMPDIR_ROOT/repo/scripts/context-index.js"
+  node "$MIGRATE" --root "$TMPDIR_ROOT" --write >/dev/null 2>&1
+  assert_contains "$(cat "$TMPDIR_ROOT/repo/scripts/context-index.js")" "custom"
+
+  it "installs only default core scripts during migration"
+  count=$(find "$TMPDIR_ROOT/repo/scripts" -type f | wc -l | tr -d ' ')
+  [ "$count" -eq 9 ] && [ ! -f "$TMPDIR_ROOT/repo/scripts/eval-loop.js" ] && pass || fail "expected 9 core scripts without eval-loop, got $count"
+
+  it "skips dirty git worktrees by default"
+  setup_tmpdir
+  write_v2_context "$TMPDIR_ROOT/repo" "### Objectives
+1. CLI works (npm test exits 0)
+
+"
+  (cd "$TMPDIR_ROOT/repo" && git init >/dev/null 2>&1)
+  output=$(node "$MIGRATE" --root "$TMPDIR_ROOT" --write 2>&1)
+  assert_contains "$output" "dirty git worktree"
+  assert_contains "$(cat "$TMPDIR_ROOT/repo/CONTEXT.md")" "context-harness:schema v2"
 
   cleanup_tmpdir
 fi
@@ -423,7 +724,7 @@ if should_run "skill-packaging"; then
   it "ships context-catch-up as a separate skill"
   [ -f "$REPO_ROOT/context-catch-up/SKILL.md" ] && pass || fail "missing context-catch-up/SKILL.md"
 
-  it "ships context-grill as a separate skill"
+  it "keeps deprecated context-grill compatibility stub"
   [ -f "$REPO_ROOT/context-grill/SKILL.md" ] && pass || fail "missing context-grill/SKILL.md"
 
   it "ships context-launch as a separate skill"
@@ -435,6 +736,7 @@ if should_run "skill-packaging"; then
   it "names the context-grill skill in frontmatter"
   output=$(sed -n '1,8p' "$REPO_ROOT/context-grill/SKILL.md" 2>&1)
   assert_contains "$output" "name: context-grill"
+  assert_contains "$output" "user-invocable: false"
 
   it "names the context-launch skill in frontmatter"
   output=$(sed -n '1,8p' "$REPO_ROOT/context-launch/SKILL.md" 2>&1)
@@ -445,14 +747,18 @@ if should_run "skill-packaging"; then
   assert_contains "$output" "name: context-handoff"
   assert_contains "$output" "user-invocable: false"
 
-  it "context-grill asks one question at a time"
-  assert_contains "$(cat "$REPO_ROOT/context-grill/SKILL.md")" "Ask one question at a time"
+  it "context-grill is deprecated in favor of context-maintain"
+  output=$(cat "$REPO_ROOT/context-grill/SKILL.md")
+  assert_contains "$output" "deprecated"
+  assert_contains "$output" "Use \`context-maintain\` instead"
 
-  it "context-grill recommends answers"
-  assert_contains "$(cat "$REPO_ROOT/context-grill/SKILL.md")" "Recommended answer"
+  it "context-maintain owns plan stress-tests"
+  output=$(cat "$REPO_ROOT/context-maintain/SKILL.md")
+  assert_contains "$output" "## Plan Stress-Test"
+  assert_contains "$output" "Ask only where human judgment changes"
 
-  it "context-grill inspects code before asking"
-  assert_contains "$(cat "$REPO_ROOT/context-grill/SKILL.md")" "inspect instead"
+  it "context-maintain recommends answers during stress-tests"
+  assert_contains "$(cat "$REPO_ROOT/context-maintain/SKILL.md")" "include a recommended answer"
 
   it "context-launch produces ready-to-paste Codex goals"
   output=$(cat "$REPO_ROOT/context-launch/SKILL.md")

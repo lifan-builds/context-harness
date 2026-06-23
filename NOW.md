@@ -1,14 +1,14 @@
 # Now
 
 ## Current Focus
-Pushed and redeployed context-harness token and skill workflow updates.
+`context-grill` deprecation completed and deployed locally through agent-nexus.
 
 ## Active Blockers
 - None.
 
 ## Immediate Next Step
-None.
+Restart AI IDEs to pick up the redeployed skill frontmatter.
 
 ## Session State
-- Last modified: 2026-05-26T18:32:53Z
-- Files touched: AGENTS.md, CONTEXT.md, PLAN.md, NOW.md, context-maintain/SKILL.md, scripts/codex-context-hook.js, scripts/context-index.js, tests/run-all.sh
+- Last modified: 2026-06-23T00:42:10.000Z
+- Files touched: AGENTS.md, CONTEXT.md, NOW.md, PLAN.md, README.md, SKILL.md, context-grill/SKILL.md, context-maintain/SKILL.md, tests/run-all.sh

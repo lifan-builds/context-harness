@@ -3,16 +3,15 @@ name: context-harness
 description: >
   Route lightweight project context work to the right companion skill:
   context-init for new repositories, context-catch-up for session resume, and
-  context-grill for stress-testing plans, context-launch for long-running task
-  briefs, and context-maintain for updates, lessons, plans, closeout, and
-  reflection.
+  context-launch for long-running task briefs, and context-maintain for updates,
+  lessons, plan stress-tests, closeout, and reflection.
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
 ---
 
 # Context Harness
 
-4 files, 9 rules, zero ceremony.
+4 files, lean rules, zero ceremony.
 Context window = volatile RAM. Filesystem = persistent storage.
 Write anything important to disk before it scrolls away.
 
@@ -26,9 +25,11 @@ Use the smallest skill that matches the agent's intent:
 |--------|-------|
 | New repo or missing context files | `context-init` |
 | New agent, resume, or "catch me up" | `context-catch-up` |
-| Stress-test a plan, taxonomy, workflow, or context model | `context-grill` |
 | Convert conversation into a long-running Codex task brief | `context-launch` |
-| Context updates, lesson capture, plan/NOW updates, closeout, reflection | `context-maintain` |
+| Context updates, lesson capture, plan stress-tests, plan/NOW updates, closeout, reflection | `context-maintain` |
+
+`context-grill` is deprecated and remains only as a compatibility stub for
+explicit legacy requests. New plan stress-tests belong in `context-maintain`.
 
 This root skill is the front door and reference. Prefer invoking a companion
 skill directly when the mode is obvious.
@@ -57,7 +58,7 @@ skill directly when the mode is obvious.
 |-----------|------|
 | No `CONTEXT.md` at project root | Use `context-init` |
 | `CONTEXT.md` exists and the agent is starting/resuming | Use `context-catch-up` |
-| The user wants a plan challenged against docs, terms, and code | Use `context-grill` |
+| The user wants a plan challenged against docs, terms, and code | Use `context-maintain` Plan Stress-Test |
 | The user wants a long-running task brief or `/goal` for a fresh agent | Use `context-launch` |
 | The agent needs to update context, preserve a lesson, correction, plan, or session state | Use `context-maintain` |
 | Legacy v1 files exist without `CONTEXT.md` | Use `context-init` migration flow |
@@ -67,17 +68,14 @@ skill directly when the mode is obvious.
 ## Init Mode
 
 Run `node scripts/context-gen.js` to auto-detect project info, structure,
-stack-specific Suggested Rules, and Memory Prompts.
+stack-specific Suggested Rules, Suggested Workflow, and Memory Prompts.
 
 Fallback: scan package.json/pyproject.toml/Cargo.toml/go.mod manually.
 
-Present the `## Suggested Rules` block as a starting point; user confirms
-or edits. Always defaults include Core Rules plus stack-tailored habits.
-
-**Objectives are not auto-filled** — too project-specific. They are
-outcome-level success criteria: "if every Objective holds, has the project
-achieved what it exists to achieve?" Hygiene belongs in **Always**. Prefer
-verifiable form; observable-only is OK if automation isn't.
+Present `## Suggested Rules` and `## Suggested Workflow` as starting points;
+the user confirms or edits Never/Always rules and verification commands.
+Project-wide Objectives are legacy v2; new projects use `PLAN.md` Done
+Criteria for task outcomes and `CONTEXT.md` Workflow Verification for commands.
 
 ### Step 3: Generate CONTEXT.md + NOW.md + AGENTS.md
 
@@ -98,7 +96,7 @@ If legacy files exist but `CONTEXT.md` does not:
 
 1. Run context-gen.js for fresh Project/Structure
 2. Copy durable Learned Patterns into CONTEXT.md
-3. Ask user to distill 3 Never + 3 Always + 3 Objectives
+3. Ask user to distill Never/Always rules and workflow verification commands
 4. Merge active items from PLANS.md + FINDINGS.md into new PLAN.md
 5. Replace old agent instructions with the AGENTS.md Context Contract
 
@@ -110,7 +108,7 @@ If legacy files exist but `CONTEXT.md` does not:
 
 ```markdown
 # Context
-<!-- context-harness:schema v2 -->
+<!-- context-harness:schema v3 -->
 
 ## Project
 [Auto-generated: name, tech stack, description.]
@@ -130,17 +128,14 @@ If legacy files exist but `CONTEXT.md` does not:
 2. [User-defined]
 3. [User-defined]
 
-### Objectives
-<!-- Outcome-level success. Prefer `<outcome> (<cmd> exits 0)`. Not hygiene. -->
-1. [Outcome-level success criterion]
-2. [Outcome-level success criterion]
-3. [Outcome-level success criterion]
-
 ## Workflow
 - Setup: [install command]
 - Run: [dev command]
 - Test: [test command]
 - Lint: [lint command]
+
+### Verification
+- [Required command or manual check before completing relevant work.]
 
 ## Language
 <!-- Durable terms and agent discoveries. Keep concise. -->
@@ -185,7 +180,7 @@ append). First file read on recovery, last file written before session end.
 
 ```markdown
 # Agent Instructions
-<!-- context-harness:schema v2 -->
+<!-- context-harness:schema v3 -->
 
 ## Context Contract
 - At session start/resume, read `NOW.md` first, then use the Context Index
@@ -213,9 +208,15 @@ Generated from `CONTEXT.md`; open only task-relevant sections.
 ## Goal
 [What the user can do after this is complete. 1-2 sentences.]
 
+## Done Criteria
+- [Observable or testable completion criterion.]
+
 ## Progress
 - [ ] Step 1
 - [ ] Step 2
+
+## Verification
+- [Command/check to run and expected result.]
 
 ## Findings
 [Task-local research, discoveries, errors, and low-confidence lessons.]
@@ -243,24 +244,15 @@ Generated from `CONTEXT.md`; open only task-relevant sections.
 
 ---
 
-## Eval Loop
+## Legacy Eval Loop
 
-Run the evaluator to check your work against the 3 Objectives:
+`scripts/eval-loop.js` is deprecated legacy v2 tooling for repos that still
+carry `### Objectives`. New schema v3 projects use `PLAN.md` Done Criteria and
+`CONTEXT.md` Workflow Verification instead.
 
 ```bash
-node scripts/eval-loop.js
+node scripts/install-project.js --profile legacy
 ```
-
-The script parses Objectives from CONTEXT.md, extracts testable commands
-(pattern: `(command exits N)`), and runs them. Loop until all pass or
-max iterations (default 5) exhausted.
-
-For autonomous execution: make changes, run eval-loop, read failures,
-fix, re-run. This is the generator-evaluator pattern — you generate code,
-the script evaluates it.
-
-Environment variables: `MAX_ITERATIONS=5`, `PASS_THRESHOLD=all`,
-`CONTEXT_FILE=CONTEXT.md`.
 
 ---
 
@@ -273,15 +265,15 @@ markdown helpers.
 | Script | Purpose | When to use |
 |--------|---------|-------------|
 | `scripts/lib.js` | Shared helpers | Imported by every other script |
-| `scripts/install-project.js` | Copy context-harness runtime scripts into a target repo | Init mode |
+| `scripts/install-project.js` | Copy default runtime scripts; `--profile legacy` includes ADR/eval tools | Init mode |
 | `scripts/codex-context-hook.js` | Codex lifecycle hook dispatcher for catch-up, init, and maintain nudges | Codex hooks |
 | `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware rule defaults | Init mode, Update mode |
-| `scripts/context-index.js` | Update AGENTS.md index; list/query/print CONTEXT.md sections | After CONTEXT.md changes |
+| `scripts/context-index.js` | Update/list/query/print/check context sections | After CONTEXT.md changes |
+| `scripts/migrate-project.js` | Batch migrate schema v2 projects to v3 | Manual migration from this repo |
 | `scripts/guard.js` | Block --no-verify, detect secrets, protect linter configs | Runs automatically via PreToolUse hook |
 | `scripts/format-on-edit.js` | Auto-format files after edits | Runs automatically via PostToolUse hook |
 | `scripts/session-end.js` | Stamp NOW.md, prune PLAN.md when >150 lines | Runs automatically via Stop hook |
 | `scripts/task.js` | Task switcher — rewrites NOW.md; logs to PLAN.md Progress | Run on task start / done |
-| `scripts/eval-loop.js` | Evaluate against 3 Objectives | After completing a task or before committing |
 
 ```bash
 node scripts/task.js start "Implement auth middleware"

@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 "use strict";
 
-// eval-loop.js — lightweight GAN-style evaluator.
-// Parses 3 Objectives from CONTEXT.md, runs testable commands, loops.
+// eval-loop.js — deprecated legacy evaluator for schema v2 Objectives.
+// New schema v3 projects should use PLAN.md Done Criteria and Workflow
+// Verification instead of durable project-wide Objectives.
 //
 // Usage: node scripts/eval-loop.js [pre-command]
 // Env vars:

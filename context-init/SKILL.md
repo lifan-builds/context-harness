@@ -20,7 +20,7 @@ Create the smallest durable context layer that lets future agents catch up:
 - `PLAN.md` only when there is an active multi-step task
 
 Generated `AGENTS.md` and `CONTEXT.md` must include
-`<!-- context-harness:schema v2 -->` so future skill versions can detect and
+`<!-- context-harness:schema v3 -->` so future skill versions can detect and
 upgrade older layouts.
 
 ## Init Flow
@@ -37,8 +37,10 @@ upgrade older layouts.
    node ../scripts/context-gen.js
    ```
 
-2. Present the generated `## Suggested Rules` as a starting point.
-3. Ask the user to confirm or edit `Never`, `Always`, and `Objectives`.
+2. Present the generated `## Suggested Rules` and `## Suggested Workflow` as a
+   starting point.
+3. Ask the user to confirm or edit `Never`, `Always`, and workflow
+   verification commands.
 4. Write `CONTEXT.md`, `NOW.md`, and `AGENTS.md` from the templates in the root
    `context-harness` skill.
 5. Install context-harness runtime scripts into the target repo:
@@ -57,8 +59,8 @@ If legacy v1 files exist but `CONTEXT.md` does not:
 
 1. Run `context-gen.js` for fresh `Project` and `Structure`.
 2. Copy durable learned patterns into `CONTEXT.md`.
-3. Ask the user to distill conventions into 3 `Never`, 3 `Always`, and 3
-   `Objectives`.
+3. Ask the user to distill conventions into concise `Never` and `Always`
+   rules plus workflow verification commands.
 4. Merge active items from `PLANS.md` and `FINDINGS.md` into `PLAN.md`.
 5. Replace old agent instructions with the `AGENTS.md` Context Contract.
 
@@ -67,7 +69,8 @@ schema marker, use `context-catch-up` Compatibility Upgrade instead of init.
 
 ## Guardrails
 
-- Objectives are never auto-filled. They are outcome-level success criteria.
+- Do not create durable Objectives for new schema v3 projects; use `PLAN.md`
+  Done Criteria and `CONTEXT.md` Workflow Verification instead.
 - Keep generated files short enough to be read every session.
 - Keep `AGENTS.md` small: contract plus generated `CONTEXT.md` index.
 - Runtime scripts are project-local after init, so `AGENTS.md` can refer to

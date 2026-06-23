@@ -2,16 +2,17 @@
 name: context-maintain
 description: >
   Maintain context-harness during active work: update context, capture lessons,
-  keep PLAN.md/NOW.md current, and reflect after corrections or failed
-  attempts.
+  stress-test plans, keep PLAN.md/NOW.md current, and reflect after corrections
+  or failed attempts.
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
 ---
 
 # Context Maintain
 
-Use this after init, catch-up, and grill to update context, capture lessons,
-maintain `PLAN.md`, close `NOW.md`, or reflect after corrections/failures.
+Use this after init and catch-up to update context, capture lessons,
+stress-test plans, maintain `PLAN.md`, close `NOW.md`, or reflect after
+corrections/failures.
 
 ## Trigger
 
@@ -42,6 +43,20 @@ For ordinary uncertainty before the first attempt, inspect or ask instead.
 
 Only high and repeated medium signals are durable-memory candidates.
 
+## Plan Stress-Test
+
+Use when a plan, taxonomy, workflow, or context model needs pressure-testing
+before implementation.
+
+1. Read `NOW.md`, then `CONTEXT.md`, and `PLAN.md` if it exists.
+2. Check vague terms against `CONTEXT.md` `## Language`.
+3. Inspect files, docs, tests, and cheap dry runs before asking questions.
+4. Ask only where human judgment changes the agent's direction.
+5. If you ask, ask one question at a time and include a recommended answer.
+6. Route task-local uncertainty to `PLAN.md`; route durable terms, invariants,
+   and workflow constraints to `CONTEXT.md`.
+7. Name the next concrete checkpoint and verification command.
+
 ## Reflect Mode
 
 1. Stop the automatic retry.
@@ -53,6 +68,19 @@ Only high and repeated medium signals are durable-memory candidates.
 6. Choose the smallest correction.
 7. State the checkpoint that will prove the next attempt worked.
 8. Resume with the correction.
+
+## Dream/Compact Mode
+
+Use after substantial work, research, or migration when the session state needs
+consolidation rather than more execution.
+
+1. Review `PLAN.md`, recent findings, verification output, and touched files.
+2. Prune stale task notes; archive completed progress when the plan is long.
+3. Propose durable `CONTEXT.md` deltas only for terms, rules, invariants, or
+   repeated lessons that will help future agents.
+4. Record verification evidence in `PLAN.md` or closeout notes.
+5. Do not store secrets, raw transcripts, raw web/API output, or personal data.
+6. Refresh `AGENTS.md` if `CONTEXT.md` changed, then rewrite `NOW.md`.
 
 ## Routing
 

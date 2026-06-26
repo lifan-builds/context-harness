@@ -303,9 +303,12 @@ if should_run "install-project"; then
   it "copies Codex context hook dispatcher"
   [ -f "$TMPDIR_ROOT/scripts/codex-context-hook.js" ] && pass || fail "missing copied codex-context-hook.js"
 
-  it "installs 9 default scripts"
+  it "installs 9 default scripts plus CommonJS package marker"
   count=$(find "$TMPDIR_ROOT/scripts" -type f | wc -l | tr -d ' ')
-  [ "$count" -eq 9 ] && pass || fail "expected 9 scripts, got $count"
+  [ "$count" -eq 10 ] && pass || fail "expected 10 files, got $count"
+
+  it "marks runtime scripts as CommonJS"
+  assert_contains "$(cat "$TMPDIR_ROOT/scripts/package.json")" '"type": "commonjs"'
 
   it "does not install legacy eval-loop by default"
   [ ! -f "$TMPDIR_ROOT/scripts/eval-loop.js" ] && pass || fail "unexpected eval-loop.js"
@@ -347,6 +350,15 @@ if should_run "lib"; then
   it "handles malformed hook input"
   output=$(printf 'not json' | node -e "const { readHookInput } = require('$LIB'); console.log(readHookInput().command);")
   [ "$output" = "not json" ] && pass || fail "unexpected malformed payload: $output"
+
+  it "prefers nested context roots over parent git roots"
+  setup_tmpdir
+  mkdir -p "$TMPDIR_ROOT/parent/child"
+  (cd "$TMPDIR_ROOT/parent" && git init >/dev/null 2>&1)
+  touch "$TMPDIR_ROOT/parent/package.json"
+  touch "$TMPDIR_ROOT/parent/child/CONTEXT.md"
+  output=$(node -e "const { findProjectRoot } = require('$LIB'); console.log(findProjectRoot('$TMPDIR_ROOT/parent/child'));")
+  [ "$output" = "$TMPDIR_ROOT/parent/child" ] && pass || fail "unexpected root: $output"
 fi
 
 # =============================
@@ -688,7 +700,7 @@ EOF
 
   it "installs only default core scripts during migration"
   count=$(find "$TMPDIR_ROOT/repo/scripts" -type f | wc -l | tr -d ' ')
-  [ "$count" -eq 9 ] && [ ! -f "$TMPDIR_ROOT/repo/scripts/eval-loop.js" ] && pass || fail "expected 9 core scripts without eval-loop, got $count"
+  [ "$count" -eq 10 ] && [ ! -f "$TMPDIR_ROOT/repo/scripts/eval-loop.js" ] && pass || fail "expected 9 core scripts plus package marker without eval-loop, got $count"
 
   it "skips dirty git worktrees by default"
   setup_tmpdir
@@ -1322,6 +1334,88 @@ if should_run "skill"; then
 
   it "has migration section"
   assert_contains "$(cat "$SKILL")" "Migrate from v1"
+fi
+
+# =============================
+# Test: context-index.js
+# =============================
+
+if should_run "context-index"; then
+  suite "context-index.js"
+  CONTEXT_INDEX="$REPO_ROOT/scripts/context-index.js"
+
+  write_minimal_context_project() {
+    setup_tmpdir
+    cat > "$TMPDIR_ROOT/CONTEXT.md" << 'EOF'
+# Context
+<!-- context-harness:schema v3 -->
+
+## Project
+Test project.
+
+## Structure
+```
+.
+```
+
+## Rules
+
+### Never
+1. Never store secrets.
+
+### Always
+1. Always run checks.
+
+## Workflow
+- Test: npm test
+
+## Language
+- **Term**: Definition.
+
+## Relationships
+- Durable facts live in CONTEXT.md.
+
+## Flagged Ambiguities
+- None.
+
+## Learned Patterns
+- When context changes, refresh the index.
+EOF
+  }
+
+  it "passes check for a fresh minimal harness"
+  write_minimal_context_project
+  (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1)
+  assert_contains "$output" "OK context-harness check passed"
+
+  it "fails check when required CONTEXT sections are missing"
+  write_minimal_context_project
+  perl -0pi -e 's/\n## Relationships[\s\S]*?\n## Flagged Ambiguities/\n## Flagged Ambiguities/' "$TMPDIR_ROOT/CONTEXT.md"
+  (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1)
+  assert_contains "$output" "FAIL CONTEXT.md is missing ## Relationships"
+
+  it "warns when AGENTS.md uses legacy schema"
+  write_minimal_context_project
+  (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
+  perl -0pi -e 's/context-harness:schema v3/context-harness:schema v2/' "$TMPDIR_ROOT/AGENTS.md"
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1)
+  assert_contains "$output" "WARN AGENTS.md uses legacy schema v2"
+
+  it "warns when AGENTS.md contains detailed operating context"
+  write_minimal_context_project
+  (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
+  cat >> "$TMPDIR_ROOT/AGENTS.md" << 'EOF'
+
+## Current Status
+Durable project facts should not live here.
+
+## Near-Term Priorities
+These belong in CONTEXT.md or PLAN.md.
+EOF
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1)
+  assert_contains "$output" "WARN AGENTS.md appears to contain durable operating context"
 fi
 
 # =============================

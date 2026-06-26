@@ -81,3 +81,5 @@ scripts/
 - When a workflow feels like low-value process, fold its useful behavior into an existing skill and leave only a compatibility stub; `context-grill` now routes to `context-maintain` Plan Stress-Test.
 - When using SkillOpt-style self-improvement, separate proposal from mutation: collect evidence and validation, ask the user for approval, then update the canonical skill source rather than silently editing installed copies.
 - When adapting Claude Code-style auto memory, use semantic model judgment inside `context-maintain` instead of hard counters or line limits; keep the result visible in markdown and keep audit history separate from operational context.
+- When installing CommonJS runtime scripts into JavaScript projects, add a `scripts/package.json` with `"type": "commonjs"` because parent packages may set `"type": "module"` and break `require()`.
+- When supporting nested context roots, detect `CONTEXT.md` before parent package/git markers because nested project folders can otherwise read and update the parent repo's context files.

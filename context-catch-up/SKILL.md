@@ -12,7 +12,8 @@ context-harness files.
 
 ## Compatibility Check
 
-Before ordinary catch-up, inspect `AGENTS.md`, `CONTEXT.md`, and `NOW.md` for:
+Before ordinary catch-up, quickly inspect `AGENTS.md`, `CONTEXT.md`, and
+`NOW.md` for:
 
 - `<!-- context-harness:schema v2 -->` or
   `<!-- context-harness:schema v3 -->` in generated context files.
@@ -22,32 +23,12 @@ Before ordinary catch-up, inspect `AGENTS.md`, `CONTEXT.md`, and `NOW.md` for:
 - A non-empty `NOW.md` with current focus, blockers, immediate next step, and
   touched files.
 
-If files are old, empty, partial, or missing the schema marker, run
-Compatibility Upgrade before the normal catch-up summary.
-
-## Compatibility Upgrade
-
-Upgrade through model-led edits, not bulk rewrite:
-
-1. Preserve project-specific instructions and durable context.
-2. Replace only old context-harness boilerplate in `AGENTS.md` with the current
-   Context Contract and schema marker.
-3. Add missing `CONTEXT.md` sections with concise placeholders only when the
-   repo lacks them; do not invent project-specific rules or Objectives.
-4. If `NOW.md` is empty or missing, create a minimal resume state from visible
-   repo/task context and mark unknowns explicitly.
-5. Install or refresh runtime scripts:
-
-   ```bash
-   node <context-harness-skill-dir>/scripts/install-project.js
-   ```
-
-6. Run `node scripts/context-index.js update`.
-7. Show the user a short upgrade summary before continuing.
-
-Ask only when project intent or durable rules cannot be inferred. For legacy
-Objectives, preserve the content; migrate command checks to Workflow
-Verification only when explicitly upgrading to schema v3.
+If files are old, empty, partial, or missing the schema marker, report the
+drift in the catch-up summary. Repair it only when the user asks, when the
+current task requires reliable project context, or when the edit is a narrow
+index/script refresh. Prefer model-led edits that preserve local instructions
+over broad rewrites. If repairing, refresh runtime scripts, run
+`node scripts/context-index.js update`, and continue with the normal catch-up.
 
 ## Read Order
 

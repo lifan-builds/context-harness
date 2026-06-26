@@ -158,6 +158,17 @@ function checkHarness(context) {
   else if (!hasSchema(agents)) failures.push("AGENTS.md is missing a context-harness schema marker.");
   else if (hasLegacySchema(agents)) warnings.push("AGENTS.md uses legacy schema v2.");
 
+  if (agents.trim()) {
+    const agentLines = agents.trimEnd().split("\n").length;
+    const nonIndex = stripIndex(agents);
+    if (agentLines > 80) {
+      warnings.push(`AGENTS.md has ${agentLines} lines; keep it to the Context Contract plus generated Context Index.`);
+    }
+    if (looksLikeDetailedOperatingBrief(nonIndex)) {
+      warnings.push("AGENTS.md appears to contain durable operating context; move project facts to CONTEXT.md.");
+    }
+  }
+
   for (const heading of requiredSections) {
     if (!hasHeading(context, 2, heading)) failures.push(`CONTEXT.md is missing ## ${heading}.`);
   }
@@ -194,6 +205,32 @@ function hasSchema(text) {
 
 function hasLegacySchema(text) {
   return /<!--\s*context-harness:schema\s+v2\s*-->/.test(text);
+}
+
+function stripIndex(text) {
+  const start = text.indexOf(START);
+  const end = text.indexOf(END);
+  if (start === -1 || end === -1 || end <= start) return text;
+  return `${text.slice(0, start)}${text.slice(end + END.length)}`;
+}
+
+function looksLikeDetailedOperatingBrief(text) {
+  const durableHeadings = [
+    "Current Status",
+    "Project Mission",
+    "Near-Term Priorities",
+    "Guiding Principles",
+    "High-Level Timeline",
+    "Communication Style",
+    "Reusable Templates",
+    "Recent Key Achievements",
+  ];
+  const headingHits = durableHeadings.filter((heading) => hasHeading(text, 2, heading) || hasHeading(text, 3, heading)).length;
+  if (headingHits >= 2) return true;
+
+  return /detailed durable project context remains in `?AGENTS\.md`?/i.test(text)
+    || /AGENTS\.md.*(detailed|primary).*operating/i.test(text)
+    || /comprehensive context for AI agents/i.test(text);
 }
 
 function hasHeading(markdown, level, heading) {

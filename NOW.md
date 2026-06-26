@@ -1,14 +1,15 @@
 # Now
 
 ## Current Focus
-Implemented the next `context-maintain` Dream/Compact improvement: automatic semantic Dream checks, direct context edits when useful, and lazy `.context-harness/DREAM.md` audit logging.
+Completed canonical context-harness hardening and the one-time v3 migration across local context roots.
 
 ## Active Blockers
-- None for the Dream/Compact patch.
+- None for migration/checks.
+- Push may still fail per repo if an upstream is missing or remote authentication rejects.
 
 ## Immediate Next Step
-Review the patch, then deploy/sync the updated skill repo through agent-nexus if accepted.
+Commit and push migrated repos on their current branches; report any repos without upstreams or failed pushes.
 
 ## Session State
-- Last modified: 2026-06-23T20:41:24.000Z
-- Files touched: .context-harness/DREAM.md, CONTEXT.md, NOW.md, PLAN.md, README.md, SKILL.md, context-maintain/SKILL.md, scripts/context-gen.js, scripts/context-index.js, tests/run-all.sh
+- Last modified: 2026-06-26T17:38:46Z
+- Files touched: AGENTS.md, CONTEXT.md, NOW.md, context-catch-up/SKILL.md, scripts/context-index.js, scripts/install-project.js, scripts/lib.js, scripts/migrate-project.js, scripts/package.json, tests/run-all.sh

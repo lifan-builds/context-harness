@@ -302,12 +302,23 @@ function installCoreScripts(project) {
     if (!fs.existsSync(source)) continue;
     const next = readText(source);
     const current = readText(target);
-    if (!current || current === next || current.includes("context-harness")) {
+    if (!current || current === next || isContextHarnessRuntime(current, name)) {
       fs.writeFileSync(target, next);
       copied += 1;
     } else {
       skipped += 1;
     }
+  }
+  const packageJsonTarget = path.join(targetDir, "package.json");
+  const packageJsonContent = `${JSON.stringify({
+    private: true,
+    type: "commonjs",
+    description: "context-harness runtime scripts"
+  }, null, 2)}\n`;
+  const existingPackage = readText(packageJsonTarget);
+  if (!existingPackage || readPackageType(existingPackage) !== "commonjs") {
+    fs.writeFileSync(packageJsonTarget, packageJsonContent);
+    copied += 1;
   }
   return { copied, skipped };
 }
@@ -349,6 +360,20 @@ function readText(file) {
   } catch {
     return "";
   }
+}
+
+function readPackageType(text) {
+  try {
+    return JSON.parse(text).type || "";
+  } catch {
+    return "";
+  }
+}
+
+function isContextHarnessRuntime(text, name) {
+  return text.includes("context-harness")
+    || text.includes(`${name} —`)
+    || text.includes(`${name} -`);
 }
 
 function ensureTrailingNewline(text) {

@@ -1,15 +1,14 @@
 # Now
 
 ## Current Focus
-Completed canonical context-harness hardening and the one-time v3 migration across local context roots.
+Prepared context-harness changes for push and local agent-nexus deployment.
 
 ## Active Blockers
-- None for migration/checks.
-- Push may still fail per repo if an upstream is missing or remote authentication rejects.
+- None.
 
 ## Immediate Next Step
-Commit and push migrated repos on their current branches; report any repos without upstreams or failed pushes.
+After deployment, restart AI IDEs or agent hosts if new skill metadata is not visible.
 
 ## Session State
-- Last modified: 2026-06-26T17:38:46Z
-- Files touched: AGENTS.md, CONTEXT.md, NOW.md, context-catch-up/SKILL.md, scripts/context-index.js, scripts/install-project.js, scripts/lib.js, scripts/migrate-project.js, scripts/package.json, tests/run-all.sh
+- Last modified: 2026-06-29T00:21:38Z
+- Files touched: AGENTS.md, CONTEXT.md, NOW.md, PLAN.md, README.md, SKILL.md, context-upgrade/SKILL.md, context-upgrade/agents/openai.yaml

@@ -42,14 +42,17 @@ scripts/
 - Local deploy: After every repo update, use agent access to deploy it locally.
 
 ## Language
+- **context-catch-up**: The startup/resume skill for a freshly started agent session or genuinely resumed session that needs to recover project state before planning or editing. Avoid invoking it during ordinary mid-session turns after context has already been loaded.
 - **context-maintain**: The ongoing context skill for maintaining context after or during work: updates, lesson capture, plan state, session closeout, and Reflect Mode after corrections or failed attempts. Avoid: context-update.
 - **context-grill**: Deprecated compatibility stub. Avoid for new work; use `context-maintain` Plan Stress-Test for stress-testing plans, taxonomies, workflows, or context models.
 - **context-launch**: The skill for converting the current conversation and project context into a long-running Codex task brief or `/goal` for a fresh agent. Avoid: context-handoff.
 - **context-handoff**: Deprecated compatibility stub. Avoid for new work; use `context-maintain` for closeout, transfer notes, next steps, and durable context updates.
+- **context-upgrade**: The operator skill for context-harness source upgrades, schema migrations, local fleet migrations, deployment checks, and packaging migration lessons for repeat use.
 - **Legacy Objectives**: Preserved schema v2 project outcomes. Avoid using them for new work; use `PLAN.md` Done Criteria and `CONTEXT.md` Workflow Verification.
 
 ## Relationships
-- The preferred companion skill set is `context-init`, `context-catch-up`, `context-launch`, and `context-maintain`.
+- The preferred companion skill set is `context-init`, `context-catch-up`, `context-launch`, `context-maintain`, and `context-upgrade`.
+- `context-catch-up` is only for whole fresh session or true resume boundaries; ordinary follow-up turns should rely on already-loaded context and use `context-maintain` only when context needs updating.
 - `context-maintain` includes the old standalone reflection workflow as Reflect Mode.
 - `context-maintain` includes the old `context-grill` pressure-testing workflow as Plan Stress-Test.
 - `context-launch` is separate from `context-maintain` because its output is a ready-to-run task prompt for another agent, not ordinary context preservation.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Context Upgrade"
+  short_description: "Upgrade context-harness installs safely"
+  default_prompt: "Use $context-upgrade to plan and execute a context-harness upgrade across this repo or my local project fleet."

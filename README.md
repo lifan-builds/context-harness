@@ -66,6 +66,7 @@ catch-all skill:
 | `context-catch-up` | Let a fresh or resumed agent recover current project state |
 | `context-launch` | Convert the current conversation into a long-running Codex task brief |
 | `context-maintain` | Maintain context during active work, including plan stress-tests, Reflect Mode, and automatic Dream/Compact consideration |
+| `context-upgrade` | Plan, validate, and deploy context-harness upgrades or project migrations |
 
 `context-grill` is deprecated. Its useful pressure-testing behavior now lives in
 `context-maintain`, and the old skill remains only as a compatibility stub.
@@ -203,6 +204,7 @@ split by invocation intent:
 | `context-catch-up` | A new agent or resumed session needs to read durable context |
 | `context-launch` | The current conversation should become a long-running Codex goal for a fresh agent |
 | `context-maintain` | Work is underway and the agent needs to update context, capture lessons, stress-test a plan, maintain plan state, close out, or reflect after a correction |
+| `context-upgrade` | context-harness itself or a fleet of project contexts needs a version upgrade, schema migration, deployment, or migration lesson packaged for repeat use |
 
 `context-grill` is deprecated. It remains only as a non-invocable compatibility
 stub for explicit legacy requests. Its useful behavior moved into
@@ -236,6 +238,12 @@ work. Use it only for debugging context drift or later human review.
 preserves project-specific context, replaces only old harness boilerplate,
 installs project-local runtime scripts, and refreshes the generated
 `AGENTS.md` index.
+
+`context-upgrade` is the operator workflow for changing the harness itself or
+repeating a local migration. It captures the conservative upgrade habits:
+dry-run first, preserve local context, skip dirty repos by default, verify
+source changes, deploy through the normal local layer, and record skipped
+targets for follow-up.
 
 `context-launch` produces a model-led launch brief for long-running Codex work:
 goal, done criteria, files to read, constraints, checkpoints, verification, and

@@ -5,7 +5,7 @@ description: >
   context-init for new repositories, context-catch-up for session resume, and
   context-launch for long-running task briefs, and context-maintain for updates,
   lessons, plan stress-tests, closeout, reflection, and automatic Dream/Compact
-  consolidation.
+  consolidation, and context-upgrade for upgrades/migrations.
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
 ---
@@ -28,12 +28,10 @@ Use the smallest skill that matches the agent's intent:
 | New agent, resume, or "catch me up" | `context-catch-up` |
 | Convert conversation into a long-running Codex task brief | `context-launch` |
 | Context updates, lesson capture, plan stress-tests, plan/NOW updates, closeout, reflection, Dream/Compact consolidation | `context-maintain` |
+| Upgrade context-harness itself or migrate project contexts across versions | `context-upgrade` |
 
 `context-grill` is deprecated and remains only as a compatibility stub for
 explicit legacy requests. New plan stress-tests belong in `context-maintain`.
-
-This root skill is the front door and reference. Prefer invoking a companion
-skill directly when the mode is obvious.
 
 ## Behavioral Principles
 
@@ -62,6 +60,7 @@ skill directly when the mode is obvious.
 | The user wants a plan challenged against docs, terms, and code | Use `context-maintain` Plan Stress-Test |
 | The user wants a long-running task brief or `/goal` for a fresh agent | Use `context-launch` |
 | The agent needs to update context, preserve a lesson, correction, plan, or session state | Use `context-maintain` |
+| The user wants to upgrade context-harness itself, migrate schema versions, or repeat a local fleet migration | Use `context-upgrade` |
 | Legacy v1 files exist without `CONTEXT.md` | Use `context-init` migration flow |
 
 ---

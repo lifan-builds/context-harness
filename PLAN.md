@@ -62,7 +62,7 @@ dump.
   candidate and pruned removed `context-launch`/`context-handoff` symlinks from
   all configured targets.
 - After publishing, Agent Nexus `sync --yes` fetched
-  `lifan-builds/context-harness@66132f7` from GitHub and deployed it locally.
+  `lifan-builds/context-harness@main` from GitHub and deployed it locally.
 - Agent Nexus `doctor` exits 0 after local deployment.
 
 ## Archive

@@ -8,10 +8,10 @@ context-harness is a portable context framework for AI coding agents. It ships a
 ```
 .
 context-catch-up/
-context-grill/ (deprecated compatibility stub)
-context-handoff/ (deprecated compatibility stub)
 context-init/
 context-maintain/
+context-upgrade/
+set-goal/
 scripts/
 ```
 
@@ -31,7 +31,7 @@ scripts/
 <!-- Deprecated in schema v3. Preserve as project intent; use PLAN.md Done Criteria and Workflow Verification for active checks. -->
 1. Agents can initialize lightweight project context in a new repo.
 2. Agents can catch up quickly from durable context files.
-3. Agents can improve durable context through maintenance, reflection, plan stress-tests, and long-running task launch briefs.
+3. Agents can improve durable context through maintenance, reflection, plan stress-tests, and long-running goal prompts.
 
 ## Workflow
 - Setup: n/a
@@ -43,19 +43,20 @@ scripts/
 
 ## Language
 - **context-catch-up**: The startup/resume skill for a freshly started agent session or genuinely resumed session that needs to recover project state before planning or editing. Avoid invoking it during ordinary mid-session turns after context has already been loaded.
+- **context-init**: The fresh-repository initialization skill. It creates a new context-harness layout only; avoid using it for legacy, partial, or schema migration.
 - **context-maintain**: The ongoing context skill for maintaining context after or during work: updates, lesson capture, plan state, session closeout, and Reflect Mode after corrections or failed attempts. Avoid: context-update.
-- **context-grill**: Deprecated compatibility stub. Avoid for new work; use `context-maintain` Plan Stress-Test for stress-testing plans, taxonomies, workflows, or context models.
-- **context-launch**: The skill for converting the current conversation and project context into a long-running Codex task brief or `/goal` for a fresh agent. Avoid: context-handoff.
-- **context-handoff**: Deprecated compatibility stub. Avoid for new work; use `context-maintain` for closeout, transfer notes, next steps, and durable context updates.
-- **context-upgrade**: The operator skill for context-harness source upgrades, schema migrations, local fleet migrations, deployment checks, and packaging migration lessons for repeat use.
+- **set-goal**: The skill for converting the current conversation and project context into a directly usable long-running goal for Codex goal mode, loop mode, or a fresh agent.
+- **context-upgrade**: Explicit-only operator skill for context-harness source upgrades, legacy v1 migration, schema migrations, partial/custom layout repair, local fleet migrations, deployment checks, and packaging migration lessons for repeat use. Avoid implicit invocation.
 - **Legacy Objectives**: Preserved schema v2 project outcomes. Avoid using them for new work; use `PLAN.md` Done Criteria and `CONTEXT.md` Workflow Verification.
 
 ## Relationships
-- The preferred companion skill set is `context-init`, `context-catch-up`, `context-launch`, `context-maintain`, and `context-upgrade`.
+- The preferred companion skill set is `context-init`, `context-catch-up`, `set-goal`, `context-maintain`, and explicit-only `context-upgrade`.
+- Deprecated compatibility stub skills are removed completely, not shipped as hidden/non-invocable skills.
+- `context-init` is only for fresh repositories; all migration and layout repair belongs to explicit `context-upgrade`.
 - `context-catch-up` is only for whole fresh session or true resume boundaries; ordinary follow-up turns should rely on already-loaded context and use `context-maintain` only when context needs updating.
 - `context-maintain` includes the old standalone reflection workflow as Reflect Mode.
-- `context-maintain` includes the old `context-grill` pressure-testing workflow as Plan Stress-Test.
-- `context-launch` is separate from `context-maintain` because its output is a ready-to-run task prompt for another agent, not ordinary context preservation.
+- `set-goal` is separate from `context-maintain` because its output is a ready-to-run goal/loop prompt for another agent or mode, not ordinary context preservation.
+- `context-upgrade` must not be implicitly invoked; it is reserved for explicit user requests when the harness, schema, deployed skill copies, or local project fleet need an update.
 - `context-maintain` owns automatic Dream/Compact consideration after maintenance events; Dream edits context directly when useful and logs intent to `.context-harness/DREAM.md`.
 - `.context-harness/DREAM.md` is a non-operational audit log for debugging context drift or human review; agents must not read it during normal catch-up or task work.
 - Local agent-nexus deployment should use this repository's canonical source and `context-maintain` instead of Matt Pocock's `grill-with-docs`.
@@ -66,9 +67,7 @@ scripts/
 
 ## Flagged Ambiguities
 - Update/capture/plan/end are not separate skills; they belong under `context-maintain`.
-- Handoff is deprecated because it was not useful enough as a separate workflow; use `context-maintain` for closeout and next-step context.
-- Grill is deprecated because it was not useful enough as a separate workflow; use `context-maintain` Plan Stress-Test for pressure-testing plans.
-- Launch is not handoff revival; use `context-launch` only when the desired artifact is a long-running agent task brief.
+- Removed skills are not compatibility shims; `set-goal`, `context-maintain`, and `context-upgrade` own their replacement behaviors directly.
 
 ## Learned Patterns
 - When splitting context-harness into companion skills, keep the split based on invocation intent because too many maintenance-like skills make the harness harder to choose.
@@ -80,8 +79,7 @@ scripts/
 - Codex hooks should stay simple lifecycle nudges: session start points to `context-catch-up`, missing project context points to `context-init`, and substantial task completion points to `context-maintain`.
 - When migrating existing projects to a new context-harness contract, prefer model-led edits over bulk migration scripts because each repo may have local AGENTS.md conventions that need judgment.
 - For backward compatibility, generated context files should carry a lightweight schema/version marker and new skills should model-led upgrade older or partial context files instead of assuming the latest AGENTS.md contract is already present.
-- When a workflow feels like low-value process, deprecate it instead of keeping it in the preferred skill path; `context-handoff` now remains only as a compatibility stub.
-- When a workflow feels like low-value process, fold its useful behavior into an existing skill and leave only a compatibility stub; `context-grill` now routes to `context-maintain` Plan Stress-Test.
+- When a workflow is removed from the preferred skill path, remove the stub completely once the replacement behavior is covered by an active skill and tests.
 - When using SkillOpt-style self-improvement, separate proposal from mutation: collect evidence and validation, ask the user for approval, then update the canonical skill source rather than silently editing installed copies.
 - When adapting Claude Code-style auto memory, use semantic model judgment inside `context-maintain` instead of hard counters or line limits; keep the result visible in markdown and keep audit history separate from operational context.
 - When installing CommonJS runtime scripts into JavaScript projects, add a `scripts/package.json` with `"type": "commonjs"` because parent packages may set `"type": "module"` and break `require()`.

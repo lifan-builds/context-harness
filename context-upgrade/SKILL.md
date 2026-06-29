@@ -7,13 +7,19 @@ description: >
   migrate projects between schema versions, package lessons from a migration,
   harden compatibility behavior, or repeat a previous context-harness
   upgrade/migration safely.
+disable-model-invocation: true
+user-invocable: true
 ---
 
 # Context Upgrade
 
-Upgrade/migration work is a controlled operator workflow. Prefer model-led
-edits, schema-aware scripts, explicit verification, and conservative deployment
-over broad rewrites.
+Upgrade/migration work is a controlled operator workflow. It must be invoked
+explicitly by the user when context-harness itself has an update, a schema
+migration is needed, or a local fleet migration is requested. Do not invoke
+implicitly just because a repo contains context-harness files.
+
+Prefer model-led edits, schema-aware scripts, explicit verification, and
+conservative deployment over broad rewrites.
 
 ## Start
 
@@ -76,6 +82,10 @@ node scripts/context-index.js check
 
 ## Project Migration
 
+Use this for all context-harness migration work: legacy v1 files, schema v2 to
+v3, partial layouts, custom local contexts, and fleet migrations. `context-init`
+is only for fresh repositories.
+
 For a single repo or fleet migration:
 
 1. Run a dry-run inventory first:
@@ -90,16 +100,20 @@ node scripts/migrate-project.js --root <path>
    and avoid overwriting unrelated user changes.
 4. For partial or custom contexts, inspect files and make model-led edits
    instead of forcing a generated layout.
-5. Apply the migration only after the dry-run result is understood:
+5. For legacy v1 layouts without `CONTEXT.md`, model-led migrate durable
+   learned patterns, active plan/findings state, user rules, workflow checks,
+   and old agent instructions into the v3 `AGENTS.md`, `CONTEXT.md`, `NOW.md`,
+   and optional `PLAN.md` shape.
+6. Apply the migration only after the dry-run result is understood:
 
 ```bash
 node scripts/migrate-project.js --root <path> --write
 ```
 
-6. Use `--include-dirty` only after explicit user direction.
-7. In each migrated repo, refresh the generated index and install/update local
+7. Use `--include-dirty` only after explicit user direction.
+8. In each migrated repo, refresh the generated index and install/update local
    runtime scripts when the migration requires it.
-8. Re-run dry-run with the same root to confirm remaining skips are expected:
+9. Re-run dry-run with the same root to confirm remaining skips are expected:
 
 ```bash
 node scripts/migrate-project.js --root <path> --include-dirty

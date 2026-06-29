@@ -1,127 +1,79 @@
-# Plan
+# Context Harness Release Plan
 
-## Findings
-- 2026-06-28 narrowed research correction: the relevant Karpathy lineage is `forrestchang/andrej-karpathy-skills` and ports/forks such as `duolahypercho/andrej-karpathy-skills` and `swarmclawai/andrej-karpathy-skills`, not the broader skill marketplace. Its useful core is four durable behavioral checks: think before coding, keep it simple, make surgical changes, and define/verify the goal.
-- 2026-06-28 Karpathy comparison: context-harness already carries those four principles in root `SKILL.md`, but generated repo `AGENTS.md` only contains the Context Contract and index. Downstream repos may therefore get durable context mechanics without always getting the behavioral guardrails unless the root skill is explicitly loaded.
-- 2026-06-28 lightweight context/memory peer scan: closest peers are `nydrx/agent-memory-skills` (`.memory/` committed + `.scratch/` ignored, L0-L3 progressive disclosure, active/superseded status), `Daaaaave/agentic-workspace-core` (repo-native docs, generated `llms.txt`, knowledge doctor/check, skills/evals), `strangeman-aboy/agent-memory-skill` (sidecar `state.json`, candidate/promote, handoff packets, behavior scenarios), and `AdamTylerLynch/obsidian-agent-memory-skills` (Obsidian vault with graph traversal).
-- 2026-06-28 lightweight context lesson: context-harness is leaner than most peers because it uses four markdown files plus scripts, but peers do better at explicit status semantics, L0/L1/L2/L3 read tiers, candidate memory review, and checked behavior scenarios.
-- 2026-06-28 Superpowers comparison: `obra/superpowers` is a heavier workflow harness, but its useful transferable ideas are bootstrap/session-start activation, mandatory skill checks before work, eval-backed skill changes, and generated adapters across many agent hosts.
-- 2026-06-28 fresh skill-trend research: Agent Reach was available through `gh` and Jina Reader after network escalation; Exa was not configured, Reddit was not logged in, V2EX DNS failed, and `agent-reach check-update` could not resolve DNS. Evidence came from official OpenAI Codex skills docs, Agent Skills docs/eval guidance, Claude Code skills docs, GitHub repo searches, and representative public skill repos.
-- 2026-06-28 trend scan: official Codex skills docs emphasize progressive disclosure, front-loaded trigger descriptions, a skill-list context budget, optional `scripts/` / `references/` / `assets/`, `agents/openai.yaml` for UI/policy/dependencies, Record & Replay, and testing prompts against the skill description.
-- 2026-06-28 trend scan: `openai/skills` now marks itself deprecated and points distribution toward `openai/plugins`; plugin examples bundle skills with manifests, MCP/app config, hooks, commands, assets, and richer distribution metadata.
-- 2026-06-28 trend scan: GitHub public Codex skill search surfaced categories around curated skill registries, artifact generation/conversion, personal skill managers, code complexity/audit skills, workflow automation, and cross-agent skill packs. Representative results included `ComposioHQ/awesome-codex-skills`, `Dimillian/CodexSkillManager`, `ningzimu/image-to-editable-ppt-skill`, and broad Claude/Codex skill collections.
-- 2026-06-28 trend scan: Agent Skills eval guidance recommends with-skill vs without-skill baselines, realistic prompts, assertions, timing/token capture, grading evidence, and iteration. This reinforces adding a small eval harness for context-harness skills instead of relying only on manual self-review.
-- 2026-06-28 local inspection: context-harness already matches core trends on progressive disclosure and focused companion skills, but it has no checked-in skill eval cases, no plugin packaging path, and the root `SKILL.md` remains relatively long at 298 lines compared with smaller companion skills.
-- 2026-06-28 local inspection: `context-upgrade` remains the highest-leverage patch target because upgrade/migration work is where deterministic preflight reports, forward tests, deployment smoke checks, and plugin-package checks matter most.
-- 2026-06-27 follow-up research attempt: Agent Reach is installed, but Exa is not configured, GitHub CLI is unauthenticated, and escalated network commands were rejected by the approval system due to a usage limit until 2:00 PM. This pass should be treated as a local synthesis of prior captured public research plus repo inspection, not a fresh web crawl.
-- 2026-06-27 local repo inspection: `context-upgrade` is the right place for the next patch. It already covers dry-run migration, conservative deployment, and closeout, but still lacks explicit preflight report, forward-test, and post-deploy smoke-check subsections that would operationalize the trend toward narrow skills with deterministic validation.
-- 2026-06-27 skill trends scan: current public Codex/Claude skill repos cluster around concrete repeatable workflows, multimodal artifact conversion, security/audit reports, skill/package managers, and large cross-agent skill packs rather than vague agent behavior rules.
-- 2026-06-27 skill trends scan: OpenAI Codex skill docs emphasize concise `SKILL.md` instructions plus optional scripts/references/assets and `agents/openai.yaml`; Anthropic Claude Code skill docs show the same progressive-disclosure pattern with `SKILL.md`, scripts, and resources.
-- 2026-06-27 skill trends scan: GitHub search surfaced `awesome-codex-skills`, `CodexSkillManager`, Trail of Bits security skills, codebase/course generators, image/PPT conversion skills, and broad Claude/Codex/Gemini skill packs. The common quality marker is a narrow outcome plus deterministic helper scripts or validation.
-- 2026-06-27 `context-upgrade` gap: the skill captures migration preferences but does not yet require a structured preflight report listing source version, target version, schema inventory, dirty repos, partial contexts, unsupported repos, and deployment targets.
-- 2026-06-27 `context-upgrade` gap: the skill should add an explicit forward-test step for changed skills: validate metadata, run repo tests, then ask a fresh agent/subagent to use the upgraded skill on a representative migration task before deployment when practical.
-- 2026-06-27 `context-upgrade` gap: the skill should specify a post-deploy smoke check across installed targets, including symlink/frontmatter verification and a reminder that IDEs may need restart after metadata changes.
-- Codex supports hooks through `~/.codex/config.toml` and project-level `.codex/config.toml`.
-- Codex hook events include `SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `Notification`, and `Stop`.
-- Plugin-provided hooks are supported in plugin manifests, but currently require `experimental_use_rmcp_client = true` and `experimental_plugin_hooks = true`.
-- Context-harness should prefer hooks for reminders, guardrails, and closeout prompts, while keeping skills as the manual entry points.
-- 2026-06-23 local Codex inspection: active hooks are correctly installed in `~/.codex/hooks.json` by agent-nexus and call the JS dispatcher; agent-nexus is the deployment layer. The active cached `lifan-builds/context-harness` dispatcher is older than the working-tree `scripts/codex-context-hook.js`, which has newer v2/v3 schema detection.
-- `AGENTS.md` should remain the automatic activation layer, but its durable-context content should be a generated high-level index into `CONTEXT.md`, not a duplicate of full context.
-- Research scan for self-improving skills: strongest adjacent patterns are Reflexion-style verbal feedback, Self-Refine/GEPA-style artifact optimization, Voyager/AutoSkill-style skill libraries, Toolformer/LATM-style tool creation, and SkillOps-style lifecycle management.
-- For context-harness, the practical direction is not autonomous rewriting of skills after every run; use evidence-gated improvement with telemetry/findings, eval checks, human review for `SKILL.md` changes, and lifecycle states for skill artifacts.
-- SkillOpt source-code scan: its trainer uses six stages (`rollout`, `reflect`, `aggregate`, `select`, `update`, `evaluate`) and persists `history.json`, `runtime_state.json`, `best_skill.md`, per-step `candidate_skill.md`, `merged_patch.json`, `ranked_edits.json`, and edit-apply reports.
-- SkillOpt represents edits as structured operations (`append`, `insert_after`, `replace`, `delete`) with `target`, `content`, `support_count`, and `source_type`; this maps well to a small context-harness proposal format instead of full-file rewrites.
-- SkillOpt's validation gate is intentionally pure: accept only when candidate score beats the current score, track a separate best skill, and let the trainer handle persistence. Context-harness should borrow that separation for user-approved skill updates.
-- SkillOpt protects managed regions and tracks rejected edits/failure patterns in a step buffer so the optimizer avoids repeating bad patches; context-harness can approximate this with `PLAN.md` candidate status and rejected-patch notes before adding a script.
-- Token scan: the always-read surface is already small; low-risk savings came from compacting generated `AGENTS.md` index text, Codex hook nudges, and repeated prose in `context-maintain` rather than weakening behavioral rules.
-- Claude/Anthropic public memory docs emphasize a layered memory hierarchy: enterprise policy, project memory, user memory, local project memory, and imported files, with more-specific memories taking precedence and `CLAUDE.md` kept concise and human-editable.
-- Claude Code's documented auto-memory flow updates `CLAUDE.md` in the background by default and asks for approval when configured, but the useful transferable pattern is evidence-gated consolidation, not automatic unrestricted rewriting.
-- Managed Agents "Dreams" describe an asynchronous post-task consolidation pass over session data that writes concise, verifiable memory updates to memory stores; this maps to context-harness session closeout better than live prompt-time memory mutation.
-- Managed Agents memory guidance favors a small set of structured markdown memory files, explicit task instructions about when/how to search and update memory, no secrets, and periodic cleanup of stale or duplicate entries.
-- For context-harness, the strongest applicable pattern is a `context-maintain` dream/compact pass: after substantial work, review session findings, propose durable `CONTEXT.md` deltas or task-local `PLAN.md` deltas, refresh `AGENTS.md` index, and update `NOW.md`.
-- For indexing, context-harness already has the right primitive in `scripts/context-index.js`; the likely next improvement is richer section metadata and queryable summaries, not vector search or hidden memory stores.
-- Follow-up research boundary: do not inspect leaked proprietary Claude Code source directly even with user permission; use official docs plus public commentary/videos/posts and clearly label secondary evidence.
-- Public commentary around Claude Code's auto memory describes a two-tier project memory: a concise root index and topic/detail files, with the agent deciding when to search deeper. This reinforces `AGENTS.md` as a startup index and argues against loading all durable context by default.
-- For context-harness skill design, the high-leverage patch candidate is adding a `Dream Mode` subsection to `context-maintain`: trigger, inputs, consolidation rubric, output routing, verification, and explicit no-secrets/no-raw-transcripts guardrails.
-- 2026-06-09 research scan: AGENTS.md best practice is converging on concise, repo-local instructions with setup/test/security commands, not broad process frameworks; context-harness already matches this with a small AGENTS contract and generated CONTEXT index.
-- Recent AGENTS.md efficiency research is mixed: helpful instructions can lower exploration and cost, while verbose or generic repository context can increase cost. This argues for pruning generic Objectives/eval-loop surface instead of adding more default rules.
-- The current eval-loop is wired into the public surface: README, root SKILL.md, context-init, install-project.js, scripts/eval-loop.js, and tests. Deprecating it should remove it from default generation/install/docs while leaving a migration path for existing users.
-- Keep verification as a first-class habit, but route it to task-local done criteria and project workflow checks rather than persistent "3 Objectives" in every CONTEXT.md.
-- 2026-06-23 local adoption scan found 24 root project context footprints under `/Users/lfan/Project`: 10 schema v3, 9 schema v2, 1 legacy marker, and 4 partial/non-harness contexts.
-- The strongest local uses are continuity-heavy projects where `NOW.md` carries the live resume state, `CONTEXT.md` captures durable rules/relationships, and `PLAN.md` carries task-local evidence and decisions across multi-session work.
-- The weakest local uses are oversized `NOW.md` files (`seasonal-arpg-engine`, `baby`, `sellbig`, `awareness`) and archive-like `PLAN.md` files (`moonshot`, `agent-guild`, `awareness`, `flyingpig`, `wishlist`) where agents must read too much before acting.
-- Several high-stakes or personal-operation repos (`baby`, `seasonal-arpg-engine`, `xianyu`, `nitan-pod`, `self-promoting`) skip `PLAN.md`, which makes `NOW.md` absorb detailed evidence, blockers, and next actions that should be split into current-state vs support notes.
-- Recent local git history shows context files are genuinely used, not just installed: since 2026-06-01, context commits appeared in `baby`, `credit-card-tracker`, `moonshot`, `mychart-cli`, `seasonal-arpg-engine`, and `context-harness`; multiple other repos carry uncommitted context updates.
-- Online research scan: public practice around `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` is converging on concise repo instructions plus separate task/memory files, lifecycle hooks for enforcement, reusable skills for workflows, subagents for isolated exploration, and explicit compaction/retrospective steps for long sessions.
-- Public community discussion shows a recurring taxonomy gap: users confuse project instructions, memory files, skills, hooks, plugins, and subagents. Context-harness should make these boundaries explicit in its own docs and generated comments.
-- GitHub search on 2026-06-23 shows fast growth of `AGENTS.md` utilities, generators, rule kits, and portable cross-agent config repos, but many appear template-heavy; context-harness should differentiate by staying evidence-driven and health-checkable rather than becoming another rules dump.
-- 2026-06-23 dream-mechanism follow-up: public Claude Code docs describe Auto Memory as model-decided, future-usefulness-based memory consolidation, stored in visible markdown under `~/.claude/projects/<project>/memory/` with a concise `MEMORY.md` entrypoint and topic files loaded on demand.
-- Public reporting/analysis around Anthropic "dreaming" frames it as asynchronous post-task learning/consolidation: agents review past work, extract reusable lessons, and improve future behavior without being in the critical path of task execution.
-- The useful context-harness adaptation is soft automatic consolidation inside `context-maintain`: after context updates or closeout, decide whether a dream pass is useful from semantic signals such as completed work, stale blockers, repeated findings, conflicts, or overloaded active state. Avoid hard line-count triggers as the primary mechanism.
-- Research boundary: do not inspect leaked/proprietary Claude Code source for dream internals; rely on public docs, public reporting, and community commentary.
+## Goal
+Make Context Harness release-ready as a lightweight project-memory layer for
+coding agents: small visible context files, clear skill invocation timing,
+explicit upgrades, and proof that a fresh agent can resume without a long prompt
+dump.
+
+## Current Findings
+- Deprecated `context-launch`, `context-handoff`, and `context-grill` stubs are
+  removed completely; tests assert those skill files are absent.
+- `context-init` is fresh-repo initialization only. Legacy v1, schema v2,
+  partial/custom layout repair, and fleet migration route to explicit
+  `context-upgrade`.
+- `context-catch-up` is only for fresh-session or true-resume boundaries. It
+  reports schema drift and does not repair layouts implicitly.
+- `set-goal` is the long-running goal/loop workflow and includes goal, context,
+  constraints, done criteria, milestones, verification, loop rules, and closeout.
+- `context-upgrade` is explicit-only through skill frontmatter and Codex policy
+  metadata.
+- Public install URLs use `lifan-builds/context-harness` consistently.
 
 ## Decisions
-- Skill patch candidate: target `context-catch-up/SKILL.md`; problem: current wording says "starting or resuming" but does not explicitly prevent agents from re-running catch-up on ordinary mid-session turns; evidence: direct user correction on 2026-06-28 that `context-catch-up` should only be invoked when an entire fresh session is started and otherwise should not be forced; proposed edit operations: replace description/Trigger wording to say "fresh agent session or true resume boundary", add a guardrail "Do not invoke during ordinary follow-up turns once context has been loaded"; checks: `tests/run-all.sh`, `node scripts/context-index.js check`; status: pending explicit approval before mutating `context-catch-up/SKILL.md`.
-- Recommendation candidate: make Karpathy-style behavior an explicit optional generated layer, probably a short `## Behavioral Guardrails` block in generated `AGENTS.md` or `CONTEXT.md#Rules`, instead of leaving it only in the root skill. Keep it four bullets; do not expand it into a process framework.
-- Recommendation candidate: add an explicit context read-tier vocabulary to context-harness docs: `AGENTS.md`/`NOW.md` as L0, `CONTEXT.md` index rows as L1, selected `CONTEXT.md` sections as L2, and linked domain docs or `PLAN.md` details as L3.
-- Recommendation candidate: add status semantics to `PLAN.md`/context maintenance without new folders: active, blocked, done, superseded, stale. This borrows the useful peer pattern while preserving the four-file harness.
-- Recommendation candidate: add behavior/eval scenarios for context-harness skills, especially catch-up, maintain, and upgrade, before adding more features.
-- Recommendation candidate: add lightweight skill eval fixtures under each high-risk skill or a shared `evals/` directory, starting with `context-catch-up`, `context-maintain`, and `context-upgrade`; compare expected routing/output against a baseline and record token/time only when practical.
-- Recommendation candidate: add an optional plugin distribution path for context-harness once the skill source is stable: minimal `.codex-plugin/plugin.json`, bundled skills, scripts, hooks metadata where supported, and a packaging smoke check.
-- Recommendation candidate: split bulky root `SKILL.md` reference material into `references/` only if it reduces the always-loaded body after activation without making companion skills harder to navigate.
-- 2026-06-26 decision: add `context-upgrade` as a dedicated operator skill for future context-harness source upgrades, schema migrations, fleet migrations, deployment checks, and migration preference packaging. This is distinct from `context-maintain` because the invocation intent is upgrade/migration execution, not ordinary context upkeep.
-- Recommendation candidate: deprecate the 3 Objectives/eval-loop framework from the preferred context-harness path. Replace it with a lean `Verification` note in `CONTEXT.md#Workflow` and task-specific done criteria in `PLAN.md` or `context-launch`.
-- Recommendation candidate: keep `AGENTS.md` as contract plus index only; avoid adding auto-loaded summaries, vector stores, or hidden memory. Add richer context-index metadata only if it helps agents choose which section to open.
-- Recommendation candidate: make optional scripts truly optional in default install. `eval-loop.js` should become legacy/optional; consider whether `adr.js` should also stop installing by default because ADRs are not required for ordinary capture.
-- 2026-06-09 deeper scan: Anthropic's "Building Effective Agents" reinforces simple composable patterns over framework complexity; for context-harness this supports improving `context-maintain` and install profiles instead of adding new companion skills.
-- 2026-06-09 deeper scan: Claude Code memory docs support a hierarchy of concise human-editable memory files and imports; context-harness should keep `CONTEXT.md` as durable truth and add optional detail maps only when a single file becomes ambiguous.
-- 2026-06-09 deeper scan: OpenAI agent-eval guidance and agent-harness research support traceable verification evidence, but they do not support a generic project-wide 3-objective loop as a default context primitive.
-- 2026-06-09 deeper repo scan: root `SKILL.md` is 299 lines, default install copies 11 scripts, and the docs still present `eval-loop.js` and `adr.js` as normal companion scripts despite the repo's lean/default-optional direction.
-- Recommendation candidate: add a small harness-health check, preferably as `context-index.js check` rather than a new script, to validate schema marker, stale AGENTS index, `NOW.md` length, and oversized `PLAN.md`.
-- Recommendation candidate: add `Done Criteria` and `Verification` to the optional `PLAN.md` template so eval discipline moves into task-local state instead of durable project Objectives.
-- Recommendation candidate: keep Dream/Compact mode inside `context-maintain`, focused on post-task consolidation: prune stale task notes, propose durable deltas, record verification evidence, and avoid secrets/raw transcripts.
-- 2026-06-23 decision: deprecate `context-grill` as a separate workflow; keep a non-invocable compatibility stub and move plan pressure-testing into `context-maintain` Plan Stress-Test.
-- Recommendation candidate: add a `context-index.js audit --root <dir>` report for local fleets that classifies schema, stale indexes, missing files, oversized `NOW.md` / `PLAN.md`, and pending migrations without modifying repos.
-- Recommendation candidate: add explicit size and routing guidance to `context-maintain`: `NOW.md` should stay a short resume packet, `PLAN.md` should be active evidence not a historical archive, and detailed dossiers should move into domain docs with links from `CONTEXT.md`.
-- Recommendation candidate: document the taxonomy boundary plainly: `AGENTS.md` = activation contract and index, `CONTEXT.md` = durable project memory, `NOW.md` = current resume state, `PLAN.md` = active task evidence/decisions, hooks = nudges/enforcement, skills = reusable workflows.
-- Recommendation candidate: revise Dream/Compact Mode to be automatic-by-default inside `context-maintain`, but explain that "automatic" means model judgment after maintenance events, not a script-backed counter or fixed threshold.
-- 2026-06-23 Dream design decision: implement Dream as an automatic semantic check inside every `context-maintain` run; if useful, edit context directly and log a short intent entry to lazily created `.context-harness/DREAM.md`.
-- 2026-06-23 Dream log decision: `.context-harness/DREAM.md` is audit-only, non-operational, intended to be tracked, and must never be read during normal catch-up or task work.
+- Do not ship hidden compatibility stubs; replacement behavior lives in
+  `set-goal`, `context-maintain`, and `context-upgrade`.
+- Keep the preferred skill set small: `context-init`, `context-catch-up`,
+  `set-goal`, `context-maintain`, and explicit-only `context-upgrade`.
+- Keep migration and layout repair out of ordinary catch-up so upgrades happen
+  only when the user asks for harness/schema/fleet update work.
+- Keep `AGENTS.md` as activation contract plus generated context index; durable
+  detail stays in `CONTEXT.md` and active task evidence stays here.
 
 ## Progress
-- [x] Implemented schema v3 defaults: no generated Objectives, task-local Done Criteria, Workflow Verification, and schema v3 templates.
-- [x] Soft-deprecated `eval-loop.js`: legacy profile only, kept tests for existing Objective repos.
-- [x] Added `context-index.js check` and `scripts/migrate-project.js` for batch schema v2 migration.
-- [x] Added Dream/Compact mode to `context-maintain`.
-- [x] Deprecated `context-grill` and moved useful pressure-testing behavior into `context-maintain`.
-- [x] Batch migrated 7 clean local project repos under `/Users/lfan/Project`: `agent`, `awareness`, `credit-card-tracker`, `ergatta`, `med-context`, `self-promoting`, and `xianyu`.
-- [x] Deployed local context-harness v3 patch with agent-nexus to Claude, Cursor, Antigravity, and Codex.
-- [x] Re-deployed the local working tree through agent-nexus; managed `context-grill` symlinks now resolve to `/Users/lfan/Project/context-harness/context-grill`.
-- [x] Completed 2026-06-23 local-plus-online research pass on real project usage and current public context-harness-adjacent patterns.
-- [x] Implemented automatic Dream/Compact guidance in `context-maintain`, root docs, README, generator prompt text, and line-count warning behavior.
-- [x] Packaged upgrade/migration preferences into the new `context-upgrade` skill and linked it from the root skill, README, and durable context.
+- [x] Updated README positioning around four visible files, progressive
+  disclosure, companion skills, and proof artifacts.
+- [x] Added `RELEASE_GOAL.md` for repo-local release readiness.
+- [x] Added `examples/cold-resume-demo.md` showing `NOW.md` first, `AGENTS.md`
+  index second, selective `CONTEXT.md` sections, `PLAN.md` task state, and the
+  next verification action.
+- [x] Updated root and companion skill docs for `set-goal`, explicit-only
+  `context-upgrade`, fresh-session-only `context-catch-up`, and fresh-repo-only
+  `context-init`.
+- [x] Updated Codex hook nudges to route drift to `context-catch-up` summary plus
+  explicit `context-upgrade`, not implicit repair.
+- [x] Added release-proof tests for catch-up timing, maintain routing,
+  Dream/Compact ownership, explicit-only upgrade metadata, set-goal headings,
+  removed deprecated stubs, and the cold-resume demo artifact.
 
 ## Follow-Ups
-- Pending approval: update `context-catch-up/SKILL.md` so its trigger scope is fresh-session/true-resume only, not ordinary mid-session turns.
-- Narrowed 2026-06-28 recommendation: before plugin packaging or broad marketplace work, patch generated context guidance so downstream repos get the Karpathy four behavioral guardrails plus context read-tier semantics in a tiny form.
-- Follow-up candidate: decide whether behavioral guardrails belong in generated `AGENTS.md` (always-read, stronger, more token cost) or generated `CONTEXT.md#Rules` (durable, selectively read, weaker activation).
-- Fresh 2026-06-28 recommendation: keep the current next patch focused on `context-upgrade/SKILL.md` and add `Preflight Report`, `Forward-Test`, `Post-Deploy Smoke Check`, plus a small `Plugin Packaging Check` note because OpenAI's current distribution guidance has moved from raw skills toward plugins.
-- Follow-up candidate: create a first `evals/` proof of concept for `context-upgrade` with 2-3 prompts: source-only upgrade, fleet migration dry run, and installed-skill deployment smoke check.
-- Next best patch: update `context-upgrade/SKILL.md` with three procedural sections: `Preflight Report`, `Forward-Test`, and `Post-Deploy Smoke Check`; then verify with `tests/run-all.sh` and `node scripts/context-index.js check`.
-- Dirty repos were skipped by default and still have pending v3 migrations: `agent-guild`, `agent-nexus`, `baby`, `flyingpig`, `hoa-assessment-challenge`, `moonshot`, `resume`, `seasonal-arpg-engine`, and `wishlist`.
-- Unsupported or legacy-marker-missing repos were skipped: `deal`, `nitan-pod`, `sellbig`, and `snow-plan`.
-- Post-migration checks found pre-existing cleanup needs: `agent` is missing `Language` and `Flagged Ambiguities`; `awareness`, `ergatta`, `med-context`, and `xianyu` have oversized `NOW.md` or `PLAN.md`.
-- Restart AI IDEs to pick up the redeployed skill frontmatter.
-- Consider a fleet cleanup pass for dirty/pending repos and a separate compaction pass for oversized `NOW.md` / `PLAN.md` files before adding new harness features.
+- Restart AI IDEs or agent hosts so frontmatter and skill metadata are reloaded
+  after the local Agent Nexus deployment.
+- Later, consider optional plugin packaging and a small eval fixture set for
+  high-risk skills, but do not block this release on those.
 
 ## Verification
-- 2026-06-28 narrowed research verification: Agent Reach GitHub searches for `karpathy skills`, `andrej karpathy skills`, `agent memory skill`, `claude code superpowers skills`, and related context-harness terms succeeded with escalation; inspected `forrestchang/andrej-karpathy-skills`, `duolahypercho/andrej-karpathy-skills`, `swarmclawai/andrej-karpathy-skills`, `nydrx/agent-memory-skills`, `Daaaaave/agentic-workspace-core`, `strangeman-aboy/agent-memory-skill`, `AdamTylerLynch/obsidian-agent-memory-skills`, and `obra/superpowers`. `agent-reach check-update` reports v1.5.0 available.
-- 2026-06-28 research verification: `agent-reach doctor` reported 3/16 channels available; Agent Reach `gh search repos "codex skills"` and `"claude skills"` succeeded with escalation; Jina Reader fetched official OpenAI Codex skills docs, Agent Skills docs/eval guidance, and Claude Code skills docs; `gh repo view openai/skills`, `openai/plugins`, `ComposioHQ/awesome-codex-skills`, `Dimillian/CodexSkillManager`, and `ningzimu/image-to-editable-ppt-skill` succeeded.
-- `tests/run-all.sh` exits 0: 173 passed, 0 failed.
-- `node scripts/context-index.js check` exits 0.
-- `node scripts/migrate-project.js --root /Users/lfan/Project --include-dirty` confirms the migrated repos and `context-harness` are up to date; remaining dirty repos are pending by policy.
-- `nexus sync --yes` exits 0 and deploys 14 skills to Claude, Cursor, Antigravity, and Codex.
-- `nexus doctor` exits 0; all four targets report 14 skill symlinks and Codex has 3 hook entries.
-- Installed `context-grill` frontmatter under `/Users/lfan/.codex/skills/context-grill/SKILL.md` has `user-invocable: false`, and all four managed `context-grill` symlinks resolve to `/Users/lfan/Project/context-harness/context-grill`.
-- 2026-06-23 research verification: local scan used read-only filesystem inventory and git history; online scan used `agent-reach doctor`, GitHub search, Reddit search, and official/web sources. Twitter search failed with an HTTP 404 and was not used as evidence.
-- 2026-06-23 Dream patch verification: `node scripts/context-index.js check` exits 0; `tests/run-all.sh` exits 0 with 178 passed, 0 failed.
+- `tests/run-all.sh` exits 0 with 206 passed, 0 failed.
+- `node scripts/context-index.js check` exits 0 after this compacted plan.
+- Agent Nexus `sync --dry-run` against the sibling local Context Harness release
+  candidate discovers 6 Context Harness skills, including `set-goal`, and no
+  removed stubs.
+- Agent Nexus `sync --yes` deployed the sibling local Context Harness release
+  candidate and pruned removed `context-launch`/`context-handoff` symlinks from
+  all configured targets.
+- Agent Nexus `doctor` exits 0 after local deployment.
+
+## Archive
+- June 2026 research compared Context Harness with Karpathy-style skill
+  principles, Superpowers, AGENTS.md conventions, auto-memory/dream patterns,
+  and lightweight agent-memory projects. The useful durable direction remains:
+  keep the harness small, use progressive disclosure, prefer visible markdown,
+  route current evidence to `PLAN.md`, and use model-led Dream/Compact only when
+  it materially improves future catch-up.
+- Earlier schema v3 work deprecated default project-wide Objectives, moved
+  command verification into `CONTEXT.md#Workflow`, kept legacy eval tooling under
+  an optional profile, added `context-index.js check`, and added
+  `migrate-project.js` for schema v2 migration.
+- Earlier local deployment and fleet migration notes are historical. Current
+  release verification should rely on the commands listed above plus a fresh
+  Agent Nexus dry run or sync against the local release candidate.

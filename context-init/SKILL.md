@@ -1,14 +1,17 @@
 ---
 name: context-init
-description: Initialize context-harness in a new repository or migrate a legacy v1 context setup into AGENTS.md, CONTEXT.md, NOW.md, and optional PLAN.md.
+description: Initialize context-harness in a new repository by creating AGENTS.md, CONTEXT.md, NOW.md, and optional PLAN.md.
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
 ---
 
 # Context Init
 
-Use this when a repository has no `CONTEXT.md`, or when legacy v1 files exist
-without the current context-harness layout.
+Use this only when a repository has no context-harness layout and should get a
+fresh `AGENTS.md`, `CONTEXT.md`, `NOW.md`, and optional `PLAN.md`.
+
+If a repository already has old, partial, or legacy context-harness files, use
+`context-upgrade` instead. All migration work belongs there.
 
 ## Goal
 
@@ -20,8 +23,8 @@ Create the smallest durable context layer that lets future agents catch up:
 - `PLAN.md` only when there is an active multi-step task
 
 Generated `AGENTS.md` and `CONTEXT.md` must include
-`<!-- context-harness:schema v3 -->` so future skill versions can detect and
-upgrade older layouts.
+`<!-- context-harness:schema v3 -->` so future skill versions can detect the
+layout.
 
 ## Init Flow
 
@@ -53,24 +56,12 @@ upgrade older layouts.
    high-level index into `CONTEXT.md`.
 7. Ask whether there is a multi-step task. If yes, create `PLAN.md`.
 
-## Migration Flow
-
-If legacy v1 files exist but `CONTEXT.md` does not:
-
-1. Run `context-gen.js` for fresh `Project` and `Structure`.
-2. Copy durable learned patterns into `CONTEXT.md`.
-3. Ask the user to distill conventions into concise `Never` and `Always`
-   rules plus workflow verification commands.
-4. Merge active items from `PLANS.md` and `FINDINGS.md` into `PLAN.md`.
-5. Replace old agent instructions with the `AGENTS.md` Context Contract.
-
-If context-harness files exist but are old, empty, partial, or missing the
-schema marker, use `context-catch-up` Compatibility Upgrade instead of init.
-
 ## Guardrails
 
 - Do not create durable Objectives for new schema v3 projects; use `PLAN.md`
   Done Criteria and `CONTEXT.md` Workflow Verification instead.
+- Do not migrate old layouts here; route legacy v1, schema v2, partial, or
+  custom context-harness files to `context-upgrade`.
 - Keep generated files short enough to be read every session.
 - Keep `AGENTS.md` small: contract plus generated `CONTEXT.md` index.
 - Runtime scripts are project-local after init, so `AGENTS.md` can refer to

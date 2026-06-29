@@ -717,6 +717,65 @@ EOF
 fi
 
 # =============================
+# Test: release proof artifacts
+# =============================
+
+if should_run "release-proof"; then
+  suite "release proof artifacts"
+
+  it "proves catch-up timing is fresh-session only"
+  output=$(cat "$REPO_ROOT/context-catch-up/SKILL.md")
+  assert_contains "$output" "fresh-session or true-resume boundary"
+  assert_contains "$output" "Do not invoke during ordinary mid-session follow-up turns"
+
+  it "proves maintain owns ongoing updates and closeout"
+  output=$(cat "$REPO_ROOT/context-maintain/SKILL.md")
+  assert_contains "$output" "update context, capture lessons"
+  assert_contains "$output" "## Routing"
+  assert_contains "$output" "## Session Closeout"
+
+  it "proves maintain owns Dream and plan stress-tests"
+  output=$(cat "$REPO_ROOT/context-maintain/SKILL.md")
+  assert_contains "$output" "## Plan Stress-Test"
+  assert_contains "$output" "## Dream/Compact Mode"
+
+  it "proves upgrade cannot be implicitly invoked"
+  output=$(cat "$REPO_ROOT/context-upgrade/SKILL.md")
+  assert_contains "$output" "disable-model-invocation: true"
+  assert_contains "$output" "implicitly just because"
+  assert_contains "$(cat "$REPO_ROOT/context-upgrade/agents/openai.yaml")" "allow_implicit_invocation: false"
+
+  it "proves set-goal has long-running goal shape"
+  output=$(cat "$REPO_ROOT/set-goal/SKILL.md")
+  assert_contains "$output" "goal mode, loop mode, or a fresh agent"
+  assert_contains "$output" "## Done Means"
+  assert_contains "$output" "## Milestones"
+  assert_contains "$output" "## Verification"
+  assert_contains "$output" "## Loop Rules"
+  assert_contains "$output" "## Closeout"
+
+  it "proves deprecated skill stubs are removed"
+  [ ! -e "$REPO_ROOT/context-launch/SKILL.md" ] && \
+    [ ! -e "$REPO_ROOT/context-handoff/SKILL.md" ] && \
+    [ ! -e "$REPO_ROOT/context-grill/SKILL.md" ] && pass || fail "deprecated skill stub still exists"
+
+  it "proves context-init does not own migration"
+  output=$(cat "$REPO_ROOT/context-init/SKILL.md")
+  assert_contains "$output" "All migration work belongs"
+  assert_not_contains "$output" "Migration Flow"
+
+  it "ships a cold-resume demo artifact"
+  [ -f "$REPO_ROOT/examples/cold-resume-demo.md" ] && pass || fail "missing cold-resume demo"
+
+  it "cold-resume demo shows selective context recovery"
+  output=$(cat "$REPO_ROOT/examples/cold-resume-demo.md")
+  assert_contains "$output" 'Read `NOW.md`'
+  assert_contains "$output" 'Read `AGENTS.md`'
+  assert_contains "$output" 'Choose relevant `CONTEXT.md` sections'
+  assert_contains "$output" "Correct Next Action"
+fi
+
+# =============================
 # Test: skill packaging
 # =============================
 
@@ -736,33 +795,21 @@ if should_run "skill-packaging"; then
   it "ships context-catch-up as a separate skill"
   [ -f "$REPO_ROOT/context-catch-up/SKILL.md" ] && pass || fail "missing context-catch-up/SKILL.md"
 
-  it "keeps deprecated context-grill compatibility stub"
-  [ -f "$REPO_ROOT/context-grill/SKILL.md" ] && pass || fail "missing context-grill/SKILL.md"
+  it "does not ship context-grill"
+  [ ! -e "$REPO_ROOT/context-grill/SKILL.md" ] && pass || fail "unexpected context-grill/SKILL.md"
 
-  it "ships context-launch as a separate skill"
-  [ -f "$REPO_ROOT/context-launch/SKILL.md" ] && pass || fail "missing context-launch/SKILL.md"
+  it "ships set-goal as a separate skill"
+  [ -f "$REPO_ROOT/set-goal/SKILL.md" ] && pass || fail "missing set-goal/SKILL.md"
 
-  it "keeps deprecated context-handoff compatibility stub"
-  [ -f "$REPO_ROOT/context-handoff/SKILL.md" ] && pass || fail "missing context-handoff/SKILL.md"
+  it "does not ship context-launch"
+  [ ! -e "$REPO_ROOT/context-launch/SKILL.md" ] && pass || fail "unexpected context-launch/SKILL.md"
 
-  it "names the context-grill skill in frontmatter"
-  output=$(sed -n '1,8p' "$REPO_ROOT/context-grill/SKILL.md" 2>&1)
-  assert_contains "$output" "name: context-grill"
-  assert_contains "$output" "user-invocable: false"
+  it "does not ship context-handoff"
+  [ ! -e "$REPO_ROOT/context-handoff/SKILL.md" ] && pass || fail "unexpected context-handoff/SKILL.md"
 
-  it "names the context-launch skill in frontmatter"
-  output=$(sed -n '1,8p' "$REPO_ROOT/context-launch/SKILL.md" 2>&1)
-  assert_contains "$output" "name: context-launch"
-
-  it "names the context-handoff skill in frontmatter"
-  output=$(sed -n '1,8p' "$REPO_ROOT/context-handoff/SKILL.md" 2>&1)
-  assert_contains "$output" "name: context-handoff"
-  assert_contains "$output" "user-invocable: false"
-
-  it "context-grill is deprecated in favor of context-maintain"
-  output=$(cat "$REPO_ROOT/context-grill/SKILL.md")
-  assert_contains "$output" "deprecated"
-  assert_contains "$output" "Use \`context-maintain\` instead"
+  it "names the set-goal skill in frontmatter"
+  output=$(sed -n '1,8p' "$REPO_ROOT/set-goal/SKILL.md" 2>&1)
+  assert_contains "$output" "name: set-goal"
 
   it "context-maintain owns plan stress-tests"
   output=$(cat "$REPO_ROOT/context-maintain/SKILL.md")
@@ -772,17 +819,22 @@ if should_run "skill-packaging"; then
   it "context-maintain recommends answers during stress-tests"
   assert_contains "$(cat "$REPO_ROOT/context-maintain/SKILL.md")" "include a recommended answer"
 
-  it "context-launch produces ready-to-paste Codex goals"
-  output=$(cat "$REPO_ROOT/context-launch/SKILL.md")
-  assert_contains "$output" "ready-to-paste Codex goal block"
+  it "set-goal produces ready-to-paste Codex goals"
+  output=$(cat "$REPO_ROOT/set-goal/SKILL.md")
+  assert_contains "$output" "ready-to-paste goal block"
   assert_contains "$output" "Done Means"
-  assert_contains "$output" "Autonomy And Escalation"
+  assert_contains "$output" "Loop Rules"
 
-  it "context-handoff is deprecated in favor of context-maintain"
-  output=$(cat "$REPO_ROOT/context-handoff/SKILL.md")
-  assert_contains "$output" "deprecated"
-  assert_contains "$output" "Use \`context-maintain\` instead"
-  assert_contains "$output" "4,000 characters"
+  it "context-upgrade is explicit-only"
+  output=$(sed -n '1,12p' "$REPO_ROOT/context-upgrade/SKILL.md")
+  assert_contains "$output" "disable-model-invocation: true"
+  assert_contains "$(cat "$REPO_ROOT/context-upgrade/agents/openai.yaml")" "allow_implicit_invocation: false"
+
+  it "context-upgrade owns all migration"
+  output=$(cat "$REPO_ROOT/context-upgrade/SKILL.md")
+  assert_contains "$output" "legacy v1"
+  assert_contains "$output" "schema v2"
+  assert_contains "$output" "context-init"
 
   it "keeps the context-maintain skill reasonably concise"
   words=$(wc -w < "$REPO_ROOT/context-maintain/SKILL.md")
@@ -1237,13 +1289,13 @@ EOF
   it "includes current NOW.md in catch-up context"
   assert_contains "$output" "Ship hooks"
 
-  it "nudges compatibility upgrade for old context-harness files"
+  it "routes old context-harness files to explicit upgrade"
   setup_tmpdir
   echo "# Agents" > "$TMPDIR_ROOT/AGENTS.md"
   echo "# Context" > "$TMPDIR_ROOT/CONTEXT.md"
   echo "# Now" > "$TMPDIR_ROOT/NOW.md"
   output=$(cd "$TMPDIR_ROOT" && printf '{"cwd":"%s"}' "$TMPDIR_ROOT" | node "$CODEX_HOOK" --mode catch-up)
-  assert_contains "$output" "Compatibility Upgrade"
+  assert_contains "$output" "context-upgrade"
 
   it "emits init context when project lacks context files"
   setup_tmpdir
@@ -1332,8 +1384,10 @@ if should_run "skill"; then
   it "references guard.js"
   assert_contains "$(cat "$SKILL")" "guard.js"
 
-  it "has migration section"
-  assert_contains "$(cat "$SKILL")" "Migrate from v1"
+  it "routes migration to context-upgrade"
+  content=$(cat "$SKILL")
+  assert_contains "$content" "Use \`context-upgrade\`"
+  assert_not_contains "$content" "Migrate from v1"
 fi
 
 # =============================

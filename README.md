@@ -2,15 +2,27 @@
 
 4 files, lean rules, zero ceremony.
 
-A portable context framework for AI coding agents. Generates `AGENTS.md`,
-`CONTEXT.md`, `NOW.md`, `PLAN.md` and ships Node.js scripts that do the
-mechanical work: stack detection, decision capture, session stamping, checks,
-and migration.
+context-harness is a portable project-memory layer for coding agents. It keeps
+the always-read surface small, puts durable facts in visible markdown, and uses
+companion skills only at clear lifecycle moments.
 
-context-harness is my answer to a simple lesson from studying serious agent
-skill systems: skills are compressed patterns. The best move is not to copy a
-big framework wholesale. It is to let your agent learn from those patterns,
-adapt them to your workflow, and keep improving its own context loop.
+It generates:
+
+```text
+AGENTS.md   # tiny startup contract + generated CONTEXT.md index
+CONTEXT.md  # durable project facts, terms, constraints, learned patterns
+NOW.md      # current focus, blockers, next step
+PLAN.md     # optional active plan, findings, decisions, verification
+```
+
+The scripts handle the mechanical work: stack detection, runtime script
+installation, context indexing, session stamping, checks, and migration. The
+skills handle the judgment: when to catch up, maintain context, set a long
+running goal, or run an explicit upgrade.
+
+This is intentionally not another large methodology framework. The default
+contract is `AGENTS.md` plus a generated index; agents open deeper context only
+when the task calls for it.
 
 Inspired by
 [Karpathy's coding principles](https://github.com/forrestchang/andrej-karpathy-skills):
@@ -29,19 +41,21 @@ Then ask your coding agent to initialize context in a target repository using
 the `context-harness` skill. On harnesses without slash commands, have the agent
 read `SKILL.md` and follow Init mode.
 
-The generated repo-level contract is small:
-
-```text
-AGENTS.md   # small always-read contract + generated CONTEXT.md index
-CONTEXT.md  # durable project facts, terms, constraints, learned patterns
-NOW.md      # current focus, blockers, next step
-PLAN.md     # optional living plan for multi-step work
-```
-
 Generated `AGENTS.md` and `CONTEXT.md` include
 `<!-- context-harness:schema v3 -->`. Newer context-harness skills use that
-marker to detect older or partial layouts and run a model-led Compatibility
-Upgrade on first catch-up.
+marker to detect older or partial layouts. Migration and repair belong in
+explicit `context-upgrade`, not `context-init` or ordinary catch-up.
+
+## Proof
+
+- Cold-resume demo: [`examples/cold-resume-demo.md`](examples/cold-resume-demo.md)
+- Verification suite: `tests/run-all.sh`
+- Context health check: `node scripts/context-index.js check`
+
+The release proof covers catch-up timing, maintain routing, explicit-only
+upgrade behavior, set-goal output shape, and the cold-resume path where a fresh
+agent reads `NOW.md`, uses the `AGENTS.md` index, opens only relevant
+`CONTEXT.md` sections, and names the next action.
 
 ## Philosophy
 
@@ -62,14 +76,11 @@ catch-all skill:
 
 | Skill | Intent |
 |---|---|
-| `context-init` | Initialize a new repo or migrate legacy v1 context files |
+| `context-init` | Initialize a new repo |
 | `context-catch-up` | Let a fresh or resumed agent recover current project state |
-| `context-launch` | Convert the current conversation into a long-running Codex task brief |
+| `set-goal` | Convert the current conversation into a directly usable long-running goal for Codex goal mode, loop mode, or a fresh agent |
 | `context-maintain` | Maintain context during active work, including plan stress-tests, Reflect Mode, and automatic Dream/Compact consideration |
-| `context-upgrade` | Plan, validate, and deploy context-harness upgrades or project migrations |
-
-`context-grill` is deprecated. Its useful pressure-testing behavior now lives in
-`context-maintain`, and the old skill remains only as a compatibility stub.
+| `context-upgrade` | Explicit-only operator workflow for context-harness upgrades or project migrations |
 
 The important change is the shape: split by the agent's intent at invocation,
 not by every tiny maintenance action. Update, capture, plan, closeout, and
@@ -200,17 +211,11 @@ split by invocation intent:
 
 | Skill | Use when |
 |---|---|
-| `context-init` | A repo is new to context-harness or needs v1 migration |
-| `context-catch-up` | A new agent or resumed session needs to read durable context |
-| `context-launch` | The current conversation should become a long-running Codex goal for a fresh agent |
+| `context-init` | A repo is new to context-harness |
+| `context-catch-up` | A fresh agent session or true resumed session needs to read durable context |
+| `set-goal` | The current conversation should become a directly usable long-running goal for Codex goal mode, loop mode, or a fresh agent |
 | `context-maintain` | Work is underway and the agent needs to update context, capture lessons, stress-test a plan, maintain plan state, close out, or reflect after a correction |
-| `context-upgrade` | context-harness itself or a fleet of project contexts needs a version upgrade, schema migration, deployment, or migration lesson packaged for repeat use |
-
-`context-grill` is deprecated. It remains only as a non-invocable compatibility
-stub for explicit legacy requests. Its useful behavior moved into
-`context-maintain`: inspect first, ask only where human judgment changes the
-agent's direction, then route resolved terms, constraints, and decisions to the
-right context file.
+| `context-upgrade` | The user explicitly asks to upgrade context-harness itself or migrate legacy/partial/project/fleet context; this skill should not be implicitly invoked |
 
 `context-maintain` includes Reflect Mode for repeated mistakes and automatic
 Dream/Compact consideration after maintenance events. Every maintain run asks
@@ -234,25 +239,23 @@ raw web/API output, or large copied sections.
 Agents must not read `.context-harness/DREAM.md` during normal catch-up or task
 work. Use it only for debugging context drift or later human review.
 
-`context-catch-up` includes Compatibility Upgrade for existing repos. It
-preserves project-specific context, replaces only old harness boilerplate,
-installs project-local runtime scripts, and refreshes the generated
-`AGENTS.md` index.
+`context-catch-up` is only for fresh-session or true-resume boundaries. It
+reports old, partial, or schema-drifted layouts but does not repair them.
+Migration and layout repair move through explicit `context-upgrade`.
 
 `context-upgrade` is the operator workflow for changing the harness itself or
-repeating a local migration. It captures the conservative upgrade habits:
+running any context migration, including legacy v1, schema v2, partial layouts,
+and local fleet migrations. It captures the conservative upgrade habits:
 dry-run first, preserve local context, skip dirty repos by default, verify
 source changes, deploy through the normal local layer, and record skipped
-targets for follow-up.
+targets for follow-up. It is explicit-only because upgrades should happen when
+the skill or schema has an update, not during ordinary context use.
 
-`context-launch` produces a model-led launch brief for long-running Codex work:
-goal, done criteria, files to read, constraints, checkpoints, verification, and
-closeout. It is separate from closeout because the output is an execution prompt
-for a fresh agent, not a memory artifact.
-
-`context-handoff` is deprecated. It remains only as a compatibility stub for
-explicit requests; new session closeout and transfer notes should use
-`context-maintain`.
+`set-goal` produces a model-led goal prompt for long-running Codex work: goal,
+done criteria, files to read, constraints, milestones, verification, loop
+rules, and closeout. It is separate from closeout because the output is an
+execution prompt for goal mode, loop mode, or a fresh agent, not a memory
+artifact.
 
 ## Installation
 
@@ -269,19 +272,19 @@ Let `<skill-dir>` be wherever your harness loads skills from. Common paths:
 ```yaml
 # nexus.yml
 packages:
-  - repo: fantasy-cc/context-harness
+  - repo: lifan-builds/context-harness
     ref: main
 ```
 Then `nexus sync` deploys to every configured target.
 
 **Option 2: Claude Code plugin**
 ```
-/plugin marketplace add https://github.com/fantasy-cc/context-harness
+/plugin marketplace add https://github.com/lifan-builds/context-harness
 ```
 
 **Option 3: Direct clone**
 ```bash
-git clone https://github.com/fantasy-cc/context-harness <skill-dir>/context-harness
+git clone https://github.com/lifan-builds/context-harness <skill-dir>/context-harness
 ```
 
 ## Usage
@@ -338,14 +341,14 @@ rather than depending on SKILL.md frontmatter.
 
 ## Migration
 
-If you have existing v1 files (AGENTS.md, PLANS.md, FINDINGS.md, EVALUATION.md),
-invoke the skill and it will offer to migrate — pulling learned patterns,
-active tasks, and conventions into the new 3-file structure.
-
-For schema v2 repos, `migrate-project.js` upgrades schema markers, moves
-command Objectives into Workflow Verification, preserves manual Objectives as
-Legacy Objectives, refreshes `AGENTS.md`, and installs the default lean script
-profile. Dirty git worktrees are skipped unless `--include-dirty` is passed.
+Use `context-upgrade` for every migration path. For legacy v1 files
+(`AGENTS.md`, `PLANS.md`, `FINDINGS.md`, `EVALUATION.md`), it should
+model-led migrate learned patterns, active tasks, conventions, and workflow
+checks into the v3 files. For schema v2 repos, `migrate-project.js` upgrades
+schema markers, moves command Objectives into Workflow Verification, preserves
+manual Objectives as Legacy Objectives, refreshes `AGENTS.md`, and installs the
+default lean script profile. Dirty git worktrees are skipped unless
+`--include-dirty` is passed.
 
 ## Token Budget
 

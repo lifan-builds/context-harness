@@ -3,7 +3,7 @@ name: context-harness
 description: >
   Route lightweight project context work to the right companion skill:
   context-init for new repositories, context-catch-up for session resume, and
-  context-launch for long-running task briefs, and context-maintain for updates,
+  set-goal for long-running goal/loop prompts, and context-maintain for updates,
   lessons, plan stress-tests, closeout, reflection, and automatic Dream/Compact
   consolidation, and context-upgrade for upgrades/migrations.
 user-invocable: true
@@ -25,13 +25,12 @@ Use the smallest skill that matches the agent's intent:
 | Intent | Skill |
 |--------|-------|
 | New repo or missing context files | `context-init` |
-| New agent, resume, or "catch me up" | `context-catch-up` |
-| Convert conversation into a long-running Codex task brief | `context-launch` |
+| Fresh agent session, true resume, or "catch me up" | `context-catch-up` |
+| Convert conversation into a long-running goal or loop-mode prompt | `set-goal` |
 | Context updates, lesson capture, plan stress-tests, plan/NOW updates, closeout, reflection, Dream/Compact consolidation | `context-maintain` |
-| Upgrade context-harness itself or migrate project contexts across versions | `context-upgrade` |
+| Explicitly requested context-harness update or project-context migration | `context-upgrade` |
 
-`context-grill` is deprecated and remains only as a compatibility stub for
-explicit legacy requests. New plan stress-tests belong in `context-maintain`.
+`context-upgrade` is explicit-only and should not be implicitly invoked.
 
 ## Behavioral Principles
 
@@ -56,12 +55,12 @@ explicit legacy requests. New plan stress-tests belong in `context-maintain`.
 | Condition | Mode |
 |-----------|------|
 | No `CONTEXT.md` at project root | Use `context-init` |
-| `CONTEXT.md` exists and the agent is starting/resuming | Use `context-catch-up` |
+| `CONTEXT.md` exists and the agent is at a fresh-session or true-resume boundary | Use `context-catch-up` |
 | The user wants a plan challenged against docs, terms, and code | Use `context-maintain` Plan Stress-Test |
-| The user wants a long-running task brief or `/goal` for a fresh agent | Use `context-launch` |
+| The user wants a long-running goal for goal mode, loop mode, or a fresh agent | Use `set-goal` |
 | The agent needs to update context, preserve a lesson, correction, plan, or session state | Use `context-maintain` |
-| The user wants to upgrade context-harness itself, migrate schema versions, or repeat a local fleet migration | Use `context-upgrade` |
-| Legacy v1 files exist without `CONTEXT.md` | Use `context-init` migration flow |
+| The user explicitly asks to upgrade context-harness itself, migrate schema versions, or repeat a local fleet migration | Use `context-upgrade` |
+| Legacy, partial, old, or custom context-harness files exist | Use `context-upgrade` |
 
 ---
 
@@ -87,18 +86,6 @@ changing `CONTEXT.md`, run `node scripts/context-index.js update` so
 
 ### Step 4: Optional PLAN.md
 Ask: "Do you have a multi-step task to plan?" If yes, create PLAN.md.
-
----
-
-## Migrate from v1
-
-If legacy files exist but `CONTEXT.md` does not:
-
-1. Run context-gen.js for fresh Project/Structure
-2. Copy durable Learned Patterns into CONTEXT.md
-3. Ask user to distill Never/Always rules and workflow verification commands
-4. Merge active items from PLANS.md + FINDINGS.md into new PLAN.md
-5. Replace old agent instructions with the AGENTS.md Context Contract
 
 ---
 
@@ -289,8 +276,6 @@ node scripts/task.js done
 
 `start` rewrites NOW.md and logs prior focus to PLAN.md. `done` marks NOW.md
 idle and logs completion to PLAN.md Progress.
-
----
 
 ## Non-Goals
 

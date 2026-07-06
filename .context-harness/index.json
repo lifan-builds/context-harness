@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "updated_at": "2026-07-06",
-  "source_hash": "2d0ebe1385c9c526a331eece66ecd3409deef8f6f1389ec61c3a2a5909866a43",
+  "source_hash": "35e262e801c702969244eedeee0a0345cf215c940cba4a2521a2534e40602d23",
   "sources": [
     {
       "path": "CONTEXT.md",
@@ -10,13 +10,13 @@
     },
     {
       "path": "NOW.md",
-      "sha256": "43e636ca7158c7d1ca8fb45f2c5e569a46da14cc2d846a38a74492813d7f6a8e",
-      "lines": 15
+      "sha256": "12bce830346e7e0b2da725c55c1ab8da17370cbe67b1498e449edc80b2c46b20",
+      "lines": 16
     },
     {
       "path": "PLAN.md",
-      "sha256": "524b93319e3f10294a27c18c6a1c7c6b5cc39e5af840c8c57c3e9688a3bfa3a2",
-      "lines": 116
+      "sha256": "f8f37e709fe3ff7f75e5315827ca0adcd3ee909ae2e1e54156abf51970c50498",
+      "lines": 126
     }
   ],
   "cards": [
@@ -292,7 +292,7 @@
     {
       "id": "ctx-now-now",
       "title": "NOW.md: Now",
-      "summary": "Operating Constraints replaced the project Rules/Never/Always taxonomy in the working tree, and the second 10-pair real-world eval shows progressive-harness improving all 10 pairs.",
+      "summary": "Context Harness source was pushed and locally deployed, the /Users/lfan/Project fleet was upgraded to Operating Constraints, post-migration evals still show strong progressive-harness gains, and self-promoting promoti...",
       "source": "NOW.md#now",
       "source_path": "NOW.md",
       "kind": "resume",
@@ -300,7 +300,7 @@
       "importance": 0.95,
       "confidence": "confirmed",
       "recency": "2026-07-06",
-      "tokens_est": 430,
+      "tokens_est": 590,
       "tags": [
         "now",
         "resume"
@@ -312,13 +312,13 @@
       ],
       "card_path": ".context-harness/cards/ctx-now-now.md",
       "chunk_path": "",
-      "content_sha256": "43e636ca7158c7d1ca8fb45f2c5e569a46da14cc2d846a38a74492813d7f6a8e",
+      "content_sha256": "12bce830346e7e0b2da725c55c1ab8da17370cbe67b1498e449edc80b2c46b20",
       "key_facts": [
-        "Operating Constraints replaced the project Rules/Never/Always taxonomy in the working tree, and the second 10-pair real-world eval shows progressive-harness...",
-        "No code or context-health blockers are known.",
-        "Review the Operating Constraints diff, then decide whether to run the one-time fleet migration from legacy Rules/Never/Always to Operating Constraints before...",
-        "Last modified: 2026-07-06T03:40:00-0700",
-        "Files touched: AGENTS.md, CONTEXT.md, README.md, SKILL.md, context-catch-up/SKILL.md, context-init/SKILL.md, context-maintain/SKILL.md, context-upgrade/SKILL..."
+        "Context Harness source was pushed and locally deployed, the /Users/lfan/Project fleet was upgraded to Operating Constraints, post-migration evals still show...",
+        "No code, deployment, fleet-upgrade, or evaluation blockers are known.",
+        "Some migrated repos have pre-existing unrelated dirty worktrees; the fleet upgrade intentionally refreshed their context-harness files in place without commi...",
+        "Review the final diffs, especially the new fleet eval summary and self-promoting drafts; if accepted, commit/push the final context-harness eval record and s...",
+        "Last modified: 2026-07-06T04:16:00-0700"
       ]
     },
     {
@@ -427,7 +427,7 @@
       "importance": 0.85,
       "confidence": "confirmed",
       "recency": "2026-07-06",
-      "tokens_est": 673,
+      "tokens_est": 831,
       "tags": [
         "plan",
         "progress"
@@ -438,8 +438,8 @@
         "update context with task-local progress"
       ],
       "card_path": ".context-harness/cards/ctx-plan-progress.md",
-      "chunk_path": "",
-      "content_sha256": "99e3a7740ee714ef3cc17495b15c116f6676f71684362a88b3f9ead89f5845a5",
+      "chunk_path": ".context-harness/chunks/ctx-plan-progress.md",
+      "content_sha256": "88fbf95b7f5695e41c16245e202681c5eabb3560e6b3031246f638eb76951a79",
       "key_facts": [
         "[x] Updated README positioning around four visible files, progressive",
         "disclosure, companion skills, and proof artifacts.",

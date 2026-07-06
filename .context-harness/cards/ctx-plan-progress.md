@@ -4,8 +4,8 @@ kind: plan
 importance: 0.85
 confidence: confirmed
 source: PLAN.md#progress
-chunk: null
-tokens_est: 673
+chunk: .context-harness/chunks/ctx-plan-progress.md
+tokens_est: 831
 tags: [plan, progress]
 ---
 
@@ -28,3 +28,4 @@ tags: [plan, progress]
 
 ## Open next
 - `PLAN.md#progress`
+- `.context-harness/chunks/ctx-plan-progress.md`

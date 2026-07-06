@@ -1,0 +1,22 @@
+{
+  "id": "agent-nexus__next-step__no-harness",
+  "repo": "agent-nexus",
+  "scenario": "next-step",
+  "mode": "no-harness",
+  "resultPath": "cases/agent-nexus__next-step__no-harness/result.md",
+  "status": "needs-review",
+  "total": 7,
+  "max": 10,
+  "missing": [
+    "Push Agent Nexus release changes, then restart AI IDEs or agent hosts if updated skill metadata is not visible.",
+    "Do not classify packages by type — auto-discover all assets (skills, hooks, commands, agents) from file patterns (SKILL.md, hooks.json, etc.)."
+  ],
+  "avoided": [],
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 4,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "model behavior gap"
+}

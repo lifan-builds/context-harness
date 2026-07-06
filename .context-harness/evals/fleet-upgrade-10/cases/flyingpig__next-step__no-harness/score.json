@@ -1,0 +1,23 @@
+{
+  "id": "flyingpig__next-step__no-harness",
+  "repo": "flyingpig",
+  "scenario": "next-step",
+  "mode": "no-harness",
+  "resultPath": "cases/flyingpig__next-step__no-harness/result.md",
+  "status": "needs-review",
+  "total": 6,
+  "max": 10,
+  "missing": [
+    "Implemented and minimally live-smoked Flying Pig's Claude-Code-style Auto-Connect Existing Chrome path through a helper-owned Chrome DevTools MCP bridge. The helper starts npx -...",
+    "If the goal is full agent execution inside the existing normal Chrome tab without a CDP URL, implement an MCP-native browser backend or adapter for the subset of browser-use act...",
+    "Do not hardcode secrets or PII — environment variables only; manual login flow for auth'd sites."
+  ],
+  "avoided": [],
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 3,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "model behavior gap"
+}

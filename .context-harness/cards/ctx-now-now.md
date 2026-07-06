@@ -5,14 +5,14 @@ importance: 0.95
 confidence: confirmed
 source: NOW.md#now
 chunk: null
-tokens_est: 430
+tokens_est: 590
 tags: [now, resume]
 ---
 
 # NOW.md: Now
 
 ## Summary
-Operating Constraints replaced the project Rules/Never/Always taxonomy in the working tree, and the second 10-pair real-world eval shows progressive-harness improving all 10 pairs.
+Context Harness source was pushed and locally deployed, the /Users/lfan/Project fleet was upgraded to Operating Constraints, post-migration evals still show strong progressive-harness gains, and self-promoting promoti...
 
 ## Use when
 - resuming the current session
@@ -20,11 +20,11 @@ Operating Constraints replaced the project Rules/Never/Always taxonomy in the wo
 - update context after current work
 
 ## Key facts
-- Operating Constraints replaced the project Rules/Never/Always taxonomy in the working tree, and the second 10-pair real-world eval shows progressive-harness...
-- No code or context-health blockers are known.
-- Review the Operating Constraints diff, then decide whether to run the one-time fleet migration from legacy Rules/Never/Always to Operating Constraints before...
-- Last modified: 2026-07-06T03:40:00-0700
-- Files touched: AGENTS.md, CONTEXT.md, README.md, SKILL.md, context-catch-up/SKILL.md, context-init/SKILL.md, context-maintain/SKILL.md, context-upgrade/SKILL...
+- Context Harness source was pushed and locally deployed, the /Users/lfan/Project fleet was upgraded to Operating Constraints, post-migration evals still show...
+- No code, deployment, fleet-upgrade, or evaluation blockers are known.
+- Some migrated repos have pre-existing unrelated dirty worktrees; the fleet upgrade intentionally refreshed their context-harness files in place without commi...
+- Review the final diffs, especially the new fleet eval summary and self-promoting drafts; if accepted, commit/push the final context-harness eval record and s...
+- Last modified: 2026-07-06T04:16:00-0700
 
 ## Open next
 - `NOW.md#now`

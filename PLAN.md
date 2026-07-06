@@ -71,6 +71,16 @@ dump.
 - [x] Ran a second 10-pair real-world eval batch under
   `.context-harness/evals/operating-constraints-10`; progressive-harness improved
   all 10 pairs with a 9.1/10 average versus 6.9/10 for no-harness.
+- [x] Pushed `ed7e2f9` to `origin/main`, deployed the release locally with Agent
+  Nexus, and verified `nexus doctor` passes.
+- [x] Ran the one-time local fleet upgrade across 32 applicable repos under
+  `/Users/lfan/Project`: 31 legacy `Rules` sections converted to
+  `Operating Constraints`, 32 repos got latest runtime scripts/index refresh, and
+  follow-up verification found 0 remaining `Rules`/schema issues.
+- [x] Re-ran post-migration real-world evals under
+  `.context-harness/evals/fleet-upgrade-10`; progressive-harness averaged 9.1/10
+  versus 7.0/10 for no-harness, improving 8/10 pairs with 2 ties and no
+  regressions.
 
 ## Follow-Ups
 - Restart AI IDEs or agent hosts so frontmatter and skill metadata are reloaded

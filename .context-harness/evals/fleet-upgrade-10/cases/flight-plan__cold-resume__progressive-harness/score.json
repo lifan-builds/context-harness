@@ -1,0 +1,22 @@
+{
+  "id": "flight-plan__cold-resume__progressive-harness",
+  "repo": "flight-plan",
+  "scenario": "cold-resume",
+  "mode": "progressive-harness",
+  "resultPath": "cases/flight-plan__cold-resume__progressive-harness/result.md",
+  "status": "needs-review",
+  "total": 7,
+  "max": 10,
+  "missing": [
+    "Test: project-specific.",
+    "current focus"
+  ],
+  "avoided": [],
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 4,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "model behavior gap"
+}

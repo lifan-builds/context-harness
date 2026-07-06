@@ -1,0 +1,22 @@
+{
+  "id": "context-harness__next-step__no-harness",
+  "repo": "context-harness",
+  "scenario": "next-step",
+  "mode": "no-harness",
+  "resultPath": "cases/context-harness__next-step__no-harness/result.md",
+  "status": "needs-review",
+  "total": 7,
+  "max": 10,
+  "missing": [
+    "Operating Constraints replaced the project Rules/Never/Always taxonomy in the working tree, and the second 10-pair real-world eval shows progressive-harness improving all 10 pairs.",
+    "Keep context-harness lightweight; do not turn it into a large process framework."
+  ],
+  "avoided": [],
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 4,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "model behavior gap"
+}

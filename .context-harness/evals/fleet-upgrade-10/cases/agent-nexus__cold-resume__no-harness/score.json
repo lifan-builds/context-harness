@@ -1,0 +1,21 @@
+{
+  "id": "agent-nexus__cold-resume__no-harness",
+  "repo": "agent-nexus",
+  "scenario": "cold-resume",
+  "mode": "no-harness",
+  "resultPath": "cases/agent-nexus__cold-resume__no-harness/result.md",
+  "status": "needs-review",
+  "total": 9,
+  "max": 10,
+  "missing": [
+    "Push Agent Nexus release changes, then restart AI IDEs or agent hosts if updated skill metadata is not visible."
+  ],
+  "avoided": [],
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 5,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "model behavior gap"
+}

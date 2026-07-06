@@ -1,28 +1,52 @@
 # context-harness
 
-4 files, lean rules, zero ceremony.
+**Small visible context. Progressive retrieval. Agent judgment over process.**
 
-context-harness is a portable project-memory layer for coding agents. It keeps
-the always-read surface small, puts durable facts in visible markdown, and uses
-companion skills only at clear lifecycle moments.
+context-harness is a portable project-memory layer for coding agents. Its core
+idea is simple: keep the always-read contract tiny, store durable project truth
+in normal markdown, and let the agent retrieve deeper context only when the task
+needs it.
 
-It generates:
+It is intentionally not a large agent framework, workflow methodology, or prompt
+pile. It is a filesystem memory contract plus a few scripts and companion skills
+that help a fresh agent answer: **What is this project, what matters right now,
+and what should I do next?**
+
+## Core Design Principles
+
+1. **Always-read stays small** — `AGENTS.md` is only the activation contract and
+   generated index. It should not become the project brain.
+2. **Durable truth lives on disk** — `CONTEXT.md`, `NOW.md`, and `PLAN.md` are
+   visible markdown files that humans and agents can inspect, edit, diff, and
+   commit.
+3. **Retrieve progressively** — agents start with `NOW.md`, then use the context
+   index or `hydrate "<task>"` to open only relevant cards, chunks, or sections.
+4. **Constraints beat rulebooks** — projects keep short `Operating Constraints`
+   only when they change future agent decisions. Generic coding-agent behavior
+   belongs in the skill, not repeated in every repo.
+5. **Scripts do mechanics; agents do judgment** — Node scripts handle indexing,
+   checks, installation, migration, and session stamping. Skills guide when to
+   catch up, maintain context, set a goal, or run an explicit upgrade.
+
+## The Four Files
 
 ```text
-AGENTS.md   # tiny startup contract + generated CONTEXT.md index
+AGENTS.md   # tiny startup contract + generated context index
 CONTEXT.md  # durable project facts, terms, constraints, learned patterns
 NOW.md      # current focus, blockers, next step
 PLAN.md     # optional active plan, findings, decisions, verification
 ```
 
-The scripts handle the mechanical work: stack detection, runtime script
-installation, context indexing, session stamping, checks, and migration. The
-skills handle the judgment: when to catch up, maintain context, set a long
-running goal, or run an explicit upgrade.
+The default flow is:
 
-This is intentionally not another large methodology framework. The default
-contract is `AGENTS.md` plus a generated index; agents open deeper context only
-when the task calls for it.
+```text
+fresh agent starts
+  → read NOW.md
+  → read AGENTS.md contract/index
+  → hydrate the current task
+  → open only relevant context
+  → update NOW/PLAN/CONTEXT when the work changes state
+```
 
 Inspired by
 [Karpathy's coding principles](https://github.com/forrestchang/andrej-karpathy-skills):

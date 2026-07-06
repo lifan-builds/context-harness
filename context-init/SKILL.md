@@ -10,8 +10,8 @@ allowed-tools: "Read, Write, Edit, Bash, Glob, Grep"
 Use this only when a repository has no context-harness layout and should get a
 fresh `AGENTS.md`, `CONTEXT.md`, `NOW.md`, and optional `PLAN.md`.
 
-If a repository already has old, partial, or legacy context-harness files, use
-`context-upgrade` instead. All migration work belongs there.
+If a repository already has partial, stale, or custom context-harness files, use
+explicit `context-upgrade` instead. Init does not repair existing layouts.
 
 ## Goal
 
@@ -56,10 +56,10 @@ layout.
 
 ## Guardrails
 
-- Do not create durable Objectives for new schema v3 projects; use `PLAN.md`
-  Done Criteria and `CONTEXT.md` Workflow Verification instead.
-- Do not migrate old layouts here; route legacy v1, schema v2, partial, or
-  custom context-harness files to `context-upgrade`.
+- Use `PLAN.md` Done Criteria and `CONTEXT.md` Workflow Verification instead of
+  durable project-wide objectives.
+- Do not repair existing layouts here; route partial, stale, or custom
+  context-harness files to explicit `context-upgrade`.
 - Keep generated files short enough to be read every session.
 - Keep `AGENTS.md` small: contract plus generated `CONTEXT.md` index and a
   pointer to `hydrate`.

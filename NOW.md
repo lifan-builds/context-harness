@@ -1,16 +1,15 @@
 # Now
 
 ## Current Focus
-Context Harness source was pushed and locally deployed, the `/Users/lfan/Project` fleet was upgraded to Operating Constraints, post-migration evals still show strong progressive-harness gains, and self-promoting promotion materials were refreshed with the latest proof points.
+Legacy migration/eval/ADR tooling has been removed from context-harness now that the local project fleet is on current schema v3 with Operating Constraints.
 
 ## Active Blockers
-- No code, deployment, fleet-upgrade, or evaluation blockers are known.
-- Some migrated repos have pre-existing unrelated dirty worktrees; the fleet upgrade intentionally refreshed their context-harness files in place without committing each repo.
+- No code or verification blockers are known.
 
 ## Immediate Next Step
-Review the final diffs, especially the new fleet eval summary and self-promoting drafts; if accepted, commit/push the final context-harness eval record and separately decide whether to commit the self-promoting promotion-plan updates.
+Review the cleanup diff, then commit/push and redeploy with Agent Nexus if accepted.
 
 ## Session State
-- Last modified: 2026-07-06T04:16:00-0700
-- Files touched: AGENTS.md, CONTEXT.md, README.md, SKILL.md, context-catch-up/SKILL.md, context-init/SKILL.md, context-maintain/SKILL.md, context-upgrade/SKILL.md, examples/cold-resume-demo.md, scripts/context-gen.js, scripts/context-index.js, scripts/eval-context-library.js, scripts/eval-agent-problem-solving.js, tests/run-all.sh, PLAN.md, NOW.md, .context-harness/index.json, .context-harness/cards/*, .context-harness/chunks/*, .context-harness/shadow-context-library-report.md, .context-harness/evals/manual-realworld-10/*, .context-harness/evals/operating-constraints-10/*, .context-harness/evals/fleet-upgrade-10/*; plus fleet context-harness refreshes under /Users/lfan/Project and self-promoting PLANS/PROMOTION_STRATEGY/README/NOW/drafts.
-- Verification: `tests/run-all.sh` (212 passed, 0 failed); `node scripts/context-index.js check`; `git push origin main` pushed `ed7e2f9`; `nexus sync --dry-run`; `nexus sync --yes`; `nexus doctor`; fleet upgrade processed 32 applicable repos, converted 31 Rules sections to Operating Constraints, installed/refreshed 32 runtime script/index sets, and post-check found 0 Rules/schema issues; `node scripts/eval-context-library.js /Users/lfan/Project .context-harness/shadow-context-library-report.md` (25 repos, 19 pass, 0 warn, 0 fail, 6 skip); `node scripts/eval-agent-problem-solving.js score .context-harness/evals/fleet-upgrade-10` (progressive 9.1/10 vs no-harness 7.0/10, improved 8/10, tied 2/10, regressed 0/10).
+- Last modified: 2026-07-06T21:54:00-0700
+- Files touched: README.md, SKILL.md, context-catch-up/SKILL.md, context-init/SKILL.md, context-upgrade/SKILL.md, scripts/install-project.js, scripts/context-index.js, scripts/codex-context-hook.js, scripts/eval-agent-problem-solving.js, tests/run-all.sh, CONTEXT.md, PLAN.md, NOW.md; removed scripts/adr.js, scripts/eval-loop.js, scripts/migrate-project.js.
+- Verification: syntax checks for `tests/run-all.sh` and changed Node scripts; targeted suites `tests/run-all.sh install-project`, `context-index`, `codex-context-hook`, `skill`, `skill-packaging`; full `tests/run-all.sh` (185 passed, 0 failed); `node scripts/context-index.js check`.

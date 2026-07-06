@@ -67,7 +67,6 @@ const PURPOSES = {
   Project: "identity and purpose",
   Structure: "repo map",
   "Operating Constraints": "project-specific constraints that change agent decisions",
-  Rules: "legacy constraints and habits",
   Workflow: "setup, run, test, lint, deploy",
   Language: "canonical terms",
   Relationships: "durable invariants",
@@ -217,12 +216,10 @@ function checkHarness(context) {
     "Learned Patterns",
   ];
 
-  if (!hasSchema(context)) failures.push("CONTEXT.md is missing a context-harness schema marker.");
-  else if (hasLegacySchema(context)) warnings.push("CONTEXT.md uses legacy schema v2.");
+  if (!hasSchema(context)) failures.push("CONTEXT.md must use context-harness schema v3.");
 
   if (!agents.trim()) failures.push("AGENTS.md is missing.");
-  else if (!hasSchema(agents)) failures.push("AGENTS.md is missing a context-harness schema marker.");
-  else if (hasLegacySchema(agents)) warnings.push("AGENTS.md uses legacy schema v2.");
+  else if (!hasSchema(agents)) failures.push("AGENTS.md must use context-harness schema v3.");
 
   if (agents.trim()) {
     const agentLines = agents.trimEnd().split("\n").length;
@@ -238,10 +235,8 @@ function checkHarness(context) {
   for (const heading of requiredSections) {
     if (!hasHeading(context, 2, heading)) failures.push(`CONTEXT.md is missing ## ${heading}.`);
   }
-  if (!hasHeading(context, 2, "Operating Constraints") && !hasHeading(context, 2, "Rules")) {
+  if (!hasHeading(context, 2, "Operating Constraints")) {
     failures.push("CONTEXT.md is missing ## Operating Constraints.");
-  } else if (hasHeading(context, 2, "Rules") && !hasHeading(context, 2, "Operating Constraints")) {
-    warnings.push("CONTEXT.md uses legacy ## Rules; rename to ## Operating Constraints when migrating.");
   }
 
   if (agents.trim()) {
@@ -273,11 +268,7 @@ function checkHarness(context) {
 }
 
 function hasSchema(text) {
-  return /<!--\s*context-harness:schema\s+v[23]\s*-->/.test(text);
-}
-
-function hasLegacySchema(text) {
-  return /<!--\s*context-harness:schema\s+v2\s*-->/.test(text);
+  return /<!--\s*context-harness:schema\s+v3\s*-->/.test(text);
 }
 
 function stripIndex(text) {
@@ -774,7 +765,7 @@ function classifyKind(file, title) {
 function importanceFor(section) {
   if (section.file === "NOW.md") return 0.95;
   if (section.file === "PLAN.md") return 0.85;
-  if (["Operating Constraints", "Rules", "Workflow"].includes(section.title)) return 0.9;
+  if (["Operating Constraints", "Workflow"].includes(section.title)) return 0.9;
   if (["Language", "Relationships"].includes(section.title)) return 0.82;
   if (section.title === "Learned Patterns") return 0.78;
   if (section.lineCount > LARGE_SECTION_LINES || section.charCount > LARGE_SECTION_CHARS) return 0.74;
@@ -790,7 +781,7 @@ function tagsFor(section) {
 function readWhenFor(section) {
   if (section.file === "NOW.md") return ["resuming the current session", "choosing the immediate next step", "update context after current work"];
   if (section.file === "PLAN.md") return ["continuing the active task", "checking done criteria or decisions", "update context with task-local progress"];
-  if (section.title === "Operating Constraints" || section.title === "Rules") return ["before planning or editing", "checking project constraints", "update context safely"];
+  if (section.title === "Operating Constraints") return ["before planning or editing", "checking project constraints", "update context safely"];
   if (section.title === "Workflow") return ["running, testing, linting, deploying, deployment, or verifying changes"];
   if (section.title === "Language") return ["using project terms or resolving naming ambiguity", "update context terminology"];
   if (section.title === "Relationships") return ["changing architecture or domain relationships", "update context invariants"];

@@ -75,7 +75,7 @@ scripts/
 - When `context-maintain` changes durable project context, refresh the generated `AGENTS.md` index so future agents can navigate `CONTEXT.md` selectively instead of loading the full file by default.
 - Codex hooks should stay simple lifecycle nudges: session start points to `context-catch-up`, missing project context points to `context-init`, and substantial task completion points to `context-maintain`.
 - When migrating existing projects to a new context-harness contract, prefer model-led edits over bulk migration scripts because each repo may have local AGENTS.md conventions that need judgment.
-- For backward compatibility, generated context files should carry a lightweight schema/version marker and new skills should model-led upgrade older or partial context files instead of assuming the latest AGENTS.md contract is already present.
+- Keep the supported context-harness runtime current-v3 only after fleet migration completes; report old or partial layouts as drift and route explicit repair through `context-upgrade` instead of carrying legacy migration scripts.
 - When a workflow is removed from the preferred skill path, remove the stub completely once the replacement behavior is covered by an active skill and tests.
 - When using SkillOpt-style self-improvement, separate proposal from mutation: collect evidence and validation, ask the user for approval, then update the canonical skill source rather than silently editing installed copies.
 - When adapting Claude Code-style auto memory, use semantic model judgment inside `context-maintain` instead of hard counters or line limits; route lengthy durable detail through cards/chunks, keep concise facts visible in markdown, and keep audit history separate from operational context.

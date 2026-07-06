@@ -179,16 +179,14 @@ project-root walk, stack detection, markdown section parsing, command runner).
 | Script | Purpose |
 |--------|---------|
 | `scripts/lib.js` | Shared helpers imported by everything else |
-| `scripts/install-project.js` | Copy default runtime scripts; `--profile legacy` includes ADR/eval tools |
+| `scripts/install-project.js` | Copy current v3 runtime scripts into a target repo |
 | `scripts/codex-context-hook.js` | Codex lifecycle hook dispatcher for catch-up, init, and maintain nudges |
 | `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware operating constraint defaults |
 | `scripts/context-index.js` | Refresh AGENTS.md index; list/query/print/check CONTEXT.md sections |
-| `scripts/migrate-project.js` | Batch migrate schema v2 projects to v3; not installed into target repos |
 | `scripts/guard.js` | Security: block `--no-verify`, detect secrets, protect linter configs |
 | `scripts/format-on-edit.js` | Auto-format files after edits (Biome, Prettier, Ruff, gofmt) |
 | `scripts/session-end.js` | Stamp NOW.md; best-effort prune of completed PLAN.md items when very long |
 | `scripts/task.js` | Task switcher — rewrites NOW.md; logs to PLAN.md Progress |
-| `scripts/eval-loop.js` | Deprecated legacy v2 evaluator; install with `--profile legacy` |
 
 Hook scripts read their payload from the `TOOL_INPUT` env var or from stdin
 (pipe-friendly for Codex hooks, Cursor, Claude Code, and custom harnesses).
@@ -216,9 +214,8 @@ relevant)
 ```
 
 Task-specific outcomes live in `PLAN.md` `## Done Criteria`, not in durable
-project-wide Objectives. Schema v2 Objectives are preserved as legacy context
-during migration; command-based Objectives are moved into Workflow
-Verification.
+project-wide objectives. Workflow commands and manual checks belong in
+`CONTEXT.md` `## Workflow` and task-local verification notes.
 
 `context-gen.js` suggests stack-specific operating constraints plus verification
 commands (TypeScript gets `tsc --noEmit`, Python gets `ruff check`, Go gets
@@ -260,16 +257,16 @@ Agents must not read `.context-harness/DREAM.md` during normal catch-up or task
 work. Use it only for debugging context drift or later human review.
 
 `context-catch-up` is only for fresh-session or true-resume boundaries. It
-reports old, partial, or schema-drifted layouts but does not repair them.
-Migration and layout repair move through explicit `context-upgrade`.
+reports partial or schema-drifted layouts but does not repair them. Layout
+repair moves through explicit `context-upgrade`.
 
-`context-upgrade` is the operator workflow for changing the harness itself or
-running any context migration, including legacy v1, schema v2, partial layouts,
-and local fleet migrations. It captures the conservative upgrade habits:
-dry-run first, preserve local context, skip dirty repos by default, verify
-source changes, deploy through the normal local layer, and record skipped
-targets for follow-up. It is explicit-only because upgrades should happen when
-the skill or schema has an update, not during ordinary context use.
+`context-upgrade` is the operator workflow for changing the harness itself,
+refreshing a local fleet, validating installed skill copies, or repairing a
+current v3 layout. It captures the conservative upgrade habits: inspect first,
+preserve local context, verify source changes, deploy through the normal local
+layer, and record skipped targets for follow-up. It is explicit-only because
+upgrades should happen when the skill or schema has an update, not during
+ordinary context use.
 
 `set-goal` produces a model-led goal prompt for long-running Codex work: goal,
 done criteria, files to read, constraints, milestones, verification, loop
@@ -326,18 +323,6 @@ node scripts/context-index.js section "Operating Constraints"
 node scripts/context-index.js check
 ```
 
-**Legacy eval loop** — only for schema v2 repos that still use Objectives:
-```bash
-node <skill-dir>/context-harness/scripts/install-project.js --profile legacy
-node scripts/eval-loop.js
-```
-
-**Batch migrate** — dry-run first, then apply:
-```bash
-node <skill-dir>/context-harness/scripts/migrate-project.js --root /Users/lfan/Project
-node <skill-dir>/context-harness/scripts/migrate-project.js --root /Users/lfan/Project --write
-```
-
 **Switch tasks** — rewrites NOW.md atomically:
 ```bash
 node <skill-dir>/context-harness/scripts/task.js start "New focus"
@@ -359,16 +344,12 @@ skills.
 Each harness should wire these scripts through its native plugin/config layer
 rather than depending on SKILL.md frontmatter.
 
-## Migration
+## Layout Repair
 
-Use `context-upgrade` for every migration path. For legacy v1 files
-(`AGENTS.md`, `PLANS.md`, `FINDINGS.md`, `EVALUATION.md`), it should
-model-led migrate learned patterns, active tasks, conventions, and workflow
-checks into the v3 files. For schema v2 repos, `migrate-project.js` upgrades
-schema markers, moves command Objectives into Workflow Verification, preserves
-manual Objectives as Legacy Objectives, refreshes `AGENTS.md`, and installs the
-default lean script profile. Dirty git worktrees are skipped unless
-`--include-dirty` is passed.
+`context-init` is for fresh repositories with no context-harness layout. If a
+project already has partial, stale, or custom context-harness files, use explicit
+`context-upgrade` to inspect and repair the current v3 layout with user approval.
+context-harness no longer ships a legacy schema migration script.
 
 ## Token Budget
 

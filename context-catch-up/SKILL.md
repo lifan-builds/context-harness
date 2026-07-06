@@ -20,19 +20,16 @@ or plan stress-testing.
 Before ordinary catch-up, quickly inspect `AGENTS.md`, `CONTEXT.md`, and
 `NOW.md` for:
 
-- `<!-- context-harness:schema v2 -->` or
-  `<!-- context-harness:schema v3 -->` in generated context files.
+- `<!-- context-harness:schema v3 -->` in generated context files.
 - A small `AGENTS.md` Context Contract plus generated Context Index.
 - Required `CONTEXT.md` sections: Project, Structure, Operating Constraints,
   Workflow, Language, Relationships, Flagged Ambiguities, Learned Patterns.
-  Legacy `Rules` is acceptable during migration but should be renamed by
-  explicit `context-upgrade`.
 - A non-empty `NOW.md` with current focus, blockers, immediate next step, and
   touched files.
 
-If files are old, empty, partial, or missing the schema marker, report the
-drift in the catch-up summary and route migration or repair work to explicit
-`context-upgrade`. Do not rewrite old, partial, or schema-drifted layouts from
+If files are empty, partial, stale, or missing the v3 schema marker, report the
+drift in the catch-up summary and route inspection or repair work to explicit
+`context-upgrade`. Do not rewrite partial or schema-drifted layouts from
 catch-up, and do not let non-blocking harness drift replace the user's requested
 project task.
 
@@ -61,7 +58,7 @@ Give the user a short catch-up summary:
 ## Guardrails
 
 - Do not rewrite context files during catch-up except to capture a durable
-  correction from the user; route layout migration to `context-upgrade`.
+  correction from the user; route layout repair to explicit `context-upgrade`.
 - If `hydrate`, `check`, or generated indexes fail, mention the drift and use the
   best available fallback context, then continue the requested catch-up unless
   the drift blocks correctness or safety.

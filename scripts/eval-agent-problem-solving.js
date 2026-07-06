@@ -219,7 +219,7 @@ function buildExpected(repo, relative) {
   const now = readTextSafe(path.join(repo, "NOW.md"));
   const plan = readTextSafe(path.join(repo, "PLAN.md"));
   const workflow = cleanBlock(readSection(context, "Workflow"));
-  const rules = cleanBlock(readSection(context, "Operating Constraints") || readSection(context, "Rules"));
+  const rules = cleanBlock(readSection(context, "Operating Constraints"));
   const progress = cleanBlock(readSection(plan, "Progress"));
   return {
     repo: relative,

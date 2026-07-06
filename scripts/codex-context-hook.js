@@ -38,7 +38,7 @@ function runCatchUp(startDir) {
     [
       "context-harness detected.",
       needsUpgrade
-        ? "Before planning/editing: use context-catch-up to report context drift, then use explicit context-upgrade for layout migration or repair."
+        ? "Before planning/editing: use context-catch-up to report context drift, then use explicit context-upgrade for v3 layout inspection or repair."
         : "Before planning/editing: use context-catch-up; read NOW.md, then relevant AGENTS-indexed CONTEXT.md sections.",
       now ? `Current NOW.md:\n${now}` : "",
     ]
@@ -106,7 +106,7 @@ function trimForHook(text, maxChars) {
 }
 
 function hasSupportedSchema(text) {
-  return /<!--\s*context-harness:schema\s+v[23]\s*-->/.test(text);
+  return /<!--\s*context-harness:schema\s+v3\s*-->/.test(text);
 }
 
 function hasContextIndex(text) {

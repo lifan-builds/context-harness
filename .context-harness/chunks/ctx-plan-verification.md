@@ -20,3 +20,6 @@
 - After publishing, Agent Nexus `sync --yes` fetched
   `lifan-builds/context-harness@main` from GitHub and deployed it locally.
 - Agent Nexus `doctor` exits 0 after local deployment.
+- After legacy tooling cleanup, targeted suites `tests/run-all.sh install-project`,
+  `context-index`, `codex-context-hook`, `skill`, and `skill-packaging` pass; full
+  `tests/run-all.sh` passes with 185 passed, 0 failed; `node scripts/context-index.js check` passes.

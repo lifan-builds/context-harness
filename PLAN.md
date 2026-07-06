@@ -81,6 +81,10 @@ dump.
   `.context-harness/evals/fleet-upgrade-10`; progressive-harness averaged 9.1/10
   versus 7.0/10 for no-harness, improving 8/10 pairs with 2 ties and no
   regressions.
+- [x] Removed obsolete legacy tooling now that the local fleet is on current v3:
+  deleted `scripts/adr.js`, `scripts/eval-loop.js`, and
+  `scripts/migrate-project.js`; removed the legacy install profile; tightened
+  schema checks to v3-only; and updated docs/skills/tests accordingly.
 
 ## Follow-Ups
 - Restart AI IDEs or agent hosts so frontmatter and skill metadata are reloaded
@@ -109,6 +113,9 @@ dump.
 - After publishing, Agent Nexus `sync --yes` fetched
   `lifan-builds/context-harness@main` from GitHub and deployed it locally.
 - Agent Nexus `doctor` exits 0 after local deployment.
+- After legacy tooling cleanup, targeted suites `tests/run-all.sh install-project`,
+  `context-index`, `codex-context-hook`, `skill`, and `skill-packaging` pass; full
+  `tests/run-all.sh` passes with 185 passed, 0 failed; `node scripts/context-index.js check` passes.
 
 ## Archive
 - June 2026 research compared Context Harness with Karpathy-style skill

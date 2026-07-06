@@ -1,22 +1,22 @@
 {
   "schema": 1,
   "updated_at": "2026-07-06",
-  "source_hash": "35e262e801c702969244eedeee0a0345cf215c940cba4a2521a2534e40602d23",
+  "source_hash": "6b97ceeb34d8c68bf4438dfbb5d1b3b1f1bdfdc80ee637f0705610663ac57903",
   "sources": [
     {
       "path": "CONTEXT.md",
-      "sha256": "6b57d4c9b95c60d1087623ffd7655c1440e4fffc9992c993b3d37445f8945ca6",
+      "sha256": "86595da1ee1a82303ca33b166da4686093e083b7e470cfcd2eb92329c9d9f921",
       "lines": 89
     },
     {
       "path": "NOW.md",
-      "sha256": "12bce830346e7e0b2da725c55c1ab8da17370cbe67b1498e449edc80b2c46b20",
-      "lines": 16
+      "sha256": "ef3bc326507a5812bc11fce456628fb83e5729074ea6ee8f1c2d3b07d9db71af",
+      "lines": 15
     },
     {
       "path": "PLAN.md",
-      "sha256": "f8f37e709fe3ff7f75e5315827ca0adcd3ee909ae2e1e54156abf51970c50498",
-      "lines": 126
+      "sha256": "2b5feac3d752dd31070dda24f109a2d5960ffea2c973c7ff489eab678f31008c",
+      "lines": 133
     }
   ],
   "cards": [
@@ -268,7 +268,7 @@
       "importance": 0.78,
       "confidence": "confirmed",
       "recency": "2026-07-06",
-      "tokens_est": 1044,
+      "tokens_est": 1041,
       "tags": [
         "context",
         "learned-patterns",
@@ -280,7 +280,7 @@
       ],
       "card_path": ".context-harness/cards/ctx-context-learned-patterns.md",
       "chunk_path": ".context-harness/chunks/ctx-context-learned-patterns.md",
-      "content_sha256": "b422433a9dc187d64978589d19c81bc97908d277803101f2a29b0bee7c931af9",
+      "content_sha256": "dd48dd5e41e5cd8b8928dbcfa040d0a5a12036b2376cb9a0c2fb1efab23c3529",
       "key_facts": [
         "When splitting context-harness into companion skills, keep the split based on invocation intent because too many maintenance-like skills make the harness har...",
         "When learning from external skill systems like Superpowers or metaprompting skills, treat them as reusable patterns to adapt through our own agent workflow,...",
@@ -292,7 +292,7 @@
     {
       "id": "ctx-now-now",
       "title": "NOW.md: Now",
-      "summary": "Context Harness source was pushed and locally deployed, the /Users/lfan/Project fleet was upgraded to Operating Constraints, post-migration evals still show strong progressive-harness gains, and self-promoting promoti...",
+      "summary": "Legacy migration/eval/ADR tooling has been removed from context-harness now that the local project fleet is on current schema v3 with Operating Constraints.",
       "source": "NOW.md#now",
       "source_path": "NOW.md",
       "kind": "resume",
@@ -300,7 +300,7 @@
       "importance": 0.95,
       "confidence": "confirmed",
       "recency": "2026-07-06",
-      "tokens_est": 590,
+      "tokens_est": 265,
       "tags": [
         "now",
         "resume"
@@ -312,13 +312,13 @@
       ],
       "card_path": ".context-harness/cards/ctx-now-now.md",
       "chunk_path": "",
-      "content_sha256": "12bce830346e7e0b2da725c55c1ab8da17370cbe67b1498e449edc80b2c46b20",
+      "content_sha256": "ef3bc326507a5812bc11fce456628fb83e5729074ea6ee8f1c2d3b07d9db71af",
       "key_facts": [
-        "Context Harness source was pushed and locally deployed, the /Users/lfan/Project fleet was upgraded to Operating Constraints, post-migration evals still show...",
-        "No code, deployment, fleet-upgrade, or evaluation blockers are known.",
-        "Some migrated repos have pre-existing unrelated dirty worktrees; the fleet upgrade intentionally refreshed their context-harness files in place without commi...",
-        "Review the final diffs, especially the new fleet eval summary and self-promoting drafts; if accepted, commit/push the final context-harness eval record and s...",
-        "Last modified: 2026-07-06T04:16:00-0700"
+        "Legacy migration/eval/ADR tooling has been removed from context-harness now that the local project fleet is on current schema v3 with Operating Constraints.",
+        "No code or verification blockers are known.",
+        "Review the cleanup diff, then commit/push and redeploy with Agent Nexus if accepted.",
+        "Last modified: 2026-07-06T21:54:00-0700",
+        "Files touched: README.md, SKILL.md, context-catch-up/SKILL.md, context-init/SKILL.md, context-upgrade/SKILL.md, scripts/install-project.js, scripts/context-i..."
       ]
     },
     {
@@ -427,7 +427,7 @@
       "importance": 0.85,
       "confidence": "confirmed",
       "recency": "2026-07-06",
-      "tokens_est": 831,
+      "tokens_est": 903,
       "tags": [
         "plan",
         "progress"
@@ -439,7 +439,7 @@
       ],
       "card_path": ".context-harness/cards/ctx-plan-progress.md",
       "chunk_path": ".context-harness/chunks/ctx-plan-progress.md",
-      "content_sha256": "88fbf95b7f5695e41c16245e202681c5eabb3560e6b3031246f638eb76951a79",
+      "content_sha256": "ea368dd842816a794d18710a266033bc46c14331a6d6c853fc959db5d30f6727",
       "key_facts": [
         "[x] Updated README positioning around four visible files, progressive",
         "disclosure, companion skills, and proof artifacts.",
@@ -490,7 +490,7 @@
       "importance": 0.85,
       "confidence": "confirmed",
       "recency": "2026-07-06",
-      "tokens_est": 760,
+      "tokens_est": 827,
       "tags": [
         "plan",
         "verification"
@@ -502,7 +502,7 @@
       ],
       "card_path": ".context-harness/cards/ctx-plan-verification.md",
       "chunk_path": ".context-harness/chunks/ctx-plan-verification.md",
-      "content_sha256": "30291c1dd791954f953bbb347747b700f3a66c9dc111075ec789a8fe3d63f564",
+      "content_sha256": "8d4e1868908d8136ef9c6d3bb3053652fa7aa55dc59b64b20feba154e16d33d8",
       "key_facts": [
         "tests/run-all.sh exits 0 with 211 passed, 0 failed after adding minimal fresh-agent eval harness coverage.",
         "node scripts/context-index.js check exits 0 after refreshing generated cards/index.",

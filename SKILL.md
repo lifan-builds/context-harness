@@ -72,8 +72,7 @@ stack-specific Suggested Operating Constraints, Suggested Workflow, and Memory P
 Fallback: scan package.json/pyproject.toml/Cargo.toml/go.mod manually.
 
 Present `## Suggested Operating Constraints` and `## Suggested Workflow` as starting points; the user keeps only project-specific constraints a future agent would not infer from code or docs, and confirms verification commands.
-Project-wide Objectives are legacy v2; new projects use `PLAN.md` Done
-Criteria for task outcomes and `CONTEXT.md` Workflow Verification for commands.
+Use `PLAN.md` Done Criteria for task outcomes and `CONTEXT.md` Workflow Verification for commands.
 
 ### Step 3: Generate CONTEXT.md + NOW.md + AGENTS.md
 
@@ -240,18 +239,6 @@ only when a card says the bulky detail is needed.
 
 ---
 
-## Legacy Eval Loop
-
-`scripts/eval-loop.js` is deprecated legacy v2 tooling for repos that still
-carry `### Objectives`. New schema v3 projects use `PLAN.md` Done Criteria and
-`CONTEXT.md` Workflow Verification instead.
-
-```bash
-node scripts/install-project.js --profile legacy
-```
-
----
-
 ## Companion Scripts
 
 All scripts are Node.js and share helpers in `scripts/lib.js`. Adding a script?
@@ -261,12 +248,11 @@ markdown helpers.
 | Script | Purpose | When to use |
 |--------|---------|-------------|
 | `scripts/lib.js` | Shared helpers | Imported by every other script |
-| `scripts/install-project.js` | Copy default runtime scripts; `--profile legacy` includes ADR/eval tools | Init mode |
+| `scripts/install-project.js` | Copy current v3 runtime scripts into a target repo | Init mode |
 | `scripts/codex-context-hook.js` | Codex lifecycle hook dispatcher for catch-up, init, and maintain nudges | Codex hooks |
 | `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware rule defaults | Init mode, Update mode |
 | `scripts/context-index.js` | Update/list/query/print/stats/hydrate/check context sections and cards | After CONTEXT.md changes |
 | `scripts/eval-agent-problem-solving.js` | Prepare/score fresh-agent problem-solving evals comparing no-harness vs progressive-harness modes | Real-world context-harness evaluation |
-| `scripts/migrate-project.js` | Batch migrate schema v2 projects to v3 | Manual migration from this repo |
 | `scripts/guard.js` | Block --no-verify, detect secrets, protect linter configs | Runs automatically via PreToolUse hook |
 | `scripts/format-on-edit.js` | Auto-format files after edits | Runs automatically via PostToolUse hook |
 | `scripts/session-end.js` | Stamp NOW.md; best-effort prune of completed PLAN.md items when very long | Runs automatically via Stop hook |

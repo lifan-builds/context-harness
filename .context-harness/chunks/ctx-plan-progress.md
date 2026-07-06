@@ -50,3 +50,7 @@
   `.context-harness/evals/fleet-upgrade-10`; progressive-harness averaged 9.1/10
   versus 7.0/10 for no-harness, improving 8/10 pairs with 2 ties and no
   regressions.
+- [x] Removed obsolete legacy tooling now that the local fleet is on current v3:
+  deleted `scripts/adr.js`, `scripts/eval-loop.js`, and
+  `scripts/migrate-project.js`; removed the legacy install profile; tightened
+  schema checks to v3-only; and updated docs/skills/tests accordingly.

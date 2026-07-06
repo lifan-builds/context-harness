@@ -1,38 +1,39 @@
 ---
 name: context-upgrade
 description: >
-  Plan, implement, validate, and deploy context-harness upgrades or migrations
-  across the canonical source repo, installed skill copies, or a local fleet of
-  project contexts. Use when the user asks to upgrade context-harness itself,
-  migrate projects between schema versions, package lessons from a migration,
-  harden compatibility behavior, or repeat a previous context-harness
-  upgrade/migration safely.
+  Plan, implement, validate, and deploy context-harness source upgrades, local
+  fleet refreshes, installed skill deployments, or explicit current-v3 layout
+  repairs. Use when the user asks to upgrade context-harness itself, repair
+  stale or partial context files, package lessons from an upgrade, or verify
+  deployment targets.
 disable-model-invocation: true
 user-invocable: true
 ---
 
 # Context Upgrade
 
-Upgrade/migration work is a controlled operator workflow. It must be invoked
-explicitly by the user when context-harness itself has an update, a schema
-migration is needed, or a local fleet migration is requested. Do not invoke
-implicitly just because a repo contains context-harness files.
+Upgrade and layout-repair work is a controlled operator workflow. It must be invoked
+explicitly by the user when context-harness itself has an update, a local fleet
+refresh is requested, installed copies need validation, or a current-v3 layout
+needs repair. Do not invoke implicitly just because a repo contains
+context-harness files.
 
-Prefer model-led edits, schema-aware scripts, explicit verification, and
-conservative deployment over broad rewrites.
+Prefer model-led edits, explicit verification, and conservative deployment over
+broad rewrites.
 
 ## Start
 
 1. Read the target repo's `NOW.md`, then relevant `CONTEXT.md` sections,
-   especially `## Operating Constraints` (or legacy `## Rules`), `## Workflow`,
+   especially `## Operating Constraints`, `## Workflow`,
    `## Relationships`, and `## Learned Patterns`.
 2. Read `PLAN.md` when it contains migration findings, decisions, skipped
    repos, or previous verification output.
 3. Identify the upgrade scope:
    - canonical source repo only
    - one target project
-   - local project fleet
+   - local project fleet refresh
    - installed skill deployment targets
+   - current-v3 layout repair
 4. Inspect the current worktree before edits. Treat unrelated changes as user
    work and do not revert them.
 
@@ -63,61 +64,39 @@ When changing context-harness itself:
 1. Define the user-visible behavior and compatibility target before editing.
 2. Update the canonical skill files, templates, scripts, README text, and tests
    that directly support the behavior.
-3. Preserve backward compatibility for older schemas where reasonable.
-   Prefer explicit schema markers and compatibility branches over guessing.
-4. Keep legacy tooling available only when it has existing users, and mark it
-   as legacy instead of leaving it on the preferred path.
-5. If `CONTEXT.md` changed, run:
+3. Keep the supported layout current-v3 only unless the user explicitly chooses
+   a new schema.
+4. If `CONTEXT.md` changed, run:
 
 ```bash
 node scripts/context-index.js update
 ```
 
-6. Verify source changes with:
+5. Verify source changes with:
 
 ```bash
 tests/run-all.sh
 node scripts/context-index.js check
 ```
 
-## Project Migration
+## Project Layout Repair
 
-Use this for all context-harness migration work: legacy v1 files, schema v2 to
-v3, partial layouts, custom local contexts, and fleet migrations. `context-init`
-is only for fresh repositories.
+Use this only when the user explicitly asks to repair or refresh an existing
+context-harness project. `context-init` is only for repositories with no
+context-harness layout.
 
-For a single repo or fleet migration:
+For a single repo or fleet refresh:
 
-1. Run a dry-run inventory first:
-
-```bash
-node scripts/migrate-project.js --root <path>
-```
-
-2. Classify each target as clean, dirty, unsupported, partial, or already
-   current.
-3. For dirty repos, skip unless requested. If included, inspect `git status`
-   and avoid overwriting unrelated user changes.
-4. For partial or custom contexts, inspect files and make model-led edits
-   instead of forcing a generated layout.
-5. For legacy v1 layouts without `CONTEXT.md`, model-led migrate durable
-   learned patterns, active plan/findings state, user rules, workflow checks,
-   and old agent instructions into the v3 `AGENTS.md`, `CONTEXT.md`, `NOW.md`,
-   and optional `PLAN.md` shape.
-6. Apply the migration only after the dry-run result is understood:
-
-```bash
-node scripts/migrate-project.js --root <path> --write
-```
-
-7. Use `--include-dirty` only after explicit user direction.
-8. In each migrated repo, refresh the generated index and install/update local
-   runtime scripts when the migration requires it.
-9. Re-run dry-run with the same root to confirm remaining skips are expected:
-
-```bash
-node scripts/migrate-project.js --root <path> --include-dirty
-```
+1. Inspect the current files and `git status` first. Treat unrelated changes as
+   user work.
+2. Preserve project-specific context. Replace only stale harness boilerplate,
+   schema markers, generated index blocks, and runtime scripts that are meant to
+   be managed.
+3. For partial or custom contexts, make model-led edits instead of forcing a
+   generated layout.
+4. Refresh generated indexes and local runtime scripts when the repair requires
+   it.
+5. Re-run `node scripts/context-index.js check` in representative targets.
 
 ## Deployment
 
@@ -140,7 +119,7 @@ nexus doctor
 
 Before finishing:
 
-1. Summarize source files changed, target projects migrated, skipped repos, and
+1. Summarize source files changed, target projects repaired/refreshed, skipped repos, and
    any deployment targets updated.
 2. Record remaining fleet cleanup or unsupported targets in `PLAN.md`.
 3. Promote only durable lessons to `CONTEXT.md`.

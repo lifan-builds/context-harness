@@ -5,7 +5,7 @@ importance: 0.85
 confidence: confirmed
 source: PLAN.md#verification
 chunk: .context-harness/chunks/ctx-plan-verification.md
-tokens_est: 760
+tokens_est: 827
 tags: [plan, verification]
 ---
 

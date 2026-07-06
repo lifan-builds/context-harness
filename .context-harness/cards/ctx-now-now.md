@@ -5,14 +5,14 @@ importance: 0.95
 confidence: confirmed
 source: NOW.md#now
 chunk: null
-tokens_est: 590
+tokens_est: 265
 tags: [now, resume]
 ---
 
 # NOW.md: Now
 
 ## Summary
-Context Harness source was pushed and locally deployed, the /Users/lfan/Project fleet was upgraded to Operating Constraints, post-migration evals still show strong progressive-harness gains, and self-promoting promoti...
+Legacy migration/eval/ADR tooling has been removed from context-harness now that the local project fleet is on current schema v3 with Operating Constraints.
 
 ## Use when
 - resuming the current session
@@ -20,11 +20,11 @@ Context Harness source was pushed and locally deployed, the /Users/lfan/Project 
 - update context after current work
 
 ## Key facts
-- Context Harness source was pushed and locally deployed, the /Users/lfan/Project fleet was upgraded to Operating Constraints, post-migration evals still show...
-- No code, deployment, fleet-upgrade, or evaluation blockers are known.
-- Some migrated repos have pre-existing unrelated dirty worktrees; the fleet upgrade intentionally refreshed their context-harness files in place without commi...
-- Review the final diffs, especially the new fleet eval summary and self-promoting drafts; if accepted, commit/push the final context-harness eval record and s...
-- Last modified: 2026-07-06T04:16:00-0700
+- Legacy migration/eval/ADR tooling has been removed from context-harness now that the local project fleet is on current schema v3 with Operating Constraints.
+- No code or verification blockers are known.
+- Review the cleanup diff, then commit/push and redeploy with Agent Nexus if accepted.
+- Last modified: 2026-07-06T21:54:00-0700
+- Files touched: README.md, SKILL.md, context-catch-up/SKILL.md, context-init/SKILL.md, context-upgrade/SKILL.md, scripts/install-project.js, scripts/context-i...
 
 ## Open next
 - `NOW.md#now`

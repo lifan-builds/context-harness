@@ -18,7 +18,7 @@ If a repository already has old, partial, or legacy context-harness files, use
 Create the smallest durable context layer that lets future agents catch up:
 
 - `AGENTS.md` as the automatic Context Contract
-- `CONTEXT.md` for project facts, rules, language, relationships, and lessons
+- `CONTEXT.md` for project facts, operating constraints, language, relationships, and lessons
 - `NOW.md` for the current focus
 - `PLAN.md` only when there is an active multi-step task
 
@@ -40,10 +40,8 @@ layout.
    node ../scripts/context-gen.js
    ```
 
-2. Present the generated `## Suggested Rules` and `## Suggested Workflow` as a
-   starting point.
-3. Ask the user to confirm or edit `Never`, `Always`, and workflow
-   verification commands.
+2. Present the generated `## Suggested Operating Constraints` and `## Suggested Workflow` as a starting point.
+3. Ask the user to keep only project-specific constraints a future agent would not infer from code or docs, and confirm workflow verification commands.
 4. Write `CONTEXT.md`, `NOW.md`, and `AGENTS.md` from the templates in the root
    `context-harness` skill.
 5. Install context-harness runtime scripts into the target repo:
@@ -53,7 +51,7 @@ layout.
    ```
 
 6. Run `node scripts/context-index.js update` so `AGENTS.md` has a generated
-   high-level index into `CONTEXT.md`.
+   high-level index and `.context-harness/` has retrieval cards.
 7. Ask whether there is a multi-step task. If yes, create `PLAN.md`.
 
 ## Guardrails
@@ -63,7 +61,8 @@ layout.
 - Do not migrate old layouts here; route legacy v1, schema v2, partial, or
   custom context-harness files to `context-upgrade`.
 - Keep generated files short enough to be read every session.
-- Keep `AGENTS.md` small: contract plus generated `CONTEXT.md` index.
+- Keep `AGENTS.md` small: contract plus generated `CONTEXT.md` index and a
+  pointer to `hydrate`.
 - Runtime scripts are project-local after init, so `AGENTS.md` can refer to
-  `node scripts/context-index.js update`.
+  `node scripts/context-index.js update` and `hydrate`.
 - Do not create ADRs unless the target project already has an ADR workflow.

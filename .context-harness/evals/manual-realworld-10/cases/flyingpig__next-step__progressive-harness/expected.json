@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "repo": "flyingpig",
+  "scenario": "next-step",
+  "mode": "progressive-harness",
+  "goal": "plan next implementation step",
+  "mustMention": [
+    "Investigated the installed/local packaged Flying Pig desktop app work-window connection failure. The helper is healthy, but Open Work Window is blocked by a CDP loopback/port co...",
+    "Fix the dashboard/helper CDP launch/status path: use an app-owned alternate CDP port or honor FLYINGPIGCDPPORT, preserve the requested CDP host, and report port ownership confli...",
+    "Run product app: npm run desktop:dev",
+    "next step",
+    "verification",
+    "### Never"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-rules",
+    "ctx-context-workflow"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval gap",
+    "context quality gap",
+    "instruction gap",
+    "model behavior gap",
+    "eval harness gap"
+  ]
+}

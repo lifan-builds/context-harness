@@ -223,14 +223,14 @@ EOF
   output=$(node "$CONTEXT_GEN" "$TMPDIR_ROOT" 2>&1)
   assert_contains "$output" "Vitest"
 
-  # --- Suggested Rules output ---
-  it "emits Suggested Rules section"
-  assert_contains "$output" "## Suggested Rules"
+  # --- Suggested Operating Constraints output ---
+  it "emits Suggested Operating Constraints section"
+  assert_contains "$output" "## Suggested Operating Constraints"
 
-  it "emits core Always rule for every project"
-  assert_contains "$output" "Always prefer CLI, MCP tools, or skills over browser automation"
+  it "emits core operating constraint for every project"
+  assert_contains "$output" "Do not store secrets or credentials in the repo"
 
-  it "emits TS-flavored Always rule when TypeScript detected"
+  it "emits TS-flavored verification when TypeScript detected"
   setup_tmpdir
   cat > "$TMPDIR_ROOT/package.json" << 'EOF'
 { "name": "ts-app", "dependencies": {} }
@@ -239,7 +239,7 @@ EOF
   output=$(node "$CONTEXT_GEN" "$TMPDIR_ROOT" 2>&1)
   assert_contains "$output" "tsc --noEmit"
 
-  it "emits Python-flavored Always rule when Python detected"
+  it "emits Python-flavored verification when Python detected"
   setup_tmpdir
   cat > "$TMPDIR_ROOT/pyproject.toml" << 'EOF'
 [project]
@@ -248,7 +248,7 @@ EOF
   output=$(node "$CONTEXT_GEN" "$TMPDIR_ROOT" 2>&1)
   assert_contains "$output" "pytest"
 
-  it "emits Go-flavored Always rule when Go detected"
+  it "emits Go-flavored verification when Go detected"
   setup_tmpdir
   cat > "$TMPDIR_ROOT/go.mod" << 'EOF'
 module example.com/svc
@@ -376,13 +376,9 @@ if should_run "context-index"; then
 ## Project
 index-app is a test project.
 
-## Rules
-
-### Never
-1. Never ignore the index.
-
-### Always
-1. Always refresh AGENTS.md after durable context changes.
+## Operating Constraints
+- Do not ignore the index.
+- Refresh AGENTS.md after durable context changes.
 
 ## Language
 - **Canonical term**: A durable term that should be queryable.
@@ -400,7 +396,7 @@ EOF
   assert_contains "$output" "Context Index"
 
   it "indexes CONTEXT.md sections without duplicating full context"
-  assert_contains "$output" "CONTEXT.md#rules"
+  assert_contains "$output" "CONTEXT.md#operating-constraints"
 
   it "preserves existing AGENTS.md contract text"
   assert_contains "$output" "Existing contract line"
@@ -415,8 +411,8 @@ EOF
   assert_contains "$output" "Language"
 
   it "prints a named context section"
-  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" section "Rules" 2>&1)
-  assert_contains "$output" "Never ignore the index"
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" section "Operating Constraints" 2>&1)
+  assert_contains "$output" "Do not ignore the index"
 
   it "creates default AGENTS.md with schema v3 marker"
   setup_tmpdir
@@ -444,13 +440,9 @@ check-app is a test project.
 .
 ```
 
-## Rules
-
-### Never
-1. Never ignore checks.
-
-### Always
-1. Always refresh the index.
+## Operating Constraints
+- Do not ignore checks.
+- Refresh the index after context changes.
 
 ## Workflow
 - Test: true
@@ -516,7 +508,7 @@ check-app
 ## Structure
 .
 
-## Rules
+## Operating Constraints
 
 ## Workflow
 
@@ -563,6 +555,145 @@ EOF
   (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
   output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1); rc=$?
   [ "$rc" -eq 0 ] && echo "$output" | grep -q "WARN" && pass || fail "expected legacy warning: $output"
+
+  it "update writes progressive context library cards and chunks"
+  setup_tmpdir
+  cat > "$TMPDIR_ROOT/CONTEXT.md" << 'EOF'
+# Context
+<!-- context-harness:schema v3 -->
+
+## Project
+progressive-app
+
+## Structure
+.
+
+## Operating Constraints
+- Hydrate context before opening bulky files.
+
+## Workflow
+- Test: true
+
+## Language
+- **Card**: A compact retrieval handle.
+
+## Relationships
+EOF
+  for i in $(seq 1 85); do echo "- Relation line $i preserves a durable architecture detail."; done >> "$TMPDIR_ROOT/CONTEXT.md"
+  cat >> "$TMPDIR_ROOT/CONTEXT.md" << 'EOF'
+
+## Flagged Ambiguities
+- None.
+
+## Learned Patterns
+- None yet.
+EOF
+  cat > "$TMPDIR_ROOT/NOW.md" << 'EOF'
+# Now
+
+## Current Focus
+Progressive library test.
+EOF
+  (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
+  [ -f "$TMPDIR_ROOT/.context-harness/index.json" ] && \
+    [ -f "$TMPDIR_ROOT/.context-harness/cards/ctx-context-relationships.md" ] && \
+    [ -f "$TMPDIR_ROOT/.context-harness/chunks/ctx-context-relationships.md" ] && pass || fail "missing progressive library files"
+
+  it "hydrate returns card pointers without dumping raw chunks"
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" hydrate "architecture detail" 2>&1)
+  echo "$output" | grep -q "ctx-context-relationships" && \
+    echo "$output" | grep -q "raw detail on demand" && \
+    ! echo "$output" | grep -q "Relation line 84" && pass || fail "unexpected hydrate output: $output"
+
+  it "check fails when the context library manifest is stale"
+  node -e "const fs=require('fs'); const f='$TMPDIR_ROOT/.context-harness/index.json'; const j=JSON.parse(fs.readFileSync(f,'utf8')); j.source_hash='stale'; fs.writeFileSync(f, JSON.stringify(j, null, 2)+'\\n');"
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1); rc=$?
+  [ "$rc" -eq 1 ] && echo "$output" | grep -q ".context-harness/index.json is stale" && pass || fail "expected stale library failure: $output"
+
+  cleanup_tmpdir
+fi
+
+# =============================
+# Test: eval-agent-problem-solving.js
+# =============================
+
+if should_run "eval-agent-problem-solving"; then
+  suite "eval-agent-problem-solving.js"
+  EVAL_AGENT="$REPO_ROOT/scripts/eval-agent-problem-solving.js"
+
+  it "prepares no-harness and progressive fresh-agent eval cases"
+  setup_tmpdir
+  mkdir -p "$TMPDIR_ROOT/projects/demo/.git"
+  cat > "$TMPDIR_ROOT/projects/demo/CONTEXT.md" << 'EOF'
+# Context
+<!-- context-harness:schema v3 -->
+
+## Project
+demo project
+
+## Structure
+.
+
+## Operating Constraints
+- Do not delete demo data.
+- Preserve demo data.
+
+## Workflow
+- Verification: npm test
+
+## Language
+
+## Relationships
+
+## Flagged Ambiguities
+
+## Learned Patterns
+EOF
+  cat > "$TMPDIR_ROOT/projects/demo/NOW.md" << 'EOF'
+# Now
+
+## Current Focus
+Ship the demo evaluator.
+
+## Active Blockers
+- None.
+
+## Immediate Next Step
+Run npm test and review the eval report.
+EOF
+  cat > "$TMPDIR_ROOT/projects/demo/PLAN.md" << 'EOF'
+# Demo Plan
+
+## Progress
+- [ ] Verify evaluator.
+
+## Verification
+- npm test
+EOF
+  echo '{"scripts":{"test":"true"}}' > "$TMPDIR_ROOT/projects/demo/package.json"
+  output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" prepare "$TMPDIR_ROOT/projects" --sample 1 --scenarios cold-resume,next-step --output "$TMPDIR_ROOT/eval" 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && \
+    [ -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__no-harness/prompt.md" ] && \
+    [ -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__progressive-harness/prompt.md" ] && \
+    [ ! -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__no-harness/repo/CONTEXT.md" ] && \
+    [ -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__progressive-harness/repo/CONTEXT.md" ] && pass || fail "prepare failed: $output"
+
+  it "uses operating constraints and keeps harness drift as a follow-up"
+  node -e "const fs=require('fs'); const e=JSON.parse(fs.readFileSync('$TMPDIR_ROOT/eval/cases/demo__next-step__progressive-harness/expected.json','utf8')); const p=fs.readFileSync('$TMPDIR_ROOT/eval/cases/demo__next-step__progressive-harness/prompt.md','utf8'); if(e.mustMention.includes('### Never')) process.exit(1); if(!e.mustMention.some(x=>x.includes('delete demo data'))) process.exit(2); if(!e.expectedCards.includes('ctx-context-operating-constraints')) process.exit(3); if(!p.includes('do not let harness maintenance replace the requested project understanding or planning task')) process.exit(4);"
+  [ "$?" -eq 0 ] && pass || fail "expected operating constraint and harness-priority prompt"
+
+  it "scores supplied fresh-agent eval results"
+  cat > "$TMPDIR_ROOT/eval/cases/demo__cold-resume__progressive-harness/result.md" << 'EOF'
+Current focus: Ship the demo evaluator.
+Active blockers: None.
+Immediate next step: Run npm test and review the eval report.
+Verification command: npm test.
+Relevant files include context-maintain Dream/Compact workflow.
+EOF
+  output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" score "$TMPDIR_ROOT/eval" 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && \
+    echo "$output" | grep -q "Fresh Agent Problem-Solving Eval" && \
+    echo "$output" | grep -q "10/10 pass" && pass || fail "score failed: $output"
 
   cleanup_tmpdir
 fi
@@ -1412,13 +1543,9 @@ Test project.
 .
 ```
 
-## Rules
-
-### Never
-1. Never store secrets.
-
-### Always
-1. Always run checks.
+## Operating Constraints
+- Do not store secrets.
+- Run checks before completion.
 
 ## Workflow
 - Test: npm test

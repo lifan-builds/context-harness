@@ -74,45 +74,38 @@ before implementation.
 ## Dream/Compact Mode
 
 Dream is an automatic semantic consolidation check inside every
-`context-maintain` run. It is inspired by model-decided memory consolidation:
-the agent decides whether future agents would benefit from compacted state,
-not from a fixed line count, timer, or run counter.
+`context-maintain` run. It decides what future agents should retrieve, at what
+layer, not just what can be shortened.
 
 ### Should Dream Check
 
-After any context update, reflection, plan maintenance, or session closeout,
-decide whether a Dream pass is useful. Dream when any high-signal condition is
-true:
-
-- A task completed or substantially changed direction.
-- `NOW.md` contains detailed evidence instead of only focus, blockers, and next
-  step.
-- `PLAN.md` mixes active work with stale completed work or old blockers.
-- A blocker is obsolete, contradicted, or no longer actionable.
-- The same finding, rule, decision, or lesson appears in multiple places.
-- A correction or failed attempt revealed a reusable lesson.
-- `CONTEXT.md` changed and future agents need a shorter startup path.
-- Future catch-up would be materially easier after consolidation.
-
-If no condition is true, skip Dream silently. Do not log skipped checks.
+Dream when future catch-up would materially improve: completed or redirected
+task, bulky `NOW.md`, stale/duplicated `PLAN.md`, obsolete blocker, repeated
+correction, duplicated fact, large `CONTEXT.md` section, or lengthy durable
+detail that should not be always loaded. If no condition is true, skip Dream
+silently. Do not log skipped checks.
 
 ### Dream Pass
 
 When Dream is useful, edit directly; do not ask for approval.
 
-1. Review `NOW.md`, `PLAN.md` if present, relevant `CONTEXT.md` sections,
-   recent findings, verification output, and touched files.
-2. Rewrite `NOW.md` into a short resume packet: current focus, active blockers,
-   immediate next step, timestamp, and touched files.
-3. Prune duplicate or stale `PLAN.md` material; archive completed progress and
-   preserve active findings, decisions, done criteria, and verification.
-4. Promote only durable terms, rules, invariants, relationships, or repeated
-   lessons into `CONTEXT.md`.
-5. Move domain-detail material into existing obvious project docs only when the
-   project already has such a location. Do not invent a new docs taxonomy.
-6. Do not store secrets, raw transcripts, raw web/API output, or unnecessary
+1. Detect drift with `node scripts/context-index.js stats` plus `NOW.md`,
+   `PLAN.md`, relevant `CONTEXT.md`, recent findings, and touched files.
+2. Route each fact once: active state to `PLAN.md`; resume packet to `NOW.md`;
+   durable rules/terms/invariants/lessons to `CONTEXT.md`; lengthy durable
+   detail to `.context-harness/cards/` and `chunks/`; raw evidence to source
+   docs or archive, not operational context.
+3. When existing project docs compete with active context and the right home is
+   obvious, mark, prune, or archive those docs rather than duplicating state in
+   context-harness files.
+4. Rewrite `NOW.md` short; prune/archive stale `PLAN.md`; keep `CONTEXT.md`
+   concise and replace bulky detail with card pointers when needed.
+5. Run `node scripts/context-index.js update` after context/card/chunk changes.
+6. Verify retrieval with `node scripts/context-index.js hydrate "resume current task"`
+   and one task-specific query. A fresh agent should see the next step and key
+   rule without loading raw chunks.
+7. Do not store secrets, raw transcripts, raw web/API output, or unnecessary
    personal data.
-7. Refresh `AGENTS.md` if `CONTEXT.md` changed.
 8. Write a short intent log entry to `.context-harness/DREAM.md`.
 
 ### Dream Log

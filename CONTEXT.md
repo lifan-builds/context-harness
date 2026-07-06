@@ -15,19 +15,16 @@ set-goal/
 scripts/
 ```
 
-## Rules
+## Operating Constraints
 
-### Never
-1. Never turn context-harness into a large process framework.
-2. Never split workflows into separate skills unless the agent's intent at invocation is genuinely different.
-3. Never make ADRs required for ordinary context capture.
+- Keep context-harness lightweight; do not turn it into a large process framework.
+- Split workflows into separate skills only when the agent's invocation intent is genuinely different.
+- Do not require ADRs for ordinary context capture.
+- Keep the user-facing skill set small and easy to choose from.
+- Route durable corrections into project context before they scroll away.
+- Preserve the AGENTS.md Context Contract.
 
-### Always
-1. Always keep the user-facing skill set small and easy to choose from.
-2. Always route durable corrections into project context before they scroll away.
-3. Always preserve the AGENTS.md Context Contract.
-
-### Legacy Objectives
+## Legacy Objectives
 <!-- Deprecated in schema v3. Preserve as project intent; use PLAN.md Done Criteria and Workflow Verification for active checks. -->
 1. Agents can initialize lightweight project context in a new repo.
 2. Agents can catch up quickly from durable context files.
@@ -60,7 +57,7 @@ scripts/
 - `context-maintain` owns automatic Dream/Compact consideration after maintenance events; Dream edits context directly when useful and logs intent to `.context-harness/DREAM.md`.
 - `.context-harness/DREAM.md` is a non-operational audit log for debugging context drift or human review; agents must not read it during normal catch-up or task work.
 - Local agent-nexus deployment should use this repository's canonical source and `context-maintain` instead of Matt Pocock's `grill-with-docs`.
-- `AGENTS.md` is the small activation layer; `CONTEXT.md` is the durable source of truth, indexed into `AGENTS.md` by `scripts/context-index.js`.
+- `AGENTS.md` is the small activation layer; `CONTEXT.md` is the durable source of truth, indexed into `AGENTS.md` and `.context-harness/` cards/chunks by `scripts/context-index.js`.
 - Skill self-improvement may propose and validate candidate patches, but modifying a skill requires explicit user approval.
 - The source copy in this repository is canonical for context-harness skills; installed/local copies are deployment targets or user-private forks, not the default place for accepted upstream improvements.
 - Schema v3 removes durable project-wide Objectives from the default path; verification belongs in `CONTEXT.md` Workflow and task-specific outcomes belong in `PLAN.md` Done Criteria.
@@ -81,6 +78,12 @@ scripts/
 - For backward compatibility, generated context files should carry a lightweight schema/version marker and new skills should model-led upgrade older or partial context files instead of assuming the latest AGENTS.md contract is already present.
 - When a workflow is removed from the preferred skill path, remove the stub completely once the replacement behavior is covered by an active skill and tests.
 - When using SkillOpt-style self-improvement, separate proposal from mutation: collect evidence and validation, ask the user for approval, then update the canonical skill source rather than silently editing installed copies.
-- When adapting Claude Code-style auto memory, use semantic model judgment inside `context-maintain` instead of hard counters or line limits; keep the result visible in markdown and keep audit history separate from operational context.
+- When adapting Claude Code-style auto memory, use semantic model judgment inside `context-maintain` instead of hard counters or line limits; route lengthy durable detail through cards/chunks, keep concise facts visible in markdown, and keep audit history separate from operational context.
 - When installing CommonJS runtime scripts into JavaScript projects, add a `scripts/package.json` with `"type": "commonjs"` because parent packages may set `"type": "module"` and break `require()`.
 - When supporting nested context roots, detect `CONTEXT.md` before parent package/git markers because nested project folders can otherwise read and update the parent repo's context files.
+- When changing context-harness retrieval behavior, keep unit tests minimal for mechanics and validate usefulness through shadow tests across real project copies because retrieval quality depends on real context shapes.
+- When evaluating context-harness value, compare fresh-agent problem-solving in isolated real-repo copies with and without context-harness because the core goal is improved task understanding and next-step quality, not just retrieval correctness.
+- When adding progressive context commands such as `hydrate`, account for real-fleet version skew: agents need capability-aware fallback instructions when installed project scripts only support older commands.
+- When harness health issues appear during a real project task, treat them as follow-ups unless they block correctness or safety because context-harness should improve task solving rather than become the task.
+- When old project docs compete with active context, clean, mark, or archive those docs in their natural location when suitable instead of only adding more context-harness state.
+- Prefer `Operating Constraints` over `Rules` with `Never`/`Always` because Karpathy-style agent guidance works better as compact behavioral principles plus project-specific constraints that change decisions.

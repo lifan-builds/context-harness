@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "repo": "flyingpig",
+  "scenario": "cold-resume",
+  "mode": "progressive-harness",
+  "goal": "resume current task",
+  "mustMention": [
+    "Implemented source changes so Flying Pig can use a Claude-Code-style Auto-Connect Existing Chrome path through a helper-owned Chrome DevTools MCP bridge. The dashboard now has A...",
+    "Rebuild/repackage or run the source helper/app, then verify from the actual UI: open Chrome, visit chrome://inspect/#remote-debugging, allow remote debugging, click Auto-Connect...",
+    "Run product app: npm run desktop:dev",
+    "current focus",
+    "active blockers",
+    "immediate next step"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-workflow"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval gap",
+    "context quality gap",
+    "instruction gap",
+    "model behavior gap",
+    "eval harness gap"
+  ]
+}

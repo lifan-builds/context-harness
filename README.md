@@ -63,8 +63,8 @@ agent reads `NOW.md`, uses the `AGENTS.md` index, opens only relevant
 - Skills are reusable patterns, not templates you have to copy.
 - Your harness should teach your own agent to self-iterate inside your workflow.
 - 4 behavioral principles > 50 process rules
-- Core rules apply everywhere before project-specific rules
-- User-defined Never/Always rules keep the agent aligned
+- Generic agent behavior belongs in the skill, not every project context
+- Project-specific operating constraints preserve intent agents would not infer
 - Verification belongs in Workflow and task-local PLAN.md Done Criteria
 - Durable human input and agent discoveries belong on disk before they scroll away
 - `AGENTS.md` activates the contract and indexes `CONTEXT.md`; scripts do real work
@@ -87,10 +87,12 @@ not by every tiny maintenance action. Update, capture, plan, closeout, and
 reflection all live under `context-maintain` because they are part of the same
 ongoing memory workflow.
 
-## Core Rules
+## Core Behavior
 
-These rules apply to every project using context-harness. Project-specific
-Never / Always rules add local constraints on top.
+Generic agent behavior lives in the root skill so projects do not need to copy a
+large rulebook. Project-specific operating constraints should be rare: keep only
+constraints that change agent decisions and are not reliably inferable from code
+or ordinary docs.
 
 1. **Tool-native first** — Prefer CLI, MCP tools, or skills over browser
    automation whenever they can accomplish the task. Reserve browser automation
@@ -118,7 +120,7 @@ Scripts are invoked the same way on every platform: `node <skill-dir>/scripts/<n
 | File | Purpose | Hygiene Target |
 |------|---------|-----------|
 | `AGENTS.md` | Always-read contract plus generated `CONTEXT.md` index | 40 |
-| `CONTEXT.md` | Project info, rules, workflow, terms, learned patterns | 80 |
+| `CONTEXT.md` | Project info, operating constraints, workflow, terms, learned patterns | 80 |
 | `NOW.md` | Working memory: current focus, blockers, next step | concise |
 | `PLAN.md` | On-demand living plan for multi-step work | active state only |
 | `CONTEXT-MAP.md` | Optional map for multi-context repos | — |
@@ -155,7 +157,7 @@ project-root walk, stack detection, markdown section parsing, command runner).
 | `scripts/lib.js` | Shared helpers imported by everything else |
 | `scripts/install-project.js` | Copy default runtime scripts; `--profile legacy` includes ADR/eval tools |
 | `scripts/codex-context-hook.js` | Codex lifecycle hook dispatcher for catch-up, init, and maintain nudges |
-| `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware rule defaults |
+| `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware operating constraint defaults |
 | `scripts/context-index.js` | Refresh AGENTS.md index; list/query/print/check CONTEXT.md sections |
 | `scripts/migrate-project.js` | Batch migrate schema v2 projects to v3; not installed into target repos |
 | `scripts/guard.js` | Security: block `--no-verify`, detect secrets, protect linter configs |
@@ -167,24 +169,18 @@ project-root walk, stack detection, markdown section parsing, command runner).
 Hook scripts read their payload from the `TOOL_INPUT` env var or from stdin
 (pipe-friendly for Codex hooks, Cursor, Claude Code, and custom harnesses).
 
-## Rules And Verification
+## Operating Constraints And Verification
 
-You define project-specific rules across two durable categories. Suggested
-Always rules include the Core Rules, so generated contexts may start with more
-than six total rules when the global layer is counted.
+You define project-specific operating constraints only when they change future
+agent decisions and would not be reliably inferred from code, tests, or ordinary
+docs. Generic behavior belongs in the skill-level behavioral principles instead
+of each project's `CONTEXT.md`.
 
-**Never** (hard constraints the agent must not violate)
+**Operating Constraints**
 ```
-1. Never store secrets or credentials in the repo
-2. Never disable or weaken type checking
-3. Never ignore failing tests
-```
-
-**Always** (habits the agent must follow)
-```
-1. Always write tests for new public functions
-2. Always handle errors explicitly
-3. Always run the linter before committing
+- Do not store secrets or credentials in the repo.
+- Preserve strict type checking unless the user explicitly approves weakening it.
+- Treat failing tests as blocking unless the user explicitly accepts the risk.
 ```
 
 **Workflow Verification** (commands or checks the agent should run when
@@ -200,9 +196,9 @@ project-wide Objectives. Schema v2 Objectives are preserved as legacy context
 during migration; command-based Objectives are moved into Workflow
 Verification.
 
-`context-gen.js` prefills stack-specific Never/Always defaults (TypeScript
-gets `tsc --noEmit`, Python gets `ruff check`, Go gets `go vet`, etc.).
-It also suggests verification commands for `CONTEXT.md` `## Workflow`.
+`context-gen.js` suggests stack-specific operating constraints plus verification
+commands (TypeScript gets `tsc --noEmit`, Python gets `ruff check`, Go gets
+`go vet`, etc.) for `CONTEXT.md` `## Workflow`.
 
 ## Companion Skills
 
@@ -302,7 +298,7 @@ target repo so `AGENTS.md` can use project-local commands such as
 ```bash
 node scripts/context-index.js update
 node scripts/context-index.js query "term"
-node scripts/context-index.js section "Rules"
+node scripts/context-index.js section "Operating Constraints"
 node scripts/context-index.js check
 ```
 

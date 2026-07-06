@@ -1,0 +1,22 @@
+{
+  "id": "flight-plan__next-step__no-harness",
+  "repo": "flight-plan",
+  "scenario": "next-step",
+  "mode": "no-harness",
+  "resultPath": "cases/flight-plan__next-step__no-harness/result.md",
+  "status": "needs-review",
+  "total": 7,
+  "max": 10,
+  "missing": [
+    "Test: project-specific.",
+    "### Never"
+  ],
+  "avoided": [],
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 4,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "model behavior gap"
+}

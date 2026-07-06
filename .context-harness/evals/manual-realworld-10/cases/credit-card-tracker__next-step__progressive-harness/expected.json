@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "repo": "credit-card-tracker",
+  "scenario": "next-step",
+  "mode": "progressive-harness",
+  "goal": "plan next implementation step",
+  "mustMention": [
+    "Implemented, deployed, and production-verified the public Neon quota hardening plan: anonymous public catalog/guide/referral/sitemap surfaces now use a static shared catalog ins...",
+    "User chose to wait for the July 2026 Neon quota reset instead of upgrading Neon or cutting over to an empty fallback. Expected reset boundary is 2026-07-01T00:00:00Z / June 30,...",
+    "Setup: npm install",
+    "next step",
+    "verification",
+    "### Never"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-rules",
+    "ctx-context-workflow"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval gap",
+    "context quality gap",
+    "instruction gap",
+    "model behavior gap",
+    "eval harness gap"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "flyingpig__next-step__no-harness",
+  "repo": "flyingpig",
+  "scenario": "next-step",
+  "mode": "no-harness",
+  "resultPath": "cases/flyingpig__next-step__no-harness/result.md",
+  "status": "needs-review",
+  "total": 6,
+  "max": 10,
+  "missing": [
+    "Implemented source changes so Flying Pig can use a Claude-Code-style Auto-Connect Existing Chrome path through a helper-owned Chrome DevTools MCP bridge. The dashboard now has A...",
+    "Rebuild/repackage or run the source helper/app, then verify from the actual UI: open Chrome, visit chrome://inspect/#remote-debugging, allow remote debugging, click Auto-Connect...",
+    "Never hardcode secrets or PII — environment variables only; manual login flow for auth'd sites"
+  ],
+  "avoided": [],
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 3,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "model behavior gap"
+}

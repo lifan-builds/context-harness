@@ -1,0 +1,22 @@
+# Learned Patterns
+
+- When splitting context-harness into companion skills, keep the split based on invocation intent because too many maintenance-like skills make the harness harder to choose.
+- When learning from external skill systems like Superpowers or metaprompting skills, treat them as reusable patterns to adapt through our own agent workflow, not templates to copy directly.
+- When writing skill frontmatter, use quoted or block scalar descriptions if the text contains colon-space because Codex may skip skills whose YAML metadata fails to parse.
+- Plan stress-tests should ask the user only high-leverage questions where human judgment materially helps the agent; details that can be inferred from context, inspected in files, or verified by dry run should be handled by the agent instead of pushed to the user.
+- When adapting context-harness to Codex, treat hooks as the active lifecycle path for enforcing context habits; keep plugin hooks optional until `plugin_hooks` support is stable and trusted.
+- When `context-maintain` changes durable project context, refresh the generated `AGENTS.md` index so future agents can navigate `CONTEXT.md` selectively instead of loading the full file by default.
+- Codex hooks should stay simple lifecycle nudges: session start points to `context-catch-up`, missing project context points to `context-init`, and substantial task completion points to `context-maintain`.
+- When migrating existing projects to a new context-harness contract, prefer model-led edits over bulk migration scripts because each repo may have local AGENTS.md conventions that need judgment.
+- For backward compatibility, generated context files should carry a lightweight schema/version marker and new skills should model-led upgrade older or partial context files instead of assuming the latest AGENTS.md contract is already present.
+- When a workflow is removed from the preferred skill path, remove the stub completely once the replacement behavior is covered by an active skill and tests.
+- When using SkillOpt-style self-improvement, separate proposal from mutation: collect evidence and validation, ask the user for approval, then update the canonical skill source rather than silently editing installed copies.
+- When adapting Claude Code-style auto memory, use semantic model judgment inside `context-maintain` instead of hard counters or line limits; route lengthy durable detail through cards/chunks, keep concise facts visible in markdown, and keep audit history separate from operational context.
+- When installing CommonJS runtime scripts into JavaScript projects, add a `scripts/package.json` with `"type": "commonjs"` because parent packages may set `"type": "module"` and break `require()`.
+- When supporting nested context roots, detect `CONTEXT.md` before parent package/git markers because nested project folders can otherwise read and update the parent repo's context files.
+- When changing context-harness retrieval behavior, keep unit tests minimal for mechanics and validate usefulness through shadow tests across real project copies because retrieval quality depends on real context shapes.
+- When evaluating context-harness value, compare fresh-agent problem-solving in isolated real-repo copies with and without context-harness because the core goal is improved task understanding and next-step quality, not just retrieval correctness.
+- When adding progressive context commands such as `hydrate`, account for real-fleet version skew: agents need capability-aware fallback instructions when installed project scripts only support older commands.
+- When harness health issues appear during a real project task, treat them as follow-ups unless they block correctness or safety because context-harness should improve task solving rather than become the task.
+- When old project docs compete with active context, clean, mark, or archive those docs in their natural location when suitable instead of only adding more context-harness state.
+- Prefer `Operating Constraints` over `Rules` with `Never`/`Always` because Karpathy-style agent guidance works better as compact behavioral principles plus project-specific constraints that change decisions.

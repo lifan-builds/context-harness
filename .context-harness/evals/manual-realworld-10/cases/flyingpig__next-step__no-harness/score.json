@@ -1,0 +1,23 @@
+{
+  "id": "flyingpig__next-step__no-harness",
+  "repo": "flyingpig",
+  "scenario": "next-step",
+  "mode": "no-harness",
+  "resultPath": "cases/flyingpig__next-step__no-harness/result.md",
+  "status": "needs-review",
+  "total": 6,
+  "max": 10,
+  "missing": [
+    "Investigated the installed/local packaged Flying Pig desktop app work-window connection failure. The helper is healthy, but Open Work Window is blocked by a CDP loopback/port co...",
+    "Fix the dashboard/helper CDP launch/status path: use an app-owned alternate CDP port or honor FLYINGPIGCDPPORT, preserve the requested CDP host, and report port ownership confli...",
+    "### Never"
+  ],
+  "avoided": [],
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 3,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "model behavior gap"
+}

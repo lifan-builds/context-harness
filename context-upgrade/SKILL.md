@@ -24,8 +24,8 @@ conservative deployment over broad rewrites.
 ## Start
 
 1. Read the target repo's `NOW.md`, then relevant `CONTEXT.md` sections,
-   especially `## Rules`, `## Workflow`, `## Relationships`, and
-   `## Learned Patterns`.
+   especially `## Operating Constraints` (or legacy `## Rules`), `## Workflow`,
+   `## Relationships`, and `## Learned Patterns`.
 2. Read `PLAN.md` when it contains migration findings, decisions, skipped
    repos, or previous verification output.
 3. Identify the upgrade scope:

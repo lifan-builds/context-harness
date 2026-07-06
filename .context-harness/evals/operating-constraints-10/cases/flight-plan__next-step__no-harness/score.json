@@ -1,0 +1,23 @@
+{
+  "id": "flight-plan__next-step__no-harness",
+  "repo": "flight-plan",
+  "scenario": "next-step",
+  "mode": "no-harness",
+  "resultPath": "cases/flight-plan__next-step__no-harness/result.md",
+  "status": "needs-review",
+  "total": 6,
+  "max": 10,
+  "missing": [
+    "Use the generated AGENTS.md Context Index to open relevant CONTEXT.md sections before planning or editing.",
+    "Test: project-specific.",
+    "Never store secrets or credentials in context files."
+  ],
+  "avoided": [],
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 3,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "model behavior gap"
+}

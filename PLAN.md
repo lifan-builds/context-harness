@@ -45,16 +45,51 @@ dump.
 - [x] Added release-proof tests for catch-up timing, maintain routing,
   Dream/Compact ownership, explicit-only upgrade metadata, set-goal headings,
   removed deprecated stubs, and the cold-resume demo artifact.
+- [x] Added progressive context library support in `scripts/context-index.js`:
+  generated retrieval cards/chunks under `.context-harness/`, `hydrate` selection,
+  `stats`, stale manifest checks, and pruning stale generated markdown.
+- [x] Added `scripts/eval-context-library.js` for shadow-testing context library
+  behavior against temporary copies of real repositories under `/Users/lfan/Project/`.
+- [x] Used shadow evaluation to tighten retrieval hints and duplicate-heading card IDs
+  until 19 context-enabled repos passed with 0 warnings/failures and 5 repos skipped
+  for missing `CONTEXT.md`.
+- [x] Added `scripts/eval-agent-problem-solving.js` to prepare and score
+  fresh-agent problem-solving evals comparing `no-harness` vs
+  `progressive-harness` modes with isolated repo copies, expected facts,
+  judge prompts, and scoring reports.
+- [x] Ran 10 real-world fresh-agent evaluation pairs across `agent-nexus`,
+  `context-harness`, `credit-card-tracker`, `flight-plan`, and `flyingpig`,
+  then wrote `.context-harness/evals/manual-realworld-10/top-gaps.md` with the
+  top five design gaps.
+- [x] Focused the next fixes on the user's priorities: prevent harness-health
+  drift from hijacking project tasks, tighten lexical eval scoring, and route
+  stale competing project docs toward cleanup/archive rather than prioritizing
+  workflow/setup salience.
+- [x] Replaced the project `Rules` / `Never` / `Always` taxonomy with
+  Karpathy-style `Operating Constraints`: compact project-specific constraints
+  that change agent decisions, while generic behavior remains in the root skill.
+- [x] Ran a second 10-pair real-world eval batch under
+  `.context-harness/evals/operating-constraints-10`; progressive-harness improved
+  all 10 pairs with a 9.1/10 average versus 6.9/10 for no-harness.
 
 ## Follow-Ups
 - Restart AI IDEs or agent hosts so frontmatter and skill metadata are reloaded
   after the local Agent Nexus deployment.
-- Later, consider optional plugin packaging and a small eval fixture set for
-  high-risk skills, but do not block this release on those.
+- Later, consider optional plugin packaging and richer qualitative fresh-agent
+  eval prompts, but do not block this release on those.
 
 ## Verification
-- `tests/run-all.sh` exits 0 with 206 passed, 0 failed.
-- `node scripts/context-index.js check` exits 0 after this compacted plan.
+- `tests/run-all.sh` exits 0 with 211 passed, 0 failed after adding minimal fresh-agent eval harness coverage.
+- `node scripts/context-index.js check` exits 0 after refreshing generated cards/index.
+- `node scripts/eval-context-library.js /Users/lfan/Project .context-harness/shadow-context-library-report.md` exits 0: 24 repos found, 19 passed, 0 warned, 0 failed, 5 skipped for missing `CONTEXT.md`.
+- `node scripts/eval-agent-problem-solving.js prepare ...` plus `score` smoke exits 0 in a temporary eval run, confirming paired cases and pending-score reports work.
+- `node scripts/eval-agent-problem-solving.js prepare /Users/lfan/Project --repos context-harness,agent-nexus,credit-card-tracker,flyingpig,flight-plan --scenarios cold-resume,next-step --output .context-harness/evals/manual-realworld-10` prepared 20 cases; fresh agents filled all results; `node scripts/eval-agent-problem-solving.js score .context-harness/evals/manual-realworld-10` initially showed progressive-harness averaging 8.2/10 vs no-harness 6.6/10, with improvement in 8/10 pairs, one tie, and one regression.
+- After tightening `mustAvoid` exact phrase scoring, rescoring `.context-harness/evals/manual-realworld-10` removed DREAM false positives and changed the `flight-plan` next-step regression to a tie, while preserving the qualitative lesson that harness-health drift can distract from product work.
+- `tests/run-all.sh eval-agent-problem-solving` exits 0 with 3 passed, including coverage that expected rules use semantic bullets instead of `### Never` headings and progressive prompts keep harness drift as a follow-up.
+- `tests/run-all.sh skill-packaging` exits 0 with 34 passed after context-maintain doc cleanup guidance changed.
+- `tests/run-all.sh` exits 0 with 212 passed, 0 failed.
+- `node scripts/eval-context-library.js /Users/lfan/Project .context-harness/shadow-context-library-report.md` exits 0 after Operating Constraints changes: 24 repos found, 19 passed, 0 warned, 0 failed, 5 skipped.
+- `node scripts/eval-agent-problem-solving.js prepare /Users/lfan/Project --repos context-harness,agent-nexus,credit-card-tracker,flyingpig,flight-plan --scenarios cold-resume,next-step --output .context-harness/evals/operating-constraints-10` prepared 20 cases; fresh agents filled all results; `node scripts/eval-agent-problem-solving.js score .context-harness/evals/operating-constraints-10` showed progressive-harness averaging 9.1/10 vs no-harness 6.9/10, improving all 10 pairs with no regressions.
 - Agent Nexus `sync --dry-run` against the sibling local Context Harness release
   candidate discovers 6 Context Harness skills, including `set-goal`, and no
   removed stubs.

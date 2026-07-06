@@ -1,0 +1,24 @@
+---
+id: ctx-context-project
+kind: project
+importance: 0.65
+confidence: confirmed
+source: CONTEXT.md#project
+chunk: null
+tokens_est: 52
+tags: [context, project]
+---
+
+# CONTEXT.md: Project
+
+## Summary
+context-harness is a portable context framework for AI coding agents. It ships a root skill, companion skills, markdown context files, and Node.js scripts for keeping project memory lightweight and durable.
+
+## Use when
+- working on project
+
+## Key facts
+- context-harness is a portable context framework for AI coding agents. It ships a root skill, companion skills, markdown context files, and Node.js scripts fo...
+
+## Open next
+- `CONTEXT.md#project`

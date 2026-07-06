@@ -1,0 +1,19 @@
+{
+  "id": "context-harness__next-step__progressive-harness",
+  "repo": "context-harness",
+  "scenario": "next-step",
+  "mode": "progressive-harness",
+  "resultPath": "cases/context-harness__next-step__progressive-harness/result.md",
+  "status": "pass",
+  "total": 10,
+  "max": 10,
+  "missing": [],
+  "avoided": [],
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 6,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "none"
+}

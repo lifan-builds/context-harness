@@ -33,10 +33,10 @@ The repository contains:
 
 3. Choose relevant `CONTEXT.md` sections from the index.
 
-   For release readiness, the relevant sections are `## Rules`, `## Workflow`,
-   `## Language`, `## Relationships`, and `## Learned Patterns`.
+   For release readiness, the relevant sections are `## Operating Constraints`,
+   `## Workflow`, `## Language`, `## Relationships`, and `## Learned Patterns`.
 
-4. Extract the durable rules that matter.
+4. Extract the durable operating constraints that matter.
 
    Keep context-harness lightweight, preserve the small generated `AGENTS.md`
    contract, split skills only by genuinely different invocation intent, and

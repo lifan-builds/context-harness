@@ -1,0 +1,19 @@
+{
+  "id": "flyingpig__cold-resume__progressive-harness",
+  "repo": "flyingpig",
+  "scenario": "cold-resume",
+  "mode": "progressive-harness",
+  "resultPath": "cases/flyingpig__cold-resume__progressive-harness/result.md",
+  "status": "pass",
+  "total": 10,
+  "max": 10,
+  "missing": [],
+  "avoided": [],
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 6,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "none"
+}

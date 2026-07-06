@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "repo": "context-harness",
+  "scenario": "next-step",
+  "mode": "no-harness",
+  "goal": "plan next implementation step",
+  "mustMention": [
+    "The prioritized eval gaps are addressed in the working tree: harness drift is treated as a follow-up, eval scoring avoids key lexical false positives, and context cleanup guidan...",
+    "Review the focused gap-fix diff, then run any desired follow-up real-world eval batch before commit/push and local deployment.",
+    "Test: tests/run-all.sh",
+    "next step",
+    "verification",
+    "Keep context-harness lightweight; do not turn it into a large process framework."
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval gap",
+    "context quality gap",
+    "instruction gap",
+    "model behavior gap",
+    "eval harness gap"
+  ]
+}

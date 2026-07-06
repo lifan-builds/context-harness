@@ -67,12 +67,11 @@ Use the smallest skill that matches the agent's intent:
 ## Init Mode
 
 Run `node scripts/context-gen.js` to auto-detect project info, structure,
-stack-specific Suggested Rules, Suggested Workflow, and Memory Prompts.
+stack-specific Suggested Operating Constraints, Suggested Workflow, and Memory Prompts.
 
 Fallback: scan package.json/pyproject.toml/Cargo.toml/go.mod manually.
 
-Present `## Suggested Rules` and `## Suggested Workflow` as starting points;
-the user confirms or edits Never/Always rules and verification commands.
+Present `## Suggested Operating Constraints` and `## Suggested Workflow` as starting points; the user keeps only project-specific constraints a future agent would not infer from code or docs, and confirms verification commands.
 Project-wide Objectives are legacy v2; new projects use `PLAN.md` Done
 Criteria for task outcomes and `CONTEXT.md` Workflow Verification for commands.
 
@@ -103,17 +102,9 @@ Ask: "Do you have a multi-step task to plan?" If yes, create PLAN.md.
 ## Structure
 [Auto-generated: directory tree, 5-10 lines.]
 
-## Rules
-
-### Never
-1. [User-defined]
-2. [User-defined]
-3. [User-defined]
-
-### Always
-1. [User-defined]
-2. [User-defined]
-3. [User-defined]
+## Operating Constraints
+<!-- Project-specific constraints future agents would not reliably infer. Keep short. -->
+- [Constraint that changes agent decisions.]
 
 ## Workflow
 - Setup: [install command]
@@ -171,8 +162,12 @@ append). First file read on recovery, last file written before session end.
 
 ## Context Contract
 - At session start/resume, read `NOW.md` first, then use the Context Index
-  below to choose relevant `CONTEXT.md` sections.
-- Before planning or editing, respect `CONTEXT.md` `## Rules`.
+  below and `node scripts/context-index.js hydrate "<task>"` to choose relevant
+  cards or `CONTEXT.md` sections.
+- Before planning or editing, respect `CONTEXT.md` `## Operating Constraints`.
+- If context-harness files or generated indexes look stale, note that as a
+  follow-up unless it blocks the user task; do not let harness maintenance
+  replace the requested work.
 - If the user teaches a durable term, invariant, workflow, constraint, or
   correction, update `CONTEXT.md` before it scrolls away.
 - Route task-local findings and decisions to `PLAN.md`; durable lessons to
@@ -221,6 +216,13 @@ Created only after an automatic Dream/Compact pass changes context files.
 This is a non-operational audit log for debugging context drift or human review;
 agents must not read it during normal catch-up or task work.
 
+### Progressive Context Library (generated)
+
+`node scripts/context-index.js update` also maintains `.context-harness/index.json`,
+`.context-harness/cards/`, and `.context-harness/chunks/`. Use
+`node scripts/context-index.js hydrate "<task>"` to select cards; open raw chunks
+only when a card says the bulky detail is needed.
+
 ---
 
 ## Context Rules
@@ -232,7 +234,7 @@ agents must not read it during normal catch-up or task work.
 | **Reflection routing** | Task-local → PLAN.md Findings; durable process lesson → CONTEXT.md Learned Patterns; term → Language; invariant → Relationships; decision → PLAN.md Decisions unless the project already uses ADRs; skill correction → that skill's SKILL.md. |
 | **Learn after struggle** | >2 attempts on a problem → distill lesson to CONTEXT.md § Learned Patterns |
 | **Prune patterns** | Max 10 Learned Patterns. When full, remove the oldest entry. |
-| **Dream check** | Every `context-maintain` run asks whether future catch-up would benefit from consolidation. If yes, edit directly and log to `.context-harness/DREAM.md`. |
+| **Dream check** | Every `context-maintain` run asks whether future catch-up would benefit from consolidation. If yes, route bulky durable detail to cards/chunks, verify with `hydrate`, and log to `.context-harness/DREAM.md`. |
 | **PLAN.md pruning** | When active state is cluttered, summarize completed Progress into Archive and remove originals. |
 | **No raw external content** | Don't paste raw URLs, API responses, or web content into CONTEXT.md. Summarize findings in PLAN.md § Findings. |
 
@@ -262,7 +264,8 @@ markdown helpers.
 | `scripts/install-project.js` | Copy default runtime scripts; `--profile legacy` includes ADR/eval tools | Init mode |
 | `scripts/codex-context-hook.js` | Codex lifecycle hook dispatcher for catch-up, init, and maintain nudges | Codex hooks |
 | `scripts/context-gen.js` | Auto-detect project metadata + emit stack-aware rule defaults | Init mode, Update mode |
-| `scripts/context-index.js` | Update/list/query/print/check context sections | After CONTEXT.md changes |
+| `scripts/context-index.js` | Update/list/query/print/stats/hydrate/check context sections and cards | After CONTEXT.md changes |
+| `scripts/eval-agent-problem-solving.js` | Prepare/score fresh-agent problem-solving evals comparing no-harness vs progressive-harness modes | Real-world context-harness evaluation |
 | `scripts/migrate-project.js` | Batch migrate schema v2 projects to v3 | Manual migration from this repo |
 | `scripts/guard.js` | Block --no-verify, detect secrets, protect linter configs | Runs automatically via PreToolUse hook |
 | `scripts/format-on-edit.js` | Auto-format files after edits | Runs automatically via PostToolUse hook |

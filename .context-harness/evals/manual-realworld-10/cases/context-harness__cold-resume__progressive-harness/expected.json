@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "repo": "context-harness",
+  "scenario": "cold-resume",
+  "mode": "progressive-harness",
+  "goal": "resume current task",
+  "mustMention": [
+    "Progressive context library, real-repo retrieval shadow evaluation, and fresh-agent problem-solving eval harness are implemented and verified in the working tree.",
+    "Review the diff, then run a small manual fresh-agent eval batch from generated prompts before commit/push and local deployment.",
+    "Test: tests/run-all.sh",
+    "current focus",
+    "active blockers",
+    "immediate next step"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-workflow"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval gap",
+    "context quality gap",
+    "instruction gap",
+    "model behavior gap",
+    "eval harness gap"
+  ]
+}

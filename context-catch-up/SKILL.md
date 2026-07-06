@@ -23,20 +23,25 @@ Before ordinary catch-up, quickly inspect `AGENTS.md`, `CONTEXT.md`, and
 - `<!-- context-harness:schema v2 -->` or
   `<!-- context-harness:schema v3 -->` in generated context files.
 - A small `AGENTS.md` Context Contract plus generated Context Index.
-- Required `CONTEXT.md` sections: Project, Structure, Rules, Workflow,
-  Language, Relationships, Flagged Ambiguities, Learned Patterns.
+- Required `CONTEXT.md` sections: Project, Structure, Operating Constraints,
+  Workflow, Language, Relationships, Flagged Ambiguities, Learned Patterns.
+  Legacy `Rules` is acceptable during migration but should be renamed by
+  explicit `context-upgrade`.
 - A non-empty `NOW.md` with current focus, blockers, immediate next step, and
   touched files.
 
 If files are old, empty, partial, or missing the schema marker, report the
 drift in the catch-up summary and route migration or repair work to explicit
 `context-upgrade`. Do not rewrite old, partial, or schema-drifted layouts from
-catch-up.
+catch-up, and do not let non-blocking harness drift replace the user's requested
+project task.
 
 ## Read Order
 
 1. Read `NOW.md` first.
-2. Use `AGENTS.md` Context Index to choose relevant `CONTEXT.md` sections.
+2. Use `AGENTS.md` Context Index and, when available,
+   `node scripts/context-index.js hydrate "<task>"` to choose relevant cards or
+   `CONTEXT.md` sections.
 3. If there is no index yet, read `CONTEXT.md` enough to summarize the drift
    and recommend explicit `context-upgrade`.
 4. If present, skim active `PLAN.md` sections.
@@ -50,13 +55,16 @@ Give the user a short catch-up summary:
 - Current focus
 - Active blockers
 - Immediate next step
-- Rules or terms that matter for the requested task
+- Operating constraints or terms that matter for the requested task
 - Any uncertainty that should be resolved before editing
 
 ## Guardrails
 
 - Do not rewrite context files during catch-up except to capture a durable
   correction from the user; route layout migration to `context-upgrade`.
+- If `hydrate`, `check`, or generated indexes fail, mention the drift and use the
+  best available fallback context, then continue the requested catch-up unless
+  the drift blocks correctness or safety.
 - Do not summarize raw external content into `CONTEXT.md`; route task-local
   discoveries to `PLAN.md` when work begins.
 - Keep the summary short enough that it helps the next action, not replaces it.

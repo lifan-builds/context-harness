@@ -27,13 +27,21 @@ For ordinary uncertainty before the first attempt, inspect or ask instead.
 
 ## Maintain Loop
 
-1. Read `NOW.md`, then `CONTEXT.md`.
-2. Classify information as durable context or task-local state.
-3. Update the smallest appropriate section.
-4. If `CONTEXT.md` changed, run `node scripts/context-index.js update`.
-5. Prune stale or duplicate entries instead of appending forever.
-6. Run the project's verification command when the change affects behavior.
-7. Run the Should Dream check before closeout or final response.
+1. Read `NOW.md`, then concise `CONTEXT.md` as the always-read project layer.
+2. Run `node scripts/context-index.js hydrate "update context after current work"`
+   or a task-specific maintenance query before opening `PLAN.md`, chunks, or
+   bulky/task-specific context.
+3. Use selected cards to choose only the target source sections needed for edits.
+4. Classify information as durable context or task-local state.
+5. Update the smallest appropriate source section: task-local findings/progress/
+   decisions to `PLAN.md`; durable concise terms, rules, invariants, or lessons
+   to `CONTEXT.md`; resume packet to `NOW.md` last.
+6. After updating `CONTEXT.md`, `PLAN.md`, or `NOW.md`, run
+   `node scripts/context-index.js update` when the change should affect future
+   retrieval.
+7. Prune stale or duplicate entries instead of appending forever.
+8. Run the project's verification command when the change affects behavior.
+9. Run the Should Dream check before closeout or final response.
 
 ## Confidence
 
@@ -92,15 +100,17 @@ When Dream is useful, edit directly; do not ask for approval.
 1. Detect drift with `node scripts/context-index.js stats` plus `NOW.md`,
    `PLAN.md`, relevant `CONTEXT.md`, recent findings, and touched files.
 2. Route each fact once: active state to `PLAN.md`; resume packet to `NOW.md`;
-   durable rules/terms/invariants/lessons to `CONTEXT.md`; lengthy durable
-   detail to `.context-harness/cards/` and `chunks/`; raw evidence to source
-   docs or archive, not operational context.
-3. When existing project docs compete with active context and the right home is
+   durable rules/terms/invariants/lessons to concise `CONTEXT.md`; lengthy
+   durable detail to source docs or archive with concise pointers in operational
+   context.
+3. Treat `.context-harness/cards/` and `chunks/` as generated outputs, not
+   durable hand-edit targets.
+4. When existing project docs compete with active context and the right home is
    obvious, mark, prune, or archive those docs rather than duplicating state in
    context-harness files.
-4. Rewrite `NOW.md` short; prune/archive stale `PLAN.md`; keep `CONTEXT.md`
-   concise and replace bulky detail with card pointers when needed.
-5. Run `node scripts/context-index.js update` after context/card/chunk changes.
+5. Rewrite `NOW.md` short; prune/archive stale `PLAN.md`; keep `CONTEXT.md`
+   concise and replace bulky detail with source pointers when needed.
+6. Run `node scripts/context-index.js update` after context source changes.
 6. Verify retrieval with `node scripts/context-index.js hydrate "resume current task"`
    and one task-specific query. A fresh agent should see the next step and key
    rule without loading raw chunks.
@@ -188,10 +198,11 @@ behavior.
 ## Session Closeout
 
 Before ending: rewrite `NOW.md` with focus, blockers, next step, ISO timestamp,
-and touched files; refresh the `AGENTS.md` index if `CONTEXT.md` changed; prune
-completed `PLAN.md` progress into `## Archive` when the active plan is cluttered;
-keep `NOW.md` concise; run the Should Dream check and, if useful, log the Dream
-to `.context-harness/DREAM.md`.
+and touched files; refresh the `AGENTS.md` index if `CONTEXT.md`, `PLAN.md`, or
+`NOW.md` changed in a way future retrieval should see; prune completed `PLAN.md`
+progress into `## Archive` when the active plan is cluttered; keep `NOW.md`
+concise; run the Should Dream check and, if useful, log the Dream to
+`.context-harness/DREAM.md`.
 
 ```bash
 node scripts/session-end.js

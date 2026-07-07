@@ -92,8 +92,8 @@ function evaluateRepo(repo, tempRoot) {
   };
 
   if (!copied.includes("CONTEXT.md")) return base;
+  if (!copied.includes("NOW.md")) return { ...base, skipReason: "missing NOW.md" };
   if (!copied.includes("AGENTS.md")) base.issues.push("missing AGENTS.md");
-  if (!copied.includes("NOW.md")) base.issues.push("missing NOW.md");
 
   const update = runNode(tempRepo, "update");
   if (update.status !== 0) return { ...base, status: "fail", update, skipReason: "", issues: [...base.issues, `update failed: ${firstLine(update.output)}`] };
@@ -153,13 +153,22 @@ function hydrate(tempRepo, query) {
   const result = runNode(tempRepo, "hydrate", query);
   return {
     status: result.status,
-    cards: result.output
-      .split("\n")
-      .map((line) => line.match(/^- (ctx-[^ ]+)/))
-      .filter(Boolean)
-      .map((match) => match[1]),
+    cards: parseHydrateCards(result.output),
     output: result.output,
   };
+}
+
+function parseHydrateCards(output) {
+  const cards = [];
+  for (const line of output.split("\n")) {
+    const listed = line.match(/^\s*(?:-|\d+\.)\s+(ctx-[^\s,(]+)/);
+    if (listed) cards.push(listed[1]);
+    const selected = line.match(/^\s*-\s*selected_cards:\s*(.+)$/);
+    if (selected) {
+      cards.push(...selected[1].split(",").map((item) => item.trim()).filter((item) => item.startsWith("ctx-")));
+    }
+  }
+  return [...new Set(cards)];
 }
 
 function evaluateHydrates(copied, hydrates) {

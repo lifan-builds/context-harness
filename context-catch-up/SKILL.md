@@ -36,13 +36,17 @@ project task.
 ## Read Order
 
 1. Read `NOW.md` first.
-2. Use `AGENTS.md` Context Index and, when available,
-   `node scripts/context-index.js hydrate "<task>"` to choose relevant cards or
-   `CONTEXT.md` sections.
-3. If there is no index yet, read `CONTEXT.md` enough to summarize the drift
-   and recommend explicit `context-upgrade`.
-4. If present, skim active `PLAN.md` sections.
-5. If the project already uses ADRs, skim only the ADR titles/dates relevant to
+2. Read concise `CONTEXT.md` as the always-read project layer; this is expected
+   while it remains small enough to fit startup context.
+3. Use `node scripts/context-index.js hydrate "<task>"` when available before
+   opening `PLAN.md`, chunks, or bulky/task-specific context.
+4. Use selected cards before opening large `PLAN.md` sections, chunks, or bulky
+   raw source sections.
+5. If `CONTEXT.md` has grown large, use hydrate-selected cards or sections
+   instead of reading it wholesale and flag Dream/Compact as a follow-up.
+6. If there is no index yet, use concise `CONTEXT.md` and `AGENTS.md` fallback
+   context enough to summarize drift and recommend explicit `context-upgrade`.
+7. If the project already uses ADRs, skim only the ADR titles/dates relevant to
    the current task.
 
 ## Output
@@ -59,9 +63,9 @@ Give the user a short catch-up summary:
 
 - Do not rewrite context files during catch-up except to capture a durable
   correction from the user; route layout repair to explicit `context-upgrade`.
-- If `hydrate`, `check`, or generated indexes fail, mention the drift and use the
-  best available fallback context, then continue the requested catch-up unless
-  the drift blocks correctness or safety.
+- If `hydrate`, `check`, or generated indexes fail or warn about stale generated
+  files, mention the drift and use current markdown fallback context. Keep index
+  repair as a follow-up unless the drift blocks correctness or safety.
 - Do not summarize raw external content into `CONTEXT.md`; route task-local
   discoveries to `PLAN.md` when work begins.
 - Keep the summary short enough that it helps the next action, not replaces it.

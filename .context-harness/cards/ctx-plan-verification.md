@@ -5,7 +5,7 @@ importance: 0.85
 confidence: confirmed
 source: PLAN.md#verification
 chunk: .context-harness/chunks/ctx-plan-verification.md
-tokens_est: 827
+tokens_est: 1141
 tags: [plan, verification]
 ---
 
@@ -26,6 +26,11 @@ tests/run-all.sh exits 0 with 211 passed, 0 failed after adding minimal fresh-ag
 - node scripts/eval-agent-problem-solving.js prepare ... plus score smoke exits 0 in a temporary eval run, confirming paired cases and pending-score reports work.
 - node scripts/eval-agent-problem-solving.js prepare /Users/lfan/Project --repos context-harness,agent-nexus,credit-card-tracker,flyingpig,flight-plan --scenar...
 
-## Open next
+## Retrieval order
+- Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.
+- Use this card before opening bulky `PLAN.md`, chunks, or raw source sections for this topic.
+- Open raw detail only when this summary is insufficient for the task.
+
+## Open next only if needed
 - `PLAN.md#verification`
 - `.context-harness/chunks/ctx-plan-verification.md`

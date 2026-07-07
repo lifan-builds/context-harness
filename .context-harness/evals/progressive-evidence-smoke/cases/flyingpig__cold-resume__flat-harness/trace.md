@@ -1,0 +1,12 @@
+# Trace
+
+1. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__cold-resume__flat-harness/prompt.md` to get the eval instructions, repo path, output path, constraints, and required answer shape.
+2. Ran `ls -la "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__cold-resume__flat-harness/repo" && ls -la "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__cold-resume__flat-harness/repo/.context-harness"` to inspect the repo copy and confirm flat root context files are present; the `.context-harness` directory was absent in the eval repo.
+3. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__cold-resume__flat-harness/repo/NOW.md` for current focus, blockers, immediate next step, touched files, and verification evidence.
+4. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__cold-resume__flat-harness/repo/AGENTS.md` for the context contract and flat-file index.
+5. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__cold-resume__flat-harness/repo/CONTEXT.md` for project purpose, structure, operating constraints, workflow, relationships, and learned MCP/Chrome patterns.
+6. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__cold-resume__flat-harness/repo/PLAN.md` lines 1-400 for the latest MCP-native auto-connect plan section and relevant verification history.
+7. Ran `ls -la "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__cold-resume__flat-harness"` to confirm the output files and parent directory.
+8. Read existing `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__cold-resume__flat-harness/result.md` and `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__cold-resume__flat-harness/trace.md` before overwriting them.
+9. Wrote the final case answer to `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__cold-resume__flat-harness/result.md`.
+10. Wrote this concise tool/evidence note to `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__cold-resume__flat-harness/trace.md`.

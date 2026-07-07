@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "repo": "context-harness",
+  "scenario": "next-step",
+  "mode": "flat-harness",
+  "goal": "plan next implementation step",
+  "mustMention": [
+    "Legacy migration/eval/ADR tooling has been removed from context-harness now that the local project fleet is on current schema v3 with Operating Constraints.",
+    "Review the cleanup diff, then commit/push and redeploy with Agent Nexus if accepted.",
+    "Test: tests/run-all.sh",
+    "next step",
+    "verification",
+    "Keep context-harness lightweight; do not turn it into a large process framework."
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

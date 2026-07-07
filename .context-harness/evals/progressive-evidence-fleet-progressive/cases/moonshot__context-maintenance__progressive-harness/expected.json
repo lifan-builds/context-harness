@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "repo": "moonshot",
+  "scenario": "context-maintenance",
+  "mode": "progressive-harness",
+  "goal": "update context after completed task",
+  "mustMention": [
+    "Completed the autonomous Daily Moonshot mission-loop implementation slice.",
+    "Review the mission-loop diff and generated July 6 artifacts, then decide whether to commit the implementation slice or continue improving the autonomous scout/dossier depth.",
+    "Real trades still require exact approval or scoped standing mandate plus fresh broker review, safety checks, and order-status evidence.",
+    "NOW.md",
+    "PLAN.md",
+    "CONTEXT.md",
+    "context-index.js update"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-operating-constraints"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "wishlist__cold-resume__progressive-harness",
+  "repo": "wishlist",
+  "scenario": "cold-resume",
+  "mode": "progressive-harness",
+  "resultPath": "cases/wishlist__cold-resume__progressive-harness/result.md",
+  "tracePath": "cases/wishlist__cold-resume__progressive-harness/trace.md",
+  "status": "pass",
+  "total": 9,
+  "max": 10,
+  "answerScore": 8,
+  "retrievalScore": 10,
+  "saveRoutingScore": 10,
+  "contextEfficiencyScore": 10,
+  "missing": [
+    "Codex is the target runner for shopping monitor workflows; active skill/docs now use Codex-oriented wording."
+  ],
+  "avoided": [],
+  "evidence": {
+    "hasTrace": true,
+    "hasContextEvidence": true,
+    "hydrate": true,
+    "card": true,
+    "selectedExpectedCards": [
+      "ctx-now-now"
+    ],
+    "plan": true,
+    "chunk": false,
+    "context": true,
+    "hydrateBeforePlan": true,
+    "hydrateBeforeChunk": true,
+    "hasAlwaysReadContext": true,
+    "taskLocalToPlan": true,
+    "durableToContext": true,
+    "nowLast": true,
+    "indexUpdate": true,
+    "flatOveruse": false
+  },
+  "deterministicChecks": {
+    "mustMention": 5,
+    "mentioned": 4,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "none"
+}

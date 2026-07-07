@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "repo": "agent-guild",
+  "scenario": "context-maintenance",
+  "mode": "progressive-harness",
+  "goal": "update context after completed task",
+  "mustMention": [
+    "Status check after Codex hook config fix. The repo-local Codex hook config still uses the current structured root-level hooks.EventName = [{ hooks = [{ type = \"command\", command...",
+    "Run npm run start, open http://127.0.0.1:4173, then start a fresh trusted Codex session in /Users/lfan/Project/agent-guild and confirm the dashboard receives real lifecycle hook...",
+    "Status check after Codex hook config fix. The repo-local Codex hook config still uses the current structured root-level hooks.EventName =...",
+    "NOW.md",
+    "PLAN.md",
+    "CONTEXT.md",
+    "context-index.js update"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-operating-constraints"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

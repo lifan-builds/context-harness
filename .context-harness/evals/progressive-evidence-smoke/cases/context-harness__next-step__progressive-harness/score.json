@@ -1,0 +1,45 @@
+{
+  "id": "context-harness__next-step__progressive-harness",
+  "repo": "context-harness",
+  "scenario": "next-step",
+  "mode": "progressive-harness",
+  "resultPath": "cases/context-harness__next-step__progressive-harness/result.md",
+  "tracePath": "cases/context-harness__next-step__progressive-harness/trace.md",
+  "status": "pass",
+  "total": 10,
+  "max": 10,
+  "answerScore": 10,
+  "retrievalScore": 9,
+  "saveRoutingScore": 10,
+  "contextEfficiencyScore": 10,
+  "missing": [],
+  "avoided": [],
+  "evidence": {
+    "hasTrace": true,
+    "hasContextEvidence": true,
+    "hydrate": true,
+    "card": true,
+    "selectedExpectedCards": [
+      "ctx-now-now",
+      "ctx-context-workflow"
+    ],
+    "plan": true,
+    "chunk": false,
+    "context": true,
+    "hydrateBeforePlan": false,
+    "hydrateBeforeChunk": true,
+    "hasAlwaysReadContext": true,
+    "taskLocalToPlan": true,
+    "durableToContext": true,
+    "nowLast": false,
+    "indexUpdate": false,
+    "flatOveruse": false
+  },
+  "deterministicChecks": {
+    "mustMention": 3,
+    "mentioned": 3,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "none"
+}

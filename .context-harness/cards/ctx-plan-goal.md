@@ -25,5 +25,10 @@ Make Context Harness release-ready as a lightweight project-memory layer for
 - explicit upgrades, and proof that a fresh agent can resume without a long prompt
 - dump.
 
-## Open next
+## Retrieval order
+- Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.
+- Use this card before opening bulky `PLAN.md`, chunks, or raw source sections for this topic.
+- Open raw detail only when this summary is insufficient for the task.
+
+## Open next only if needed
 - `PLAN.md#goal`

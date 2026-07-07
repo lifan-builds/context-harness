@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "updated_at": "2026-07-06",
-  "source_hash": "6b97ceeb34d8c68bf4438dfbb5d1b3b1f1bdfdc80ee637f0705610663ac57903",
+  "updated_at": "2026-07-07",
+  "source_hash": "e246e43dd1e5667963e3faa8a840714c1d3c43aaadf28e3b0bffe38ae6e4eb71",
   "sources": [
     {
       "path": "CONTEXT.md",
@@ -10,13 +10,13 @@
     },
     {
       "path": "NOW.md",
-      "sha256": "ef3bc326507a5812bc11fce456628fb83e5729074ea6ee8f1c2d3b07d9db71af",
+      "sha256": "73ee0d414b1183190fb10dbdf8e1f6a172932439d2564dc22068c646f2565286",
       "lines": 15
     },
     {
       "path": "PLAN.md",
-      "sha256": "2b5feac3d752dd31070dda24f109a2d5960ffea2c973c7ff489eab678f31008c",
-      "lines": 133
+      "sha256": "f8d8246a515ad7a325125f611549ddcbf2c6585d01b408c2209036806b868126",
+      "lines": 161
     }
   ],
   "cards": [
@@ -292,15 +292,15 @@
     {
       "id": "ctx-now-now",
       "title": "NOW.md: Now",
-      "summary": "Legacy migration/eval/ADR tooling has been removed from context-harness now that the local project fleet is on current schema v3 with Operating Constraints.",
+      "summary": "The remaining context-harness release gaps are implemented and verified: the eval runner has resumable pending-case filling, eval copies exclude obvious private files, scoring separates answer-only review notes from r...",
       "source": "NOW.md#now",
       "source_path": "NOW.md",
       "kind": "resume",
       "scope": "task",
       "importance": 0.95,
       "confidence": "confirmed",
-      "recency": "2026-07-06",
-      "tokens_est": 265,
+      "recency": "2026-07-07",
+      "tokens_est": 363,
       "tags": [
         "now",
         "resume"
@@ -312,13 +312,13 @@
       ],
       "card_path": ".context-harness/cards/ctx-now-now.md",
       "chunk_path": "",
-      "content_sha256": "ef3bc326507a5812bc11fce456628fb83e5729074ea6ee8f1c2d3b07d9db71af",
+      "content_sha256": "73ee0d414b1183190fb10dbdf8e1f6a172932439d2564dc22068c646f2565286",
       "key_facts": [
-        "Legacy migration/eval/ADR tooling has been removed from context-harness now that the local project fleet is on current schema v3 with Operating Constraints.",
-        "No code or verification blockers are known.",
-        "Review the cleanup diff, then commit/push and redeploy with Agent Nexus if accepted.",
-        "Last modified: 2026-07-06T21:54:00-0700",
-        "Files touched: README.md, SKILL.md, context-catch-up/SKILL.md, context-init/SKILL.md, context-upgrade/SKILL.md, scripts/install-project.js, scripts/context-i..."
+        "The remaining context-harness release gaps are implemented and verified: the eval runner has resumable pending-case filling, eval copies exclude obvious priv...",
+        "No code blockers are known; diff review, Agent Nexus deployment, fleet refresh, and pushes remain.",
+        "Review the diff, deploy with Agent Nexus, refresh local repos with the latest context-harness, and push intentionally changed repos.",
+        "Last modified: 2026-07-07T00:00:00-0700",
+        "Files touched: scripts/eval-agent-problem-solving.js, scripts/context-index.js, tests/run-all.sh, context-catch-up/SKILL.md, context-upgrade/SKILL.md, PLAN.m..."
       ]
     },
     {
@@ -331,7 +331,7 @@
       "scope": "task",
       "importance": 0.85,
       "confidence": "confirmed",
-      "recency": "2026-07-06",
+      "recency": "2026-07-07",
       "tokens_est": 60,
       "tags": [
         "plan",
@@ -362,7 +362,7 @@
       "scope": "task",
       "importance": 0.85,
       "confidence": "confirmed",
-      "recency": "2026-07-06",
+      "recency": "2026-07-07",
       "tokens_est": 194,
       "tags": [
         "plan",
@@ -394,7 +394,7 @@
       "scope": "task",
       "importance": 0.85,
       "confidence": "confirmed",
-      "recency": "2026-07-06",
+      "recency": "2026-07-07",
       "tokens_est": 141,
       "tags": [
         "plan",
@@ -426,8 +426,8 @@
       "scope": "task",
       "importance": 0.85,
       "confidence": "confirmed",
-      "recency": "2026-07-06",
-      "tokens_est": 903,
+      "recency": "2026-07-07",
+      "tokens_est": 1065,
       "tags": [
         "plan",
         "progress"
@@ -439,13 +439,45 @@
       ],
       "card_path": ".context-harness/cards/ctx-plan-progress.md",
       "chunk_path": ".context-harness/chunks/ctx-plan-progress.md",
-      "content_sha256": "ea368dd842816a794d18710a266033bc46c14331a6d6c853fc959db5d30f6727",
+      "content_sha256": "80816056ba23d8341a89d12a0695b69740e2c72110a1e74da4f1f441a39eb8b5",
       "key_facts": [
         "[x] Updated README positioning around four visible files, progressive",
         "disclosure, companion skills, and proof artifacts.",
         "[x] Added RELEASEGOAL.md for repo-local release readiness.",
         "[x] Added examples/cold-resume-demo.md showing NOW.md first, AGENTS.md",
         "index second, selective CONTEXT.md sections, PLAN.md task state, and the"
+      ]
+    },
+    {
+      "id": "ctx-plan-release-review-checklist",
+      "title": "PLAN.md: Release Review Checklist",
+      "summary": "Review source changes separately from generated .context-harness/ artifacts.",
+      "source": "PLAN.md#release-review-checklist",
+      "source_path": "PLAN.md",
+      "kind": "plan",
+      "scope": "task",
+      "importance": 0.85,
+      "confidence": "confirmed",
+      "recency": "2026-07-07",
+      "tokens_est": 149,
+      "tags": [
+        "plan",
+        "release-review-checklist"
+      ],
+      "read_when": [
+        "continuing the active task",
+        "checking done criteria or decisions",
+        "update context with task-local progress"
+      ],
+      "card_path": ".context-harness/cards/ctx-plan-release-review-checklist.md",
+      "chunk_path": "",
+      "content_sha256": "f0b738b09402b25124bf4c8981ac5b8372907db53e758a58a46e7e01eab1ea8a",
+      "key_facts": [
+        "Review source changes separately from generated .context-harness/ artifacts.",
+        "Confirm eval-copy exclusions prevent .env, .env., cookies.txt, and key",
+        "material from entering case repos.",
+        "Confirm stale generated context is reported as a follow-up unless it blocks",
+        "correctness or safety."
       ]
     },
     {
@@ -458,7 +490,7 @@
       "scope": "task",
       "importance": 0.85,
       "confidence": "confirmed",
-      "recency": "2026-07-06",
+      "recency": "2026-07-07",
       "tokens_est": 64,
       "tags": [
         "plan",
@@ -489,8 +521,8 @@
       "scope": "task",
       "importance": 0.85,
       "confidence": "confirmed",
-      "recency": "2026-07-06",
-      "tokens_est": 827,
+      "recency": "2026-07-07",
+      "tokens_est": 1141,
       "tags": [
         "plan",
         "verification"
@@ -502,7 +534,7 @@
       ],
       "card_path": ".context-harness/cards/ctx-plan-verification.md",
       "chunk_path": ".context-harness/chunks/ctx-plan-verification.md",
-      "content_sha256": "8d4e1868908d8136ef9c6d3bb3053652fa7aa55dc59b64b20feba154e16d33d8",
+      "content_sha256": "88bec6f4a3ea45bf9ab55e7f11b09f48ce1ec293e890bea63750c58be728c5ea",
       "key_facts": [
         "tests/run-all.sh exits 0 with 211 passed, 0 failed after adding minimal fresh-agent eval harness coverage.",
         "node scripts/context-index.js check exits 0 after refreshing generated cards/index.",
@@ -521,7 +553,7 @@
       "scope": "task",
       "importance": 0.85,
       "confidence": "confirmed",
-      "recency": "2026-07-06",
+      "recency": "2026-07-07",
       "tokens_est": 231,
       "tags": [
         "plan",

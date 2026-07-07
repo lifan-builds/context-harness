@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "repo": "flyingpig",
+  "scenario": "cold-resume",
+  "mode": "progressive-harness",
+  "goal": "resume current task",
+  "mustMention": [
+    "Implemented and verified a minimal MCP-native existing-Chrome backend. Flying Pig can now Auto-Connect to an existing Chrome tab through Chrome DevTools MCP and run a minimal su...",
+    "If continuing implementation, run a source dashboard/manual smoke against a local mock page using Auto-Connect Existing Chrome and start a harmless MCP task from the UI. If prep...",
+    "Implemented and verified a minimal MCP-native existing-Chrome backend. Flying Pig can now Auto-Connect to an existing Chrome tab through...",
+    "current understanding",
+    "active blockers",
+    "immediate next step"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-workflow"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

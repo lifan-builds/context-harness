@@ -1,0 +1,23 @@
+# Trace Notes
+
+- Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/snow-plan__cold-resume__progressive-harness/prompt.md`.
+- Read repo always-read layer:
+  - `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/snow-plan__cold-resume__progressive-harness/repo/NOW.md`
+  - `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/snow-plan__cold-resume__progressive-harness/repo/CONTEXT.md`
+- Ran hydrate from repo root:
+  - `cd "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/snow-plan__cold-resume__progressive-harness/repo" && node scripts/context-index.js hydrate "resume current task"`
+  - Output selected one card: `ctx-now-now` (`NOW.md#now`), summary: flight tracking automation is stopped; future ski-air pricing should be searched manually using documented seed fares and helper scripts.
+- Opened selected card before any bulky context:
+  - `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/snow-plan__cold-resume__progressive-harness/repo/.context-harness/cards/ctx-now-now.md`
+- Read/inspected supporting project files with read-only commands:
+  - `ls -la /Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/snow-plan__cold-resume__progressive-harness/repo`
+  - `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/snow-plan__cold-resume__progressive-harness/repo/README.md`
+  - `find /Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/snow-plan__cold-resume__progressive-harness/repo/scripts -maxdepth 1 -type f -print`
+  - `grep -RIn "SEA-SLC\|SEA-HDN\|SEA-DEN\|SEA-JAC\|SEA-YYC\|Alaska\|Seats.aero\|seed" .../repo/FINDINGS.md .../repo/2026-2027-season-plan.md`
+- Did not open `expected.json`, `score.json`, run `manifest.json`, eval reports, `PLAN.md`, or raw chunks.
+- Did not modify files inside `repo/`.
+- Verification command identified but not run due read-only/no-source-modification constraint: `python3 -m py_compile scripts/*.py` may create `__pycache__`.
+- Save/update routing if this were an active maintenance task:
+  - New manual fare/award quotes -> `FINDINGS.md` with route, dates, fare/miles, carrier/operating carrier, and source.
+  - Changed current focus/next step -> `NOW.md`.
+  - Durable repeated workflow/API caveats -> `CONTEXT.md` learned patterns/relationships.

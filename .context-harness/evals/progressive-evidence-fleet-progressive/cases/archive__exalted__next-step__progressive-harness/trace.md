@@ -1,0 +1,23 @@
+Trace notes for read-only fresh-agent eval
+
+- Read case prompt: /Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/archive__exalted__next-step__progressive-harness/prompt.md.
+- Followed repo root: /Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/archive__exalted__next-step__progressive-harness/repo.
+- Read NOW.md first. Evidence: active focus is context-harness v3 migration completed for exalted; no blockers; immediate next step says use generated AGENTS.md Context Index before planning/editing.
+- Read CONTEXT.md as requested always-read layer. Evidence: schema v3 marker present; constraints are no secrets and preserve project-specific instructions; CONTEXT.md is very large with imported legacy notes.
+- Invoked context-catch-up skill for fresh-session discipline.
+- Read AGENTS.md. Evidence: small Context Contract plus generated Context Index present.
+- Ran hydrate before PLAN/chunks: `cd "$REPO" && node scripts/context-index.js hydrate "plan next implementation step"`.
+  - Hydrate selected cards: `ctx-context-technical-implementation`, `ctx-now-now`, `ctx-context-file-structure`, `ctx-context-future-roadmap`, `ctx-context-operating-constraints`, `ctx-context-imported-agent-notes`.
+  - Opened all selected cards before raw/source planning.
+- Tried to read PLAN.md after cards; it is missing.
+- Read/inspected only repo files and read-only commands:
+  - package.json, scripts/context-index.js, next.config.ts, vercel.json, requirements.txt.
+  - src file list; api file list.
+  - src/lib/arbitrage.ts, src/lib/rates.ts, src/lib/currencies.ts, src/types/index.ts, src/components/Calculator/index.tsx, src/hooks/usePriceRefresh.ts, src/app/api/prices/route.ts.
+  - .github/workflows/scrape-poe2scout.yml and .github/scripts/scrape_poe2scout.py.
+  - Static data metadata via Node for api/data and public/api/data: both currencies/rates timestamped 2025-10-09T05:11:37.274063Z.
+- Ran `node scripts/context-index.js check`; result failed: `FAIL AGENTS.md Context Index is stale; run node scripts/context-index.js update`.
+- Ran `node scripts/context-index.js stats`; result: AGENTS.md 47 lines, CONTEXT.md 1483 lines, NOW.md 14 lines, PLAN.md missing, cards 24, chunks 10, warnings for oversized CONTEXT.md sections.
+- Key evidence synthesized: static export in next.config.ts, Vercel outputDirectory out with only /api/data rewrite, UI hook fetches /api/prices, route handler requires server runtime/fs/live scraping, workflow writes only api/data/*.json, and static/public data appears stale.
+- Save/update routing if edits were allowed: task-local findings and decisions to PLAN.md; durable workflow/verification corrections to CONTEXT.md; active state to NOW.md; then run `node scripts/context-index.js update` and `node scripts/context-index.js check`.
+- Did not read expected.json, score.json contents, manifest.json, or eval reports. Did not modify files inside repo. Only wrote result.md and trace.md.

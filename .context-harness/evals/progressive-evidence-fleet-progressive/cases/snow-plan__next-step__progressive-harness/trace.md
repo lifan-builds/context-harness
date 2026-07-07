@@ -1,0 +1,33 @@
+# Trace Notes
+
+- Read case prompt: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/snow-plan__next-step__progressive-harness/prompt.md`.
+- Invoked `context-catch-up` because this is a fresh-agent context-harness eval.
+- Read first, per contract: `repo/NOW.md`.
+  - Current focus: flight tracking automation stopped; future ski-air pricing manual.
+  - Next step: manually re-check SEA-SLC/HDN/DEN/JAC/YYC Alaska-affiliated cash/award options for 2-4 night Jan-Mar 2027 trips.
+- Read `repo/AGENTS.md` and `repo/CONTEXT.md`.
+  - Both include `<!-- context-harness:schema v3 -->`.
+  - `AGENTS.md` has Context Contract and generated Context Index.
+  - `CONTEXT.md` is concise and includes required sections: Project, Structure, Operating Constraints, Workflow, Language, Relationships, Flagged Ambiguities, Learned Patterns.
+- Ran hydrate from repo root:
+  - `node scripts/context-index.js hydrate "plan next implementation step"`
+  - Selected cards: `ctx-now-now`, `ctx-context-operating-constraints`, `ctx-context-development-workflow`, `ctx-context-project`, `ctx-context-project-overview`, `ctx-context-structure`, `ctx-context-learned-patterns`.
+- Opened selected cards before broader plan/source inspection:
+  - `repo/.context-harness/cards/ctx-context-operating-constraints.md`
+  - `repo/.context-harness/cards/ctx-context-learned-patterns.md`
+- Read `repo/PLANS.md`; it is an older completed bootstrap/seasonal-strategy log, not an active PLAN.md.
+- Listed helper scripts with `find repo/scripts -maxdepth 1 -type f -print | sort`.
+- Read relevant helper scripts:
+  - `repo/scripts/fetch_ski_airport_fares.py`
+  - `repo/scripts/fetch_flights.py`
+  - `repo/scripts/fetch_awards.py`
+- Used grep/read inspection on:
+  - `repo/FINDINGS.md` for seed fares, buy/hold triggers, reward-watch details, Hermes automation archive.
+  - `repo/2026-2027-season-plan.md` for active itinerary, booked flights, Alaska credit, SLC/HDN/DEN/JAC/YYC context.
+- Did not modify files inside `repo/`.
+- Did not open `expected.json`, `score.json`, run `manifest.json`, or eval report contents.
+- Save/update routing I would use in a real non-read-only session:
+  - New live fare/award observations: `FINDINGS.md`, preserving old baselines as superseded.
+  - Durable new invariant/correction: `CONTEXT.md`, then `node scripts/context-index.js update`.
+  - Session closeout/current focus: `NOW.md`.
+  - Booking decisions: require explicit human confirmation before any purchase or automation.

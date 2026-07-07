@@ -160,9 +160,12 @@ append). First file read on recovery, last file written before session end.
 <!-- context-harness:schema v3 -->
 
 ## Context Contract
-- At session start/resume, read `NOW.md` first, then use the Context Index
-  below and `node scripts/context-index.js hydrate "<task>"` to choose relevant
-  cards or `CONTEXT.md` sections.
+- At session start/resume, read `NOW.md` first and read concise `CONTEXT.md` as
+  the always-read project layer.
+- Use `node scripts/context-index.js hydrate "<task>"` before opening `PLAN.md`,
+  chunks, or bulky/task-specific context.
+- Keep `CONTEXT.md` small; if it no longer fits the always-read layer, use
+  hydrate-selected cards/sections and compact it.
 - Before planning or editing, respect `CONTEXT.md` `## Operating Constraints`.
 - If context-harness files or generated indexes look stale, note that as a
   follow-up unless it blocks the user task; do not let harness maintenance
@@ -171,13 +174,15 @@ append). First file read on recovery, last file written before session end.
   correction, update `CONTEXT.md` before it scrolls away.
 - Route task-local findings and decisions to `PLAN.md`; durable lessons to
   `CONTEXT.md`.
-- After updating `CONTEXT.md`, run `node scripts/context-index.js update`.
+- After updating `CONTEXT.md`, `PLAN.md`, or `NOW.md`, run
+  `node scripts/context-index.js update` when the change should affect future
+  retrieval.
 - Before ending, update `NOW.md` with current focus, blockers, next step, and
   touched files.
 
 ## Context Index
 <!-- context-harness:index:start -->
-Generated from `CONTEXT.md`; open only task-relevant sections.
+Generated from context sources; read small `CONTEXT.md` directly and use hydrate before bulky detail.
 <!-- context-harness:index:end -->
 ```
 
@@ -218,9 +223,10 @@ agents must not read it during normal catch-up or task work.
 ### Progressive Context Library (generated)
 
 `node scripts/context-index.js update` also maintains `.context-harness/index.json`,
-`.context-harness/cards/`, and `.context-harness/chunks/`. Use
-`node scripts/context-index.js hydrate "<task>"` to select cards; open raw chunks
-only when a card says the bulky detail is needed.
+`.context-harness/cards/`, and `.context-harness/chunks/`. `NOW.md` plus concise
+`CONTEXT.md` are the always-read layer. Use `node scripts/context-index.js hydrate
+"<task>"` to select cards before opening `PLAN.md`, chunks, or bulky
+sections; open raw chunks only when a card says the detail is needed.
 
 ---
 
@@ -228,12 +234,13 @@ only when a card says the bulky detail is needed.
 
 | Rule | Detail |
 |------|--------|
+| **Always-read layer** | Read `NOW.md` first and concise `CONTEXT.md` with it. Use hydrate before `PLAN.md`, chunks, or bulky/task-specific context. |
 | **NOW.md contract** | Update before session end. Rewrite on task switch. Keep concise. First read, last write. |
 | **Capture human input** | If the user teaches a term, invariant, workflow, or constraint, write it to CONTEXT.md before it scrolls away. |
 | **Reflection routing** | Task-local → PLAN.md Findings; durable process lesson → CONTEXT.md Learned Patterns; term → Language; invariant → Relationships; decision → PLAN.md Decisions unless the project already uses ADRs; skill correction → that skill's SKILL.md. |
 | **Learn after struggle** | >2 attempts on a problem → distill lesson to CONTEXT.md § Learned Patterns |
 | **Prune patterns** | Max 10 Learned Patterns. When full, remove the oldest entry. |
-| **Dream check** | Every `context-maintain` run asks whether future catch-up would benefit from consolidation. If yes, route bulky durable detail to cards/chunks, verify with `hydrate`, and log to `.context-harness/DREAM.md`. |
+| **Dream check** | Every `context-maintain` run asks whether future catch-up would benefit from consolidation. If yes, compact bulky durable detail in source context or project docs, regenerate cards/chunks, verify with `hydrate`, and log to `.context-harness/DREAM.md`. |
 | **PLAN.md pruning** | When active state is cluttered, summarize completed Progress into Archive and remove originals. |
 | **No raw external content** | Don't paste raw URLs, API responses, or web content into CONTEXT.md. Summarize findings in PLAN.md § Findings. |
 

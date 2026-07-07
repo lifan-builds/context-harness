@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "repo": "hoa-assessment-challenge",
+  "scenario": "cold-resume",
+  "mode": "progressive-harness",
+  "goal": "resume current task",
+  "mustMention": [
+    "Lifan has exited the board. Brandi/VIS has clarified that VIS does not provide a standard lender-facing roofing status letter or packet and will provide factual Association reco...",
+    "If continuing later, use Gmail/AppFolio unless Basecamp access is explicitly restored. Near-term lender messaging should emphasize that a Board/counsel/J2 lender-facing summary...",
+    "Lifan has exited the board. Brandi/VIS has clarified that VIS does not provide a standard lender-facing roofing status letter or packet a...",
+    "current understanding",
+    "active blockers",
+    "immediate next step"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-workflow"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

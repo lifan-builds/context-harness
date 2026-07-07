@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "repo": "self-promoting",
+  "scenario": "cold-resume",
+  "mode": "progressive-harness",
+  "goal": "resume current task",
+  "mustMention": [
+    "Completed: Updated PLANS.md with the latest launch claim, proof points, channel plan, and public narrative; refreshed PROMOTIONSTRATEGY.m...",
+    "current understanding",
+    "active blockers",
+    "immediate next step"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-workflow"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

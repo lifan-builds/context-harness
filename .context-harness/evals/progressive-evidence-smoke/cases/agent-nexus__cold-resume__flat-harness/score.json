@@ -1,0 +1,42 @@
+{
+  "id": "agent-nexus__cold-resume__flat-harness",
+  "repo": "agent-nexus",
+  "scenario": "cold-resume",
+  "mode": "flat-harness",
+  "resultPath": "cases/agent-nexus__cold-resume__flat-harness/result.md",
+  "tracePath": "cases/agent-nexus__cold-resume__flat-harness/trace.md",
+  "status": "pass",
+  "total": 9,
+  "max": 10,
+  "answerScore": 10,
+  "retrievalScore": 10,
+  "saveRoutingScore": 10,
+  "contextEfficiencyScore": 0,
+  "missing": [],
+  "avoided": [],
+  "evidence": {
+    "hasTrace": true,
+    "hasContextEvidence": true,
+    "hydrate": true,
+    "card": true,
+    "selectedExpectedCards": [],
+    "plan": true,
+    "chunk": true,
+    "context": true,
+    "hydrateBeforePlan": true,
+    "hydrateBeforeChunk": false,
+    "hasAlwaysReadContext": true,
+    "taskLocalToPlan": true,
+    "durableToContext": false,
+    "nowLast": false,
+    "indexUpdate": false,
+    "flatOveruse": false
+  },
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 6,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "none"
+}

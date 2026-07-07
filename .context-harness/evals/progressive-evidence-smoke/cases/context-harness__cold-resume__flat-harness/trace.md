@@ -1,0 +1,14 @@
+# Trace
+
+1. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/context-harness__cold-resume__flat-harness/prompt.md` to capture the eval instructions, repo copy path, constraints, and required answer shape.
+2. Loaded the `context-catch-up` skill instructions for startup/resume read order, while applying the eval's stricter flat-file-only constraint and not using hydrate/cards/chunks.
+3. Ran `ls -la "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/context-harness__cold-resume__flat-harness/repo"` to confirm the eval repo copy contains `NOW.md`, `AGENTS.md`, `CONTEXT.md`, and `PLAN.md`.
+4. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/context-harness__cold-resume__flat-harness/repo/NOW.md` for current focus, blockers, immediate next step, touched files, and latest verification.
+5. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/context-harness__cold-resume__flat-harness/repo/AGENTS.md` for schema v3 Context Contract and generated Context Index.
+6. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/context-harness__cold-resume__flat-harness/repo/CONTEXT.md` for project purpose, structure, operating constraints, workflow, terminology, relationships, ambiguities, and learned patterns.
+7. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/context-harness__cold-resume__flat-harness/repo/PLAN.md` for the active release plan, cleanup progress, follow-ups, and verification history.
+8. Ran `git -C "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/context-harness__cold-resume__flat-harness/repo" status --short` as a read-only sanity check. Because the eval repo copy is nested inside the parent git worktree rather than an independent git root, the output reflected broader parent-repo paths, so it was not used as project-context evidence.
+9. Attempted to write `result.md` and `trace.md`; the write tool required reading the existing placeholder files first.
+10. Read existing placeholders `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/context-harness__cold-resume__flat-harness/result.md` and `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/context-harness__cold-resume__flat-harness/trace.md` before overwriting.
+11. Wrote the final eval answer to `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/context-harness__cold-resume__flat-harness/result.md`.
+12. Wrote this trace to `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/context-harness__cold-resume__flat-harness/trace.md`.

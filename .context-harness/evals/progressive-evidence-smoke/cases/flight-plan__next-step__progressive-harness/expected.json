@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "repo": "flight-plan",
+  "scenario": "next-step",
+  "mode": "progressive-harness",
+  "goal": "plan next implementation step",
+  "mustMention": [
+    "Context-harness v3 migration completed for flight-plan.",
+    "Use the generated AGENTS.md Context Index to open relevant CONTEXT.md sections before planning or editing.",
+    "Test: project-specific.",
+    "next step",
+    "verification",
+    "Do not store secrets or credentials in context files."
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-operating-constraints",
+    "ctx-context-workflow"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

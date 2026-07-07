@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "repo": "ergatta",
+  "scenario": "cold-resume",
+  "mode": "progressive-harness",
+  "goal": "resume current task",
+  "mustMention": [
+    "Track 7 on-device work (catalog restored). Pulse gameplay bug is fixed. Classes cache audit completed: no local experience=9 class catalog rows/history/media are present in curr...",
+    "Resume Program Start investigation: GET /workoutprograms/{id} detail endpoint still returns 403 and is currently passed through to avoid JSON crashes.",
+    "This is a research project, not a code project — there is no test suite or",
+    "current understanding",
+    "active blockers",
+    "immediate next step"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-workflow"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

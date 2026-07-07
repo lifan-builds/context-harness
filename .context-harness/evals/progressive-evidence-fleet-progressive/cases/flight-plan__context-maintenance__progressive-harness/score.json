@@ -1,0 +1,47 @@
+{
+  "id": "flight-plan__context-maintenance__progressive-harness",
+  "repo": "flight-plan",
+  "scenario": "context-maintenance",
+  "mode": "progressive-harness",
+  "resultPath": "cases/flight-plan__context-maintenance__progressive-harness/result.md",
+  "tracePath": "cases/flight-plan__context-maintenance__progressive-harness/trace.md",
+  "status": "pass",
+  "total": 9,
+  "max": 10,
+  "answerScore": 8,
+  "retrievalScore": 10,
+  "saveRoutingScore": 10,
+  "contextEfficiencyScore": 10,
+  "missing": [
+    "Use the generated AGENTS.md Context Index to open relevant CONTEXT.md sections before planning or editing."
+  ],
+  "avoided": [],
+  "evidence": {
+    "hasTrace": true,
+    "hasContextEvidence": true,
+    "hydrate": true,
+    "card": true,
+    "selectedExpectedCards": [
+      "ctx-now-now",
+      "ctx-context-operating-constraints"
+    ],
+    "plan": true,
+    "chunk": false,
+    "context": true,
+    "hydrateBeforePlan": true,
+    "hydrateBeforeChunk": true,
+    "hasAlwaysReadContext": true,
+    "taskLocalToPlan": true,
+    "durableToContext": true,
+    "nowLast": true,
+    "indexUpdate": true,
+    "flatOveruse": false
+  },
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 5,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "none"
+}

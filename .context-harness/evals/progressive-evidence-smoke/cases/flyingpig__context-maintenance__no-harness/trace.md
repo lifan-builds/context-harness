@@ -1,0 +1,41 @@
+# Trace
+
+Concise tool/evidence notes in order used.
+
+1. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/prompt.md` to get the eval instructions, repo copy path, output path, read-only constraint, and required answer shape.
+2. Command: `find "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo" -maxdepth 3 -type f | sort` to inspect the repo copy file inventory. Output was large; used preview only.
+3. Command: `ls -la "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo"` to inspect top-level repo files and directories.
+4. Command: `find "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo" -maxdepth 2 -type f \( -name "package.json" -o -name "README*" -o -name "*.md" -o -name "*.txt" -o -name "tsconfig*.json" -o -name "vite.config.*" -o -name "electron-builder.*" \) | sort` to identify key docs/config files.
+5. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/README.md` for current product shape, setup, safety model, commands, and project structure.
+6. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/package.json` for version and npm scripts.
+7. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/pyproject.toml` for Python version, dependencies, entry points, lint/test config.
+8. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/PLANS.md` for historical/stale bootstrap plan context.
+9. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/FINDINGS.md` for research/history context and market/product learnings.
+10. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/DESIGN.md` for durable UI/product design constraints.
+11. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/EVALUATION.md` for test/evaluation contracts.
+12. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/docs/beta.md` for beta scope, gates, release evidence, blockers, and operating rules.
+13. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/docs/desktop-auto-update.md` for unsigned update path, release flow, verification gates, signing blocker, and v1.0.2 baseline note.
+14. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/docs/public-beta-quickstart.md` for user-facing beta install and safety boundaries.
+15. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/docs/desktop-dashboard-shell-plan.md` for approved desktop/helper architecture and context-update expectations.
+16. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/desktop/electron-builder.json` for packaging targets, publish config, and excluded helper resources.
+17. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/.github/workflows/desktop-release.yml` for release CI gates.
+18. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/scripts/verify_desktop_update_release.mjs` for update artifact verification contract.
+19. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/desktop/main.js` for Electron helper supervision, dashboard loading, and update menu behavior.
+20. Command: `find "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/tests" -maxdepth 3 -type f | sort` to inspect test files.
+21. Command: `find "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/desktop" -maxdepth 2 -type f | sort` to inspect desktop source/test files.
+22. Command: `find "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/scripts" -maxdepth 1 -type f | sort` to inspect scripts.
+23. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/desktop/auto_update.js` for manual GitHub release update-check implementation.
+24. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/desktop/auto_update.test.mjs` for update behavior tests.
+25. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/scripts/test_desktop_shell.mjs` for desktop/helper dashboard smoke details.
+26. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/desktop/helper_supervisor.test.mjs` for helper launch, port selection, and readiness tests.
+27. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/scripts/test_dashboard_protocol.mjs` for dashboard protocol smoke details.
+28. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/scripts/build_beta_release.py` for source beta bundle includes/excludes and default version.
+29. Re-read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/docs/public-beta-quickstart.md` first 120 lines for quickstart details while drafting.
+30. Command: `for f in AGENTS.md CONTEXT.md NOW.md PLAN.md .context-harness; do if [ -e "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/repo/$f" ]; then printf '%s exists\n' "$f"; else printf '%s missing\n' "$f"; fi; done` to verify context files are absent.
+31. Attempted to write `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/result.md`; tool required reading the existing placeholder first.
+32. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/result.md` placeholder.
+33. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/trace.md` placeholder.
+34. Wrote `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/result.md` with the final eval answer.
+35. Wrote `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flyingpig__context-maintenance__no-harness/trace.md` with these notes.
+
+No repository source files were edited. No verification/build/test commands were run because the eval allowed read-only inspection commands only.

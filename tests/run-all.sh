@@ -628,14 +628,31 @@ EOF
     [ -f "$TMPDIR_ROOT/.context-harness/cards/ctx-context-relationships.md" ] && \
     [ -f "$TMPDIR_ROOT/.context-harness/chunks/ctx-context-relationships.md" ] && pass || fail "missing progressive library files"
 
-  it "hydrate returns card pointers without dumping raw chunks"
+  it "hydrate returns a retrieval packet without dumping raw chunks"
   output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" hydrate "architecture detail" 2>&1)
-  echo "$output" | grep -q "ctx-context-relationships" && \
+  echo "$output" | grep -q "Always-read layer" && \
+    echo "$output" | grep -q "Open first for progressive detail" && \
+    echo "$output" | grep -q "Open next only if needed" && \
+    echo "$output" | grep -q "Retrieval evidence" && \
+    echo "$output" | grep -q "ctx-context-relationships" && \
     echo "$output" | grep -q "raw detail on demand" && \
     ! echo "$output" | grep -q "Relation line 84" && pass || fail "unexpected hydrate output: $output"
 
-  it "check fails when the context library manifest is stale"
+  it "generated cards describe retrieval order before raw source"
+  card=$(cat "$TMPDIR_ROOT/.context-harness/cards/ctx-context-relationships.md")
+  assert_contains "$card" "Retrieval order"
+  assert_contains "$card" "Use this card before opening bulky"
+
+  it "hydrate warns on stale manifest without stale card open guidance"
   node -e "const fs=require('fs'); const f='$TMPDIR_ROOT/.context-harness/index.json'; const j=JSON.parse(fs.readFileSync(f,'utf8')); j.source_hash='stale'; fs.writeFileSync(f, JSON.stringify(j, null, 2)+'\\n');"
+  output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" hydrate "architecture detail" 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && \
+    echo "$output" | grep -q "generated card files may be stale" && \
+    echo "$output" | grep -q "source section:" && \
+    echo "$output" | grep -q "Retrieval evidence" && \
+    ! echo "$output" | grep -q "open card:" && pass || fail "expected stale hydrate warning without open card: $output"
+
+  it "check fails when the context library manifest is stale"
   output=$(cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" check 2>&1); rc=$?
   [ "$rc" -eq 1 ] && echo "$output" | grep -q ".context-harness/index.json is stale" && pass || fail "expected stale library failure: $output"
 
@@ -650,7 +667,7 @@ if should_run "eval-agent-problem-solving"; then
   suite "eval-agent-problem-solving.js"
   EVAL_AGENT="$REPO_ROOT/scripts/eval-agent-problem-solving.js"
 
-  it "prepares no-harness and progressive fresh-agent eval cases"
+  it "prepares no-harness flat-harness and progressive fresh-agent eval cases"
   setup_tmpdir
   mkdir -p "$TMPDIR_ROOT/projects/demo/.git"
   cat > "$TMPDIR_ROOT/projects/demo/CONTEXT.md" << 'EOF'
@@ -700,16 +717,49 @@ EOF
 - npm test
 EOF
   echo '{"scripts":{"test":"true"}}' > "$TMPDIR_ROOT/projects/demo/package.json"
+  echo 'SECRET=demo' > "$TMPDIR_ROOT/projects/demo/.env"
+  echo 'SECRET=demo' > "$TMPDIR_ROOT/projects/demo/.env.local"
+  echo 'cookie demo' > "$TMPDIR_ROOT/projects/demo/cookies.txt"
   output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" prepare "$TMPDIR_ROOT/projects" --sample 1 --scenarios cold-resume,next-step --output "$TMPDIR_ROOT/eval" 2>&1); rc=$?
   [ "$rc" -eq 0 ] && \
     [ -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__no-harness/prompt.md" ] && \
+    [ -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__flat-harness/prompt.md" ] && \
     [ -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__progressive-harness/prompt.md" ] && \
+    [ -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__progressive-harness/trace.md" ] && \
     [ ! -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__no-harness/repo/CONTEXT.md" ] && \
-    [ -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__progressive-harness/repo/CONTEXT.md" ] && pass || fail "prepare failed: $output"
+    [ -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__flat-harness/repo/CONTEXT.md" ] && \
+    [ ! -d "$TMPDIR_ROOT/eval/cases/demo__cold-resume__flat-harness/repo/.context-harness" ] && \
+    [ -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__progressive-harness/repo/CONTEXT.md" ] && \
+    [ ! -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__progressive-harness/repo/.env" ] && \
+    [ ! -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__progressive-harness/repo/.env.local" ] && \
+    [ ! -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__progressive-harness/repo/cookies.txt" ] && pass || fail "prepare failed: $output"
 
-  it "uses operating constraints and keeps harness drift as a follow-up"
-  node -e "const fs=require('fs'); const e=JSON.parse(fs.readFileSync('$TMPDIR_ROOT/eval/cases/demo__next-step__progressive-harness/expected.json','utf8')); const p=fs.readFileSync('$TMPDIR_ROOT/eval/cases/demo__next-step__progressive-harness/prompt.md','utf8'); if(e.mustMention.includes('### Never')) process.exit(1); if(!e.mustMention.some(x=>x.includes('delete demo data'))) process.exit(2); if(!e.expectedCards.includes('ctx-context-operating-constraints')) process.exit(3); if(!p.includes('do not let harness maintenance replace the requested project understanding or planning task')) process.exit(4);"
-  [ "$?" -eq 0 ] && pass || fail "expected operating constraint and harness-priority prompt"
+  it "uses operating constraints and requires progressive evidence"
+  node -e "const fs=require('fs'); const e=JSON.parse(fs.readFileSync('$TMPDIR_ROOT/eval/cases/demo__next-step__progressive-harness/expected.json','utf8')); const p=fs.readFileSync('$TMPDIR_ROOT/eval/cases/demo__next-step__progressive-harness/prompt.md','utf8'); if(e.mustMention.includes('### Never')) process.exit(1); if(!e.mustMention.includes('constraints')) process.exit(2); if(!e.expectedCards.includes('ctx-context-operating-constraints')) process.exit(3); if(!p.includes('Context Evidence')) process.exit(4); if(!p.includes('hydrate')) process.exit(5);"
+  [ "$?" -eq 0 ] && pass || fail "expected operating constraint and evidence prompt"
+
+  it "can prepare only selected modes"
+  output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" prepare "$TMPDIR_ROOT/projects" --sample 1 --scenarios cold-resume --modes progressive-harness --output "$TMPDIR_ROOT/eval-progressive-only" 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && \
+    [ -f "$TMPDIR_ROOT/eval-progressive-only/cases/demo__cold-resume__progressive-harness/prompt.md" ] && \
+    [ ! -e "$TMPDIR_ROOT/eval-progressive-only/cases/demo__cold-resume__no-harness" ] && \
+    [ ! -e "$TMPDIR_ROOT/eval-progressive-only/cases/demo__cold-resume__flat-harness" ] && pass || fail "mode-filter prepare failed: $output"
+
+  it "fill-pending dry-run lists only empty result cases"
+  echo "already done" > "$TMPDIR_ROOT/eval/cases/demo__cold-resume__no-harness/result.md"
+  output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" fill-pending "$TMPDIR_ROOT/eval" --scenarios cold-resume --dry-run 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && \
+    echo "$output" | grep -q "Pending cases: 2" && \
+    ! echo "$output" | grep -q "demo__cold-resume__no-harness" && \
+    echo "$output" | grep -q "demo__cold-resume__flat-harness" && \
+    echo "$output" | grep -q "demo__cold-resume__progressive-harness" && pass || fail "expected pending dry-run list: $output"
+
+  it "fill-pending resumes without overwriting completed results"
+  output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" fill-pending "$TMPDIR_ROOT/eval" --scenarios cold-resume --command "printf filled > {resultPath}" 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && \
+    [ "$(cat "$TMPDIR_ROOT/eval/cases/demo__cold-resume__no-harness/result.md")" = "already done" ] && \
+    [ "$(cat "$TMPDIR_ROOT/eval/cases/demo__cold-resume__flat-harness/result.md")" = "filled" ] && \
+    [ "$(cat "$TMPDIR_ROOT/eval/cases/demo__cold-resume__progressive-harness/result.md")" = "filled" ] && pass || fail "expected resumable fill: $output"
 
   it "scores supplied fresh-agent eval results"
   cat > "$TMPDIR_ROOT/eval/cases/demo__cold-resume__progressive-harness/result.md" << 'EOF'
@@ -718,11 +768,186 @@ Active blockers: None.
 Immediate next step: Run npm test and review the eval report.
 Verification command: npm test.
 Relevant files include context-maintain Dream/Compact workflow.
+Context Evidence: read NOW.md and concise CONTEXT.md, ran node scripts/context-index.js hydrate "resume current task", selected ctx-now-now and ctx-context-workflow from .context-harness/cards before any PLAN.md detail.
+EOF
+  cat > "$TMPDIR_ROOT/eval/cases/demo__cold-resume__progressive-harness/trace.md" << 'EOF'
+Read NOW.md
+Read CONTEXT.md
+Bash node scripts/context-index.js hydrate "resume current task"
+selected_cards: ctx-now-now, ctx-context-workflow
+open card: .context-harness/cards/ctx-now-now.md
 EOF
   output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" score "$TMPDIR_ROOT/eval" 2>&1); rc=$?
   [ "$rc" -eq 0 ] && \
     echo "$output" | grep -q "Fresh Agent Problem-Solving Eval" && \
-    echo "$output" | grep -q "10/10 pass" && pass || fail "score failed: $output"
+    echo "$output" | grep -q "Modes: no-harness, flat-harness, progressive-harness" && \
+    echo "$output" | grep -q "retrieval 10/10" && pass || fail "score failed: $output"
+
+  it "can score a completed scenario slice"
+  output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" score "$TMPDIR_ROOT/eval" --scenarios cold-resume 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && \
+    echo "$output" | grep -q "cold-resume" && \
+    ! echo "$output" | grep -q "next-step" && pass || fail "expected scoped score: $output"
+
+  it "gate fails when progressive evidence is incomplete"
+  output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" score "$TMPDIR_ROOT/eval" --gate 2>&1); rc=$?
+  [ "$rc" -ne 0 ] && echo "$output" | grep -q "Gate: fail" && pass || fail "expected gate failure: $output"
+
+  it "treats high-scoring answer-only misses as review notes"
+  setup_tmpdir
+  mkdir -p "$TMPDIR_ROOT/projects/demo/.git"
+  cat > "$TMPDIR_ROOT/projects/demo/CONTEXT.md" << 'EOF'
+# Context
+<!-- context-harness:schema v3 -->
+
+## Project
+demo project
+
+## Structure
+.
+
+## Operating Constraints
+- Preserve demo data.
+
+## Workflow
+- Verification: npm test
+
+## Language
+
+## Relationships
+
+## Flagged Ambiguities
+
+## Learned Patterns
+EOF
+  cat > "$TMPDIR_ROOT/projects/demo/NOW.md" << 'EOF'
+# Now
+
+## Current Focus
+Ship the demo evaluator.
+
+## Active Blockers
+- None.
+
+## Immediate Next Step
+Run npm test and review the eval report.
+EOF
+  cat > "$TMPDIR_ROOT/projects/demo/PLAN.md" << 'EOF'
+# Demo Plan
+
+## Progress
+- [ ] Verify evaluator.
+
+## Verification
+- npm test
+EOF
+  output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" prepare "$TMPDIR_ROOT/projects" --sample 1 --scenarios next-step --modes progressive-harness --output "$TMPDIR_ROOT/eval-answer-note" 2>&1); rc=$?
+  cat > "$TMPDIR_ROOT/eval-answer-note/cases/demo__next-step__progressive-harness/result.md" << 'EOF'
+Current understanding: Ship the demo evaluator.
+Immediate next step: Run npm test and review the eval report.
+Active caveats: preserve demo data.
+Verification command/check: npm test.
+Context Evidence: read NOW.md and concise CONTEXT.md, ran node scripts/context-index.js hydrate "plan next implementation step", selected ctx-context-operating-constraints and ctx-context-workflow from .context-harness/cards before PLAN.md.
+EOF
+  cat > "$TMPDIR_ROOT/eval-answer-note/cases/demo__next-step__progressive-harness/trace.md" << 'EOF'
+Read NOW.md
+Read CONTEXT.md
+Bash node scripts/context-index.js hydrate "plan next implementation step"
+selected_cards: ctx-context-operating-constraints, ctx-context-workflow
+open card: .context-harness/cards/ctx-context-operating-constraints.md
+EOF
+  output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" score "$TMPDIR_ROOT/eval-answer-note" --gate 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && echo "$output" | grep -q "Gate: pass" && pass || fail "expected answer-only miss gate pass: $output"
+
+  it "semantic expected facts tolerate paraphrase"
+  node -e "const fs=require('fs'); const s=JSON.parse(fs.readFileSync('$TMPDIR_ROOT/eval-answer-note/cases/demo__next-step__progressive-harness/score.json','utf8')); if(s.missing.length) { console.error(s.missing.join('; ')); process.exit(1); } if(s.answerScore !== 10) process.exit(2);"
+  [ "$?" -eq 0 ] && pass || fail "expected semantic paraphrase score"
+
+  it "answer-only misses remain review notes when retrieval evidence is strong"
+  node -e "const fs=require('fs'); const f='$TMPDIR_ROOT/eval-answer-note/cases/demo__next-step__progressive-harness/expected.json'; const e=JSON.parse(fs.readFileSync(f,'utf8')); e.mustMention.push('pytest unmentioned command one', 'pytest unmentioned command two'); fs.writeFileSync(f, JSON.stringify(e, null, 2)+'\\n');"
+  output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" score "$TMPDIR_ROOT/eval-answer-note" --gate 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && echo "$output" | grep -q "needs-review" && echo "$output" | grep -q "missing: pytest unmentioned command" && pass || fail "expected answer-only review note gate pass: $output"
+
+  it "mustAvoid remains strict"
+  cat > "$TMPDIR_ROOT/eval-answer-note/cases/demo__next-step__progressive-harness/result.md" << 'EOF'
+Current understanding: Ship the demo evaluator.
+Immediate next step: Run npm test and review the eval report.
+Active caveats: preserve demo data.
+Verification command/check: npm test.
+Bad drift: read DREAM.md during catch-up.
+Context Evidence: read NOW.md and concise CONTEXT.md, ran node scripts/context-index.js hydrate "plan next implementation step", selected ctx-context-operating-constraints and ctx-context-workflow from .context-harness/cards before PLAN.md.
+EOF
+  output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" score "$TMPDIR_ROOT/eval-answer-note" --gate 2>&1); rc=$?
+  [ "$rc" -ne 0 ] && echo "$output" | grep -q "harness-drift-priority-gap" && pass || fail "expected mustAvoid gate failure: $output"
+
+  cleanup_tmpdir
+fi
+
+# =============================
+# Test: eval-context-library.js
+# =============================
+
+if should_run "eval-context-library"; then
+  suite "eval-context-library.js"
+  EVAL_CONTEXT_LIBRARY="$REPO_ROOT/scripts/eval-context-library.js"
+
+  it "parses retrieval-packet hydrate cards in real-project shadow eval"
+  setup_tmpdir
+  mkdir -p "$TMPDIR_ROOT/projects/demo/.git"
+  cat > "$TMPDIR_ROOT/projects/demo/CONTEXT.md" << 'EOF'
+# Context
+<!-- context-harness:schema v3 -->
+
+## Project
+demo project
+
+## Structure
+.
+
+## Operating Constraints
+- Preserve demo data.
+
+## Workflow
+- Verification: npm test
+- Deployment: npm run deploy
+
+## Language
+
+## Relationships
+
+## Flagged Ambiguities
+
+## Learned Patterns
+- Run hydrate before bulky task context.
+EOF
+  cat > "$TMPDIR_ROOT/projects/demo/NOW.md" << 'EOF'
+# Now
+
+## Current Focus
+Ship the demo evaluator.
+
+## Active Blockers
+- None.
+
+## Immediate Next Step
+Run npm test.
+EOF
+  cat > "$TMPDIR_ROOT/projects/demo/AGENTS.md" << 'EOF'
+# Agent Instructions
+<!-- context-harness:schema v3 -->
+
+## Context Contract
+- Read NOW and CONTEXT.
+
+## Context Index
+<!-- context-harness:index:start -->
+<!-- context-harness:index:end -->
+EOF
+  output=$(cd "$REPO_ROOT" && node "$EVAL_CONTEXT_LIBRARY" "$TMPDIR_ROOT/projects" "$TMPDIR_ROOT/report.md" 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && \
+    echo "$output" | grep -q "Pass: 1" && \
+    echo "$output" | grep -q "resume current task: ctx-now-now" && \
+    echo "$output" | grep -q "run tests: ctx-context-workflow" && pass || fail "shadow eval failed: $output"
 
   cleanup_tmpdir
 fi
@@ -738,12 +963,20 @@ if should_run "release-proof"; then
   output=$(cat "$REPO_ROOT/context-catch-up/SKILL.md")
   assert_contains "$output" "fresh-session or true-resume boundary"
   assert_contains "$output" "Do not invoke during ordinary mid-session follow-up turns"
+  assert_contains "$output" "Read \`NOW.md\` first"
+  assert_contains "$output" "Read concise \`CONTEXT.md\`"
+  assert_contains "$output" "opening \`PLAN.md\`, chunks, or bulky"
+  assert_contains "$output" "stale generated"
+  assert_contains "$output" "current markdown fallback context"
+  assert_contains "$output" "unless the drift blocks correctness or safety"
 
   it "proves maintain owns ongoing updates and closeout"
   output=$(cat "$REPO_ROOT/context-maintain/SKILL.md")
   assert_contains "$output" "update context, capture lessons"
   assert_contains "$output" "## Routing"
   assert_contains "$output" "## Session Closeout"
+  assert_contains "$output" "hydrate \"update context after current work\""
+  assert_contains "$output" "resume packet to \`NOW.md\` last"
 
   it "proves maintain owns Dream and plan stress-tests"
   output=$(cat "$REPO_ROOT/context-maintain/SKILL.md")
@@ -755,6 +988,12 @@ if should_run "release-proof"; then
   assert_contains "$output" "disable-model-invocation: true"
   assert_contains "$output" "implicitly just because"
   assert_contains "$(cat "$REPO_ROOT/context-upgrade/agents/openai.yaml")" "allow_implicit_invocation: false"
+
+  it "proves upgrade owns conservative fleet refresh"
+  assert_contains "$output" "Fleet Refresh Guardrails"
+  assert_contains "$output" "skip dirty repos by"
+  assert_contains "$output" "Preserve project-specific context"
+  assert_contains "$output" "track skipped/failed repos"
 
   it "proves set-goal has long-running goal shape"
   output=$(cat "$REPO_ROOT/set-goal/SKILL.md")
@@ -1158,6 +1397,8 @@ Ship hooks
 EOF
   output=$(cd "$TMPDIR_ROOT" && printf '{"cwd":"%s"}' "$TMPDIR_ROOT" | node "$CODEX_HOOK" --mode catch-up)
   assert_contains "$output" "context-catch-up"
+  assert_contains "$output" "read NOW.md and concise CONTEXT.md"
+  assert_contains "$output" "run hydrate"
 
   it "includes current NOW.md in catch-up context"
   assert_contains "$output" "Ship hooks"
@@ -1188,6 +1429,9 @@ EOF
   echo "# Now" > "$TMPDIR_ROOT/NOW.md"
   output=$(cd "$TMPDIR_ROOT" && printf '{"cwd":"%s"}' "$TMPDIR_ROOT" | node "$CODEX_HOOK" --mode maintain)
   assert_contains "$output" "context-maintain"
+  assert_contains "$output" "Save task-local info to PLAN.md"
+  assert_contains "$output" "rewrite NOW.md last"
+  assert_contains "$output" "future retrieval"
 
   cleanup_tmpdir
 fi
@@ -1216,7 +1460,10 @@ if should_run "skill"; then
   assert_contains "$(cat "$SKILL")" "### AGENTS.md"
 
   it "contains Context Contract"
-  assert_contains "$(cat "$SKILL")" "Context Contract"
+  content=$(cat "$SKILL")
+  assert_contains "$content" "Context Contract"
+  assert_contains "$content" "always-read project layer"
+  assert_contains "$content" "before opening \`PLAN.md\`, chunks, or bulky"
 
   it "contains all 4 behavioral principles"
   content=$(cat "$SKILL")

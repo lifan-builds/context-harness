@@ -1,0 +1,22 @@
+# Trace Notes
+
+- Read `prompt.md` first and followed the case instructions.
+- Read `repo/NOW.md` first: active focus is OpenAI recruiter prep for Senior SWE Infrastructure, Bellevue, likely Statsig infrastructure.
+- Read `repo/CONTEXT.md` for durable facts and constraints: career-management workspace; do not fabricate experiences, metrics, salaries, publications, or job details; preserve resume/experience content unless explicitly asked.
+- Read `repo/AGENTS.md` for context contract and index guidance.
+- Ran from the case repo: `node scripts/context-index.js hydrate "plan next implementation step"`.
+  - Selected cards: `ctx-now-now`, `ctx-context-operating-constraints`, `ctx-context-do-not`, `ctx-context-project-structure`.
+- Opened selected cards before raw task files:
+  - `repo/.context-harness/cards/ctx-now-now.md`
+  - `repo/.context-harness/cards/ctx-context-operating-constraints.md`
+  - `repo/.context-harness/cards/ctx-context-do-not.md`
+  - `repo/.context-harness/cards/ctx-context-project-structure.md`
+- Inspected task-specific files:
+  - `repo/interview-prep/openai-recruiter-round-statsig-infrastructure.md`
+  - `repo/interview-prep/openai-seen-questions.md`
+  - `repo/job-search/openings.md`
+  - `repo/job-search/applications/openai-senior-software-engineer-infrastructure-seattle-2026-06-30/manifest.md`
+- Ran read-only consistency check with `rg -n "Statsig|Senior Software Engineer, Infrastructure|Bellevue|Applied|Submitted|recruiter|next round|interview loop" ...` across `NOW.md`, the OpenAI prep guide, `job-search/openings.md`, and the OpenAI application manifest.
+- Did not read `expected.json`, `score.json`, run `manifest.json`, or eval reports.
+- Did not modify files inside `repo/`.
+- Save/update routing for a live session: after the recruiter call or rehearsal, update `NOW.md`; put next-round prep details in task-local planning context; no durable `CONTEXT.md` update unless a lasting rule/correction is learned.

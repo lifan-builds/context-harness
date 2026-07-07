@@ -1,0 +1,14 @@
+# Trace
+
+1. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/credit-card-tracker__next-step__flat-harness/prompt.md` to load the eval instructions, target repo copy, constraints, and required answer shape.
+2. Ran `ls -la /Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/credit-card-tracker__next-step__flat-harness/repo` to confirm the repo copy and flat context files existed.
+3. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/credit-card-tracker__next-step__flat-harness/repo/NOW.md` for current focus, blockers, immediate next step, session state, and prior verification.
+4. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/credit-card-tracker__next-step__flat-harness/repo/CONTEXT.md` for project purpose, operating constraints, workflow commands, learned patterns, Neon quota notes, public DB-free catalog invariant, and fallback gates.
+5. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/credit-card-tracker__next-step__flat-harness/repo/AGENTS.md` for the flat context contract and context index.
+6. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/credit-card-tracker__next-step__flat-harness/repo/PLAN.md` to confirm relevant active/planned slices and distinguish product roadmap work from the current operational recovery item.
+7. Ran `ls -la /Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/credit-card-tracker__next-step__flat-harness` to confirm `result.md` and `trace.md` existed as case deliverables.
+8. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/credit-card-tracker__next-step__flat-harness/result.md` and `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/credit-card-tracker__next-step__flat-harness/trace.md`; both were empty placeholders.
+9. Wrote the final case answer to `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/credit-card-tracker__next-step__flat-harness/result.md`.
+10. Wrote these concise tool/evidence notes to `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/credit-card-tracker__next-step__flat-harness/trace.md`.
+
+No repository source files were edited. No `.context-harness/cards`, `.context-harness/chunks`, or `node scripts/context-index.js hydrate` access was used.

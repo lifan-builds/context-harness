@@ -5,14 +5,14 @@ importance: 0.95
 confidence: confirmed
 source: NOW.md#now
 chunk: null
-tokens_est: 265
+tokens_est: 363
 tags: [now, resume]
 ---
 
 # NOW.md: Now
 
 ## Summary
-Legacy migration/eval/ADR tooling has been removed from context-harness now that the local project fleet is on current schema v3 with Operating Constraints.
+The remaining context-harness release gaps are implemented and verified: the eval runner has resumable pending-case filling, eval copies exclude obvious private files, scoring separates answer-only review notes from r...
 
 ## Use when
 - resuming the current session
@@ -20,11 +20,16 @@ Legacy migration/eval/ADR tooling has been removed from context-harness now that
 - update context after current work
 
 ## Key facts
-- Legacy migration/eval/ADR tooling has been removed from context-harness now that the local project fleet is on current schema v3 with Operating Constraints.
-- No code or verification blockers are known.
-- Review the cleanup diff, then commit/push and redeploy with Agent Nexus if accepted.
-- Last modified: 2026-07-06T21:54:00-0700
-- Files touched: README.md, SKILL.md, context-catch-up/SKILL.md, context-init/SKILL.md, context-upgrade/SKILL.md, scripts/install-project.js, scripts/context-i...
+- The remaining context-harness release gaps are implemented and verified: the eval runner has resumable pending-case filling, eval copies exclude obvious priv...
+- No code blockers are known; diff review, Agent Nexus deployment, fleet refresh, and pushes remain.
+- Review the diff, deploy with Agent Nexus, refresh local repos with the latest context-harness, and push intentionally changed repos.
+- Last modified: 2026-07-07T00:00:00-0700
+- Files touched: scripts/eval-agent-problem-solving.js, scripts/context-index.js, tests/run-all.sh, context-catch-up/SKILL.md, context-upgrade/SKILL.md, PLAN.m...
 
-## Open next
+## Retrieval order
+- Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.
+- Use this card before opening bulky `PLAN.md`, chunks, or raw source sections for this topic.
+- Open raw detail only when this summary is insufficient for the task.
+
+## Open next only if needed
 - `NOW.md#now`

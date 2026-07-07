@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "repo": "context-harness",
+  "scenario": "context-maintenance",
+  "mode": "no-harness",
+  "goal": "update context after completed task",
+  "mustMention": [
+    "Legacy migration/eval/ADR tooling has been removed from context-harness now that the local project fleet is on current schema v3 with Operating Constraints.",
+    "Review the cleanup diff, then commit/push and redeploy with Agent Nexus if accepted.",
+    "Test: tests/run-all.sh",
+    "NOW.md",
+    "PLAN.md",
+    "CONTEXT.md",
+    "context-index.js update"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

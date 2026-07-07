@@ -54,3 +54,12 @@
   deleted `scripts/adr.js`, `scripts/eval-loop.js`, and
   `scripts/migrate-project.js`; removed the legacy install profile; tightened
   schema checks to v3-only; and updated docs/skills/tests accordingly.
+- [x] Completed the 57-case progressive evidence fleet eval under
+  `.context-harness/evals/progressive-evidence-fleet-progressive`; all cases are
+  filled and the gate passes after separating high-scoring answer-only review
+  notes from release-blocking retrieval/save/order gaps.
+- [x] Closed the remaining release gaps: `eval-agent-problem-solving.js` now has
+  idempotent `fill-pending` retry/resume support, eval copies exclude obvious
+  private files, semantic expected-fact matching is less phrase-brittle, stale
+  hydrate output avoids pointing at stale generated cards, and upgrade docs now
+  spell out conservative fleet-refresh guardrails.

@@ -1,0 +1,42 @@
+{
+  "id": "context-harness__context-maintenance__no-harness",
+  "repo": "context-harness",
+  "scenario": "context-maintenance",
+  "mode": "no-harness",
+  "resultPath": "cases/context-harness__context-maintenance__no-harness/result.md",
+  "tracePath": "cases/context-harness__context-maintenance__no-harness/trace.md",
+  "status": "pass",
+  "total": 10,
+  "max": 10,
+  "answerScore": 10,
+  "retrievalScore": 10,
+  "saveRoutingScore": 10,
+  "contextEfficiencyScore": 10,
+  "missing": [],
+  "avoided": [],
+  "evidence": {
+    "hasTrace": true,
+    "hasContextEvidence": true,
+    "hydrate": false,
+    "card": false,
+    "selectedExpectedCards": [],
+    "plan": true,
+    "chunk": false,
+    "context": true,
+    "hydrateBeforePlan": false,
+    "hydrateBeforeChunk": false,
+    "hasAlwaysReadContext": true,
+    "taskLocalToPlan": true,
+    "durableToContext": true,
+    "nowLast": true,
+    "indexUpdate": true,
+    "flatOveruse": false
+  },
+  "deterministicChecks": {
+    "mustMention": 7,
+    "mentioned": 7,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "none"
+}

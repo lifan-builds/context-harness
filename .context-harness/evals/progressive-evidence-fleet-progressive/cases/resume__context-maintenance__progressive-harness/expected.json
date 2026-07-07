@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "repo": "resume",
+  "scenario": "context-maintenance",
+  "mode": "progressive-harness",
+  "goal": "update context after completed task",
+  "mustMention": [
+    "OpenAI interview preparation for the applied Senior Software Engineer, Infrastructure role in Bellevue, WA, likely Statsig infrastructure inside OpenAI.",
+    "Use interview-prep/openai-recruiter-round-statsig-infrastructure.md as the primary recruiter-screen guide. If continuing prep, rehearse the 30-second pitch, Why OpenAI, Why Stat...",
+    "NOW.md",
+    "PLAN.md",
+    "CONTEXT.md",
+    "context-index.js update"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-operating-constraints"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

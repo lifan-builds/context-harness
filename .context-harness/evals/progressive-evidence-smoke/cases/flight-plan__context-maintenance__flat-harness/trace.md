@@ -1,0 +1,14 @@
+# Trace
+
+1. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__context-maintenance__flat-harness/prompt.md` to capture the eval task, repo copy path, output path, constraints, and required answer shape.
+2. Ran `ls -la "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__context-maintenance__flat-harness/repo" && ls -la "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__context-maintenance__flat-harness/repo/.context-harness"` to verify the isolated repo copy layout and confirm there is no nested `.context-harness` directory.
+3. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__context-maintenance__flat-harness/repo/NOW.md` for current focus, blockers, next step, and touched files.
+4. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__context-maintenance__flat-harness/repo/CONTEXT.md` for durable project facts, operating constraints, workflow gaps, and imported notes.
+5. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__context-maintenance__flat-harness/repo/AGENTS.md` for the context contract and Context Index maintenance rules.
+6. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__context-maintenance__flat-harness/repo/PLANS.md` because no singular `PLAN.md` was present and this is the available plan-like flat context file.
+7. Ran `ls -la "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__context-maintenance__flat-harness/repo/scripts"` to confirm `scripts/context-index.js` exists for the verification recommendation.
+8. Ran `ls -la "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__context-maintenance__flat-harness"` to check existing output files.
+9. Read existing empty `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__context-maintenance__flat-harness/result.md` before overwriting.
+10. Read existing empty `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__context-maintenance__flat-harness/trace.md` before overwriting.
+11. Wrote `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__context-maintenance__flat-harness/result.md` with the final case answer.
+12. Wrote `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__context-maintenance__flat-harness/trace.md` with these concise evidence notes.

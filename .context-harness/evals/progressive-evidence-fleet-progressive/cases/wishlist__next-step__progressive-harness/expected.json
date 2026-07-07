@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "repo": "wishlist",
+  "scenario": "next-step",
+  "mode": "progressive-harness",
+  "goal": "plan next implementation step",
+  "mustMention": [
+    "Codex is the target runner for shopping monitor workflows; active skill/docs now use Codex-oriented wording.",
+    "Ran a Tesla Model Y ski rack/cargo-box Codex smoke: init, native search-results artifact, live PDP validation, SQLite monitor report.",
+    "next step",
+    "constraints",
+    "verification"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-operating-constraints",
+    "ctx-context-workflow"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

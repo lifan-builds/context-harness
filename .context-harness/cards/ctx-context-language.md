@@ -25,5 +25,10 @@ context-catch-up: The startup/resume skill for a freshly started agent session o
 - set-goal: The skill for converting the current conversation and project context into a directly usable long-running goal for Codex goal mode, loop mode, or a...
 - context-upgrade: Explicit-only operator skill for context-harness source upgrades, legacy v1 migration, schema migrations, partial/custom layout repair, loca...
 
-## Open next
+## Retrieval order
+- Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.
+- Use this card before opening bulky `PLAN.md`, chunks, or raw source sections for this topic.
+- Open raw detail only when this summary is insufficient for the task.
+
+## Open next only if needed
 - `CONTEXT.md#language`

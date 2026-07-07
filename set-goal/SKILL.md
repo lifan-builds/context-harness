@@ -38,8 +38,10 @@ make the goal self-contained, observable, and safe to resume from.
 
 ## Workflow
 
-1. Read `NOW.md`, then use `AGENTS.md` Context Index to choose relevant
-   `CONTEXT.md` sections. Read active `PLAN.md` if present.
+1. Read `NOW.md` and concise `CONTEXT.md`; use `node scripts/context-index.js
+   hydrate "<task>"` before opening `PLAN.md`, chunks, or bulky/task-specific
+   context. Read active `PLAN.md` sections only when the goal needs task-local
+   state.
 2. Inspect source-of-truth artifacts instead of relying only on conversation:
    diffs, commits, tests, docs, issues, failing commands, or relevant files.
 3. Distill one primary outcome. If multiple unrelated outcomes remain, split
@@ -65,7 +67,8 @@ perspective and how success will be visible.]
 
 ## Context To Read First
 - `NOW.md`
-- `AGENTS.md` Context Index, then relevant `CONTEXT.md` sections
+- concise `CONTEXT.md`
+- `node scripts/context-index.js hydrate "<task>"` before `PLAN.md`, chunks, or bulky task-specific context
 - [Task-specific files, docs, issues, commits, tests]
 
 ## Current State
@@ -97,7 +100,7 @@ perspective and how success will be visible.]
 ## Closeout
 - Update `PLAN.md` with task-local findings and decisions if it exists.
 - Update `CONTEXT.md` for durable terms, rules, invariants, or lessons.
-- If `CONTEXT.md` changed, run `node scripts/context-index.js update`.
+- If `CONTEXT.md`, `PLAN.md`, or `NOW.md` changed in a way future retrieval should see, run `node scripts/context-index.js update`.
 - Rewrite `NOW.md` with focus, blockers, next step, and touched files.
 ```
 

@@ -1,0 +1,31 @@
+# Trace notes
+
+- Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/agent-nexus__context-maintenance__progressive-harness/prompt.md`.
+- Listed repo root to locate context files.
+- Read `repo/NOW.md` first. Key evidence: release changes ready to push after public Context Harness deployment; no release-blocking blockers; verification commands listed.
+- Read concise `repo/CONTEXT.md`. Key evidence: durable constraints, workflow, context routing rules, FINDINGS.md security boundary, and learned patterns.
+- Ran from `repo/`: `node scripts/context-index.js hydrate "update context after completed task"`.
+  - Selected cards: `ctx-now-now`, `ctx-plan-archive`, `ctx-plan-follow-ups`, `ctx-context-operating-constraints`, `ctx-context-workflow`, `ctx-plan-current-findings`, `ctx-plan-decisions`.
+- Opened selected cards:
+  - `.context-harness/cards/ctx-plan-archive.md`
+  - `.context-harness/cards/ctx-plan-follow-ups.md`
+  - `.context-harness/cards/ctx-plan-current-findings.md`
+  - `.context-harness/cards/ctx-plan-decisions.md`
+  - `.context-harness/cards/ctx-context-operating-constraints.md`
+  - `.context-harness/cards/ctx-context-workflow.md`
+- Ran from `repo/`: `node scripts/context-index.js hydrate "task completed update NOW PLAN progress verification follow ups"`.
+  - Selected cards: `ctx-plan-follow-ups`, `ctx-plan-progress`, `ctx-plan-verification`, `ctx-now-now`, `ctx-plan-current-findings`, `ctx-plan-archive`, `ctx-plan-decisions`.
+- Opened additional selected cards:
+  - `.context-harness/cards/ctx-plan-progress.md`
+  - `.context-harness/cards/ctx-plan-verification.md`
+  - `.context-harness/cards/ctx-now-now.md`
+- Ran from `repo/`: `node scripts/context-index.js check`.
+  - Result: failed with `FAIL AGENTS.md Context Index is stale; run \`node scripts/context-index.js update\`.`
+- Did not open `expected.json`, `score.json`, manifest files, eval reports, raw `PLAN.md`, or raw chunks.
+- Save/update routing recommended in `result.md`:
+  - `NOW.md` for resume state, blockers, next step, touched files, verification summary.
+  - `PLAN.md` for task-local progress, verification, current findings, follow-ups, and archive if closed.
+  - `CONTEXT.md` only for durable facts/constraints/lessons.
+  - `FINDINGS.md` for external/untrusted evidence.
+  - `AGENTS.md` only if startup contract changes.
+  - Regenerate `.context-harness/cards/*` and `.context-harness/index.json` with `node scripts/context-index.js update`, then `node scripts/context-index.js check`.

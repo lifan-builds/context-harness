@@ -1,0 +1,33 @@
+# Trace Notes
+
+- Read eval instructions from `prompt.md`.
+- Read `repo/NOW.md` first.
+  - Found current focus: Context Harness promotion refresh completed.
+  - Found immediate next step: review Context Harness X draft, then adapt to DEV/Hashnode long-form.
+- Read concise `repo/CONTEXT.md` as the always-read layer.
+  - Constraints used: no secrets/personal data, no automatic external publishing, keep copy clear/professional, preserve durable corrections in `CONTEXT.md` and active promotion work in `PLANS.md`.
+- Ran from `repo/`:
+  - `node scripts/context-index.js hydrate "plan next implementation step"`
+  - Hydrate selected cards: `ctx-now-now`, `ctx-context-project`, `ctx-context-operating-constraints`, `ctx-context-relationships`.
+- Opened selected cards:
+  - `.context-harness/cards/ctx-now-now.md`
+  - `.context-harness/cards/ctx-context-project.md`
+  - `.context-harness/cards/ctx-context-operating-constraints.md`
+  - `.context-harness/cards/ctx-context-relationships.md`
+  - Did not open raw chunks; selected cards plus concise `CONTEXT.md` were enough.
+- Inspected task-relevant repo files read-only:
+  - `PLANS.md`
+  - `PROMOTION_STRATEGY.md`
+  - `README.md`
+  - `drafts/context-harness-twitter.md`
+  - `drafts/agent-operating-layer-twitter.md`
+  - `CHANNEL_ACCESS.md`
+  - `drafts/context-harness-agent-nexus-gap-report.md` lines around the gap matrix/release order.
+- Used read-only commands:
+  - `ls repo/`
+  - `ls repo/scripts`
+  - `ls repo/drafts`
+  - `rg -n "Context Harness|context-harness|9\.1|7\.0|Agent Nexus|Hashnode|DEV" repo/drafts repo/FINDINGS.md`
+- No source files under `repo/` were modified.
+- Wrote final answer to `result.md`.
+- Save/update routing for a real session: create `drafts/context-harness-devto-hashnode.md`; after drafting, update `NOW.md`; update `PLANS.md` only if channel plan/blockers change; run `node scripts/context-index.js update` only if `CONTEXT.md` changes.

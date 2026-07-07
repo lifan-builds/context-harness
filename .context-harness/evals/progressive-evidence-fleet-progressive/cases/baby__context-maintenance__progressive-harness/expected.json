@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "repo": "baby",
+  "scenario": "context-maintenance",
+  "mode": "progressive-harness",
+  "goal": "update context after completed task",
+  "mustMention": [
+    "Felix remains in a 2026-07-04/06 SCH ED/PICU surgical readmission after hematochezia and high-grade bowel obstruction from ileocolic intussusception with ischemic terminal ileum...",
+    "Pull/review the next MyChart update for the ongoing SCH PICU/surgery admission, then update growth/medical.md, growth/feeding.md, growth/formula-history.md, growth/episode-patte...",
+    "Felix remains in a 2026-07-04/06 SCH ED/PICU surgical readmission after hematochezia and high-grade bowel obstruction from ileocolic intu...",
+    "NOW.md",
+    "PLAN.md",
+    "CONTEXT.md",
+    "context-index.js update"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-operating-constraints"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

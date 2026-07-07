@@ -25,6 +25,11 @@ When splitting context-harness into companion skills, keep the split based on in
 - Plan stress-tests should ask the user only high-leverage questions where human judgment materially helps the agent; details that can be inferred from context...
 - When adapting context-harness to Codex, treat hooks as the active lifecycle path for enforcing context habits; keep plugin hooks optional until pluginhooks s...
 
-## Open next
+## Retrieval order
+- Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.
+- Use this card before opening bulky `PLAN.md`, chunks, or raw source sections for this topic.
+- Open raw detail only when this summary is insufficient for the task.
+
+## Open next only if needed
 - `CONTEXT.md#learned-patterns`
 - `.context-harness/chunks/ctx-context-learned-patterns.md`

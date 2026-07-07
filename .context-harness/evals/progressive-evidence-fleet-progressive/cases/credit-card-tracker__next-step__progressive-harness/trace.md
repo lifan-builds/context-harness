@@ -1,0 +1,41 @@
+# Trace Notes
+
+- Read eval prompt: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/credit-card-tracker__next-step__progressive-harness/prompt.md`.
+- Used fresh-session catch-up route: invoked `context-catch-up` skill for the eval repo.
+- Read context in required order:
+  1. `repo/NOW.md` first.
+  2. `repo/CONTEXT.md` and `repo/AGENTS.md` for v3 schema, operating constraints, workflow, and Context Index.
+- Hydrate command run from `repo/`:
+  - `node scripts/context-index.js hydrate "plan next implementation step"`
+  - Selected cards returned: `ctx-plan-goal-1`, `ctx-plan-findings-1`, `ctx-plan-goal-3`, `ctx-plan-near-term-priority-roadmap`, `ctx-plan-archive`, `ctx-plan-decisions`, `ctx-plan-progress`.
+- Cards opened:
+  - `.context-harness/cards/ctx-plan-near-term-priority-roadmap.md`
+  - `.context-harness/cards/ctx-plan-findings-1.md`
+  - `.context-harness/cards/ctx-plan-goal-3.md`
+  - `.context-harness/cards/ctx-plan-decisions.md`
+  - `.context-harness/cards/ctx-plan-progress.md`
+  - `.context-harness/cards/ctx-plan-recommended-plan.md`
+- Raw chunk opened after selected card indicated it was available and summary was insufficient for roadmap ordering:
+  - `.context-harness/chunks/ctx-plan-near-term-priority-roadmap.md`
+- Read-only repo inspection used:
+  - `ls -la repo` to confirm snapshot layout and lack of repo-local `.git`.
+  - `repo/package.json` for verification scripts.
+  - `grep -R "SearchAnalytics\|searchAnalytics" ...` across Prisma and search analytics route.
+  - `repo/prisma/schema.prisma` lines 1-110.
+  - `repo/prisma/migrations/20260707000000_ensure_search_analytics/migration.sql`.
+  - `repo/public/sw.js`.
+  - `repo/src/components/ServiceWorkerRegistrar.tsx`.
+  - `repo/src/app/api/search/analytics/route.ts`.
+- Read-only git attempts:
+  - `git -C repo status --short`, `git -C repo diff --stat`, and `git -C repo diff --name-only` crawled to the outer `/Users/lfan/Project/context-harness` repository because the eval `repo/` snapshot has no `.git`; ignored for app planning except as a noted uncertainty.
+- Harness condition notes:
+  - `AGENTS.md` and `CONTEXT.md` have `<!-- context-harness:schema v3 -->`.
+  - Hydrate worked.
+  - `CONTEXT.md` is large due imported legacy notes; non-blocking follow-up would be compaction/upgrade only if it starts hurting retrieval.
+- Save/update routing if this were a live project session:
+  - Update `PLAN.md` with closeout review findings and commit/split decision.
+  - Update `NOW.md` after final verification with current focus, blockers, next step, and touched files.
+  - Update `CONTEXT.md` only for durable new lessons, e.g. confirmed production migration drift or a new PWA caching invariant. Existing PWA/auth-sensitive caching lesson already appears captured.
+- Files written by this eval only:
+  - `result.md`
+  - `trace.md`

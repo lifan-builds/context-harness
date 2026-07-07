@@ -1,0 +1,34 @@
+# Trace notes
+
+- Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/context-harness__context-maintenance__progressive-harness/prompt.md` first for eval instructions.
+- Used project root `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/context-harness__context-maintenance__progressive-harness/repo`.
+- Read `repo/NOW.md` first: focus is legacy migration/eval/ADR tooling cleanup; blockers none; next step review then commit/push/redeploy; verification already recorded.
+- Read `repo/AGENTS.md`: schema v3 Context Contract and generated Context Index present.
+- Read `repo/CONTEXT.md`: small enough to inspect once for durable constraints, workflow, language, relationships, and learned patterns; later hydrate noted it is beyond always-read budget.
+- Ran `node scripts/context-index.js hydrate "update context after completed task"` from `repo/`.
+  - Selected cards: `ctx-plan-progress`, `ctx-plan-verification`, `ctx-context-language`, `ctx-now-now`, `ctx-plan-follow-ups`, `ctx-context-flagged-ambiguities`, `ctx-context-operating-constraints`.
+  - Hydrate said raw sources deferred and recommended selected cards before raw sections.
+- Opened cards:
+  - `.context-harness/cards/ctx-plan-progress.md`
+  - `.context-harness/cards/ctx-plan-verification.md`
+  - `.context-harness/cards/ctx-plan-follow-ups.md`
+  - `.context-harness/cards/ctx-context-operating-constraints.md`
+- Opened raw chunks only because selected plan cards were truncated:
+  - `.context-harness/chunks/ctx-plan-progress.md`
+  - `.context-harness/chunks/ctx-plan-verification.md`
+- Read `repo/PLAN.md` to confirm headings and exact routing targets: Current Findings, Decisions, Progress, Follow-Ups, Verification, Archive.
+- Ran read-only `git -C repo status --short` and `git -C repo diff --stat`; noted these are non-authoritative because the case repo is nested under the outer git repository.
+- Save/update routing I would perform:
+  - `NOW.md`: closeout resume packet with focus/blockers/next step/touched files.
+  - `PLAN.md`: task-local progress, verification, follow-ups, and optional archive compaction.
+  - `CONTEXT.md`: no change unless a genuinely new durable invariant is discovered; existing durable rules already cover v3-only runtime and removed stubs.
+  - Generated index/cards/chunks: refresh with `node scripts/context-index.js update` after context edits.
+  - Dream/Compact: run Should Dream because task completed and PLAN is bulky; if actual compaction is done, append a short `.context-harness/DREAM.md` audit entry.
+- Recommended verification:
+  - `node scripts/context-index.js update`
+  - `node scripts/context-index.js check`
+  - `node scripts/context-index.js hydrate "resume current task"`
+  - `node scripts/context-index.js hydrate "update context after completed task"`
+  - `tests/run-all.sh install-project context-index codex-context-hook skill skill-packaging`
+  - `tests/run-all.sh`
+  - deployment check after acceptance: Agent Nexus deploy/dry-run as appropriate, then `nexus doctor`.

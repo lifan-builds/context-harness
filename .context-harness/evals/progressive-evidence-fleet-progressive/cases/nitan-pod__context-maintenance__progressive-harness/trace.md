@@ -1,0 +1,36 @@
+# Trace Notes
+
+- Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/nitan-pod__context-maintenance__progressive-harness/prompt.md`.
+- Read always-first context in repo:
+  - `NOW.md`: current focus is fixed/verified GitHub Actions weekly podcast failures; no weekly workflow blocker; context refresh files local/uncommitted.
+  - `CONTEXT.md`: concise v3 always-read layer with project structure, workflow, operating constraints, and learned patterns.
+  - `AGENTS.md`: v3 Context Contract and generated Context Index.
+- Ran hydrate before opening `PLAN.md`:
+  - `node scripts/context-index.js hydrate "update context after completed task"`
+  - selected cards: `ctx-now-now`, `ctx-plan-session-state`, `ctx-context-operating-constraints`, `ctx-plan-active-blockers`, `ctx-plan-archive`, `ctx-plan-current-focus`, `ctx-plan-goal`.
+- Opened selected cards before raw bulky/task-specific context:
+  - `.context-harness/cards/ctx-plan-current-focus.md`
+  - `.context-harness/cards/ctx-plan-active-blockers.md`
+  - `.context-harness/cards/ctx-plan-archive.md`
+  - `.context-harness/cards/ctx-plan-goal.md`
+  - `.context-harness/cards/ctx-plan-session-state.md`
+- Ran second hydrate for verification-specific query:
+  - `node scripts/context-index.js hydrate "completed GitHub Actions weekly podcast failure context update verification"`
+  - selected cards: `ctx-now-now`, `ctx-plan-current-focus`, `ctx-context-project-overview`, `ctx-plan-session-state`, `ctx-plan-verification`, `ctx-context-learned-patterns`, `ctx-context-project`.
+- Opened selected cards:
+  - `.context-harness/cards/ctx-plan-verification.md`
+  - `.context-harness/cards/ctx-context-learned-patterns.md`
+  - `.context-harness/cards/ctx-context-project-overview.md`
+  - `.context-harness/cards/ctx-context-project.md`
+- Opened raw `PLAN.md` only after cards because exact incident details were needed.
+  - Found archived details: GitHub Release phase failed with HTTP 401; fix commit `b2c7fb6` added `GH_TOKEN: ${{ github.token }}`; manual run `27985479991` succeeded and created `v2026-W26`; workflow commit `217c39a` published feed and MP3.
+- Ran read-only verification command:
+  - `node scripts/context-index.js check`
+  - result: failed with `FAIL AGENTS.md Context Index is stale; run node scripts/context-index.js update`.
+- Read-only inspected episode assets with `find .../repo/docs/episodes -maxdepth 1 -type f -print`; confirmed `weekly_meika_2026-W26.mp3` exists.
+- Save/update routing I would perform:
+  - `NOW.md`: current handoff only; workflow unblocked; next step decide commit/skip context refresh files.
+  - `PLAN.md`: archive completed incident details and verification; clear active workflow task.
+  - `CONTEXT.md`: add durable Learned Pattern for `GH_TOKEN: ${{ github.token }}` if accepted.
+  - Regenerate `AGENTS.md`, `.context-harness/index.json`, and cards via `node scripts/context-index.js update`; verify with `node scripts/context-index.js check`.
+- Did not read `expected.json`, `score.json`, run manifest, or eval reports. Did not modify `repo/`; only wrote case `result.md` and `trace.md`.

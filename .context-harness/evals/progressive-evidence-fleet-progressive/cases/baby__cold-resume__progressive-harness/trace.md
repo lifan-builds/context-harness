@@ -1,0 +1,23 @@
+# Trace Notes
+
+1. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/prompt.md`.
+2. Invoked `context-catch-up` with read-only instructions for `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo`.
+3. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/NOW.md` first.
+4. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/AGENTS.md`.
+5. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/CONTEXT.md`.
+6. Ran from repo copy: `node scripts/context-index.js hydrate "resume current task"`; output selected card `ctx-now-now` (`NOW.md: Now`), open path `.context-harness/cards/ctx-now-now.md`.
+7. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/PLAN.md`.
+8. Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/INDEX.md`; noted generated map appears stale against current `NOW.md`.
+9. Read domain routing files: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/growth/AGENTS.md`, `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/growth/README.md`, `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/home-care/AGENTS.md`, and `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/home-care/README.md`.
+10. Ran targeted search from repo copy: `rg -n "2026-07-0[456]|ileocolic|intussusception|ileocecectomy|PICU|Replogle|esmolol|piperacillin|NPO|TPN|PPN|pathology|desaturation|bradypnea" growth/medical.md growth/feeding.md growth/formula-history.md growth/episode-pattern-investigation.md home-care/discharge-checklist.md`. Output was large; preview confirmed latest readmission evidence in active files.
+11. Read current/relevant sections from `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/home-care/discharge-checklist.md`.
+12. Read current/relevant sections from `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/growth/medical.md`.
+13. Read current/relevant sections from `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/growth/feeding.md`.
+14. Read current/relevant sections from `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/growth/formula-history.md`.
+15. Read current/relevant sections from `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/repo/growth/episode-pattern-investigation.md`.
+16. Listed case directory with `ls -la /Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness`; found empty existing `result.md` and `trace.md`.
+17. Read existing empty `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/result.md` and `trace.md` before overwriting.
+18. Ran from repo copy: `node scripts/context-index.js check && git diff --check`; result: warning that `NOW.md` has 21 lines and failure that `AGENTS.md` Context Index is stale.
+19. Ran from repo copy: `git diff --check`; passed with no output.
+20. Wrote final eval answer to `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/result.md`.
+21. Wrote these trace notes to `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/baby__cold-resume__progressive-harness/trace.md`.

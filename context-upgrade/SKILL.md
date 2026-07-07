@@ -98,6 +98,17 @@ For a single repo or fleet refresh:
    it.
 5. Re-run `node scripts/context-index.js check` in representative targets.
 
+## Fleet Refresh Guardrails
+
+For local fleet refreshes, inspect target repo status first and skip dirty repos by
+default unless the user explicitly approves including them. Preserve
+project-specific context; refresh only managed harness boilerplate, runtime
+scripts, generated indexes, and schema markers that are in scope. Run
+`node scripts/context-index.js update` and `node scripts/context-index.js check`
+in updated targets or representative batches, track skipped/failed repos in
+`PLAN.md`, and do not let fleet refresh work replace the target project's actual
+product task.
+
 ## Deployment
 
 After canonical source changes that should affect local harnesses:

@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "repo": "credit-card-tracker",
+  "scenario": "next-step",
+  "mode": "progressive-harness",
+  "goal": "plan next implementation step",
+  "mustMention": [
+    "Continued the broad redesign work already present in the working tree. The redesign currently touches the public homepage, navbar/footer, pricing/FAQ/free-product messaging, car...",
+    "Review the final diff for product/design consistency, then decide whether to commit the redesign as one bundle or split it. If proceeding toward deploy, run the checks again and...",
+    "Continued the broad redesign work already present in the working tree. The redesign currently touches the public homepage, navbar/footer,...",
+    "next step",
+    "constraints",
+    "verification"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-operating-constraints",
+    "ctx-context-workflow"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

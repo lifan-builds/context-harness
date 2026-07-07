@@ -1,0 +1,42 @@
+# Trace notes
+
+- Read eval prompt: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/ergatta__next-step__progressive-harness/prompt.md`.
+- Worked only from repo root: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/ergatta__next-step__progressive-harness/repo`.
+- Read progressive always-on context in order:
+  1. `NOW.md`
+  2. `CONTEXT.md`
+- Ran hydrate before opening plan/bulky context:
+  - `node scripts/context-index.js hydrate "plan next implementation step"`
+  - Hydrate selected cards: `ctx-plan-done-criteria`, `ctx-plan-discoveries-from-prep-2026-05-15`, `ctx-plan-execution-plan-when-device-is-connected`, `ctx-plan-findings-device`, `ctx-plan-open-questions-deferred-until-evidence-demands-an-answer`, `ctx-plan-progress-2026-05-17`, `ctx-plan-three-sub-paths-ordered-by-roi`.
+- Opened selected cards before raw sections:
+  - `.context-harness/cards/ctx-plan-execution-plan-when-device-is-connected.md`
+  - `.context-harness/cards/ctx-plan-progress-2026-05-17.md`
+  - `.context-harness/cards/ctx-plan-done-criteria.md`
+  - `.context-harness/cards/ctx-plan-open-questions-deferred-until-evidence-demands-an-answer.md`
+- Inspected source/context evidence:
+  - `scripts/frida_hook.js` for current 403/list/start/stats/personal-record rewrite and pass-through behavior.
+  - `scripts/verify_chain_alive.sh` for verification health check.
+  - Targeted excerpts from `PLAN.md`, `FINDINGS.md`, `EVALUATION.md` after hydrate/cards.
+- Read-only searches used:
+  - Searched for Program Start/detail blocker terms across repo excluding `.git`, `analysis`, `network`; first grep pattern failed due invalid repeat, then corrected.
+  - Used `rg` for exact endpoint strings in decompiled APK.
+  - Some broad `find`/`grep` attempts over `analysis/` produced oversized output and were not used for substantive conclusions; subsequent targeted `rg`/`Read` calls were used.
+- Decompiled files inspected:
+  - `analysis/decompiled_apk/smali_classes7/com/ergatta/seaborn/programs/data/remote/PushProgramApi.smali`
+  - `analysis/decompiled_apk/smali_classes7/com/ergatta/seaborn/programs/model/api/WorkoutProgram.smali`
+  - `analysis/decompiled_apk/smali_classes7/com/ergatta/seaborn/programs/data/RealPushProgramRepository.smali`
+  - `analysis/decompiled_apk/smali_classes7/com/ergatta/seaborn/programs/data/RealPushProgramRepository$getProgramDetailsBy$programFlow$1$1$1.smali`
+  - `analysis/decompiled_apk/smali_classes7/com/ergatta/seaborn/programs/data/RealPushProgramRepository$startProgramById$2.smali`
+  - Related `getProgramById` / `getProgramDetailsBy` files to confirm local/remote flow.
+- Key evidence distilled:
+  - `NOW.md`: Program Start stuck because `GET /workout_programs/{id}` returns 403 and is passed through.
+  - `scripts/frida_hook.js`: list endpoints rewrite to `data:[]`; start endpoint rewrites to fake `programResultId`; unmatched detail 403s pass through.
+  - `FINDINGS.md` Discovery #13: generic detail rewrite caused Moshi `JsonDataException`; detail remains blocked.
+  - `PushProgramApi.smali`: `program(id)` is `GET workout_programs/{id}` returning `RudderApiResponse<WorkoutProgram>`; `startProgram(id)` is `POST workout_programs/{id}/start` returning `WorkoutProgramResult`.
+  - `WorkoutProgram.smali`: detail object requires `id`, `name`, `description`, `workoutDetails`, `timeLimit`.
+  - `RealPushProgramRepository` detail flow combines local overview with remote detail flow, so a valid detail object or repository-level bypass is needed.
+- Save/update routing I would perform in a real session after implementation/verification:
+  - Update `NOW.md` current focus/blocker status.
+  - Update `PLAN.md` Track 7 progress/done criteria.
+  - Update `FINDINGS.md` Discovery/Error Log with the final Program Start recipe or new blocker.
+- Files modified by this eval: only `../result.md` and `../trace.md`.

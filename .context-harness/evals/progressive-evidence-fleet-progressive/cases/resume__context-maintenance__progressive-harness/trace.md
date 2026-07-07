@@ -1,0 +1,27 @@
+# Trace Notes
+
+- Read eval prompt: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/resume__context-maintenance__progressive-harness/prompt.md`.
+- Invoked `context-catch-up` for fresh-agent resume handling.
+- Read first: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/resume__context-maintenance__progressive-harness/repo/NOW.md`.
+- Read always-read layer: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/resume__context-maintenance__progressive-harness/repo/CONTEXT.md`.
+- Read activation/index: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/resume__context-maintenance__progressive-harness/repo/AGENTS.md`.
+- Ran hydrate from repo root: `node scripts/context-index.js hydrate "update context after completed task"`.
+- Hydrate selected cards: `ctx-now-now`, `ctx-context-agent-workflows`, `ctx-context-operating-constraints`, `ctx-context-language`, `ctx-context-relationships`, `ctx-context-learned-patterns`.
+- Read selected cards under `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/resume__context-maintenance__progressive-harness/repo/.context-harness/cards/` before opening raw task context.
+- Ran `ls` on repo root; found `PLANS.md`, not `PLAN.md`.
+- Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/resume__context-maintenance__progressive-harness/repo/PLANS.md`.
+- Read relevant task artifacts:
+  - `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/resume__context-maintenance__progressive-harness/repo/interview-prep/README.md`
+  - `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/resume__context-maintenance__progressive-harness/repo/interview-prep/openai-recruiter-round-statsig-infrastructure.md`
+  - `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/resume__context-maintenance__progressive-harness/repo/interview-prep/openai-seen-questions.md`
+  - `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/resume__context-maintenance__progressive-harness/repo/job-search/openings.md`
+  - `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/resume__context-maintenance__progressive-harness/repo/job-search/applications/openai-senior-software-engineer-infrastructure-seattle-2026-06-30/manifest.md`
+- Inspected `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/resume__context-maintenance__progressive-harness/repo/scripts/context-index.js`; `checkHarness` reads `PLAN.md`, which does not match this repo’s `PLANS.md`.
+- Ran `node scripts/context-index.js check`; output: `WARN NOW.md has 32 lines; consider a Dream/Compact pass.` and `FAIL AGENTS.md Context Index is stale; run \`node scripts/context-index.js update\`.`
+- Ran read-only `git status --short` from repo root; showed parent/eval working-tree changes, not used as project-source evidence.
+- Invoked `context-maintain` to classify routing. Recommended routing:
+  - `NOW.md`: compact current focus, blockers/caveats, immediate rehearsal step, touched files, timestamp.
+  - `PLANS.md`: task-local progress, discoveries, decision to frame role as Statsig/experimentation/rollout infra, outcome.
+  - `CONTEXT.md`: no change unless user promotes OpenAI/Statsig framing to durable repo-wide rule.
+  - Generated context: run `node scripts/context-index.js update` after context changes or to repair stale `AGENTS.md` index.
+- Wrote final answer to `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/resume__context-maintenance__progressive-harness/result.md`.

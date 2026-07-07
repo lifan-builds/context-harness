@@ -1,0 +1,28 @@
+# Trace Notes
+
+- Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/context-harness__next-step__progressive-harness/prompt.md`.
+- Read first context file: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/context-harness__next-step__progressive-harness/repo/NOW.md`.
+  - Current focus: legacy migration/eval/ADR tooling removed after local fleet reached schema v3 with Operating Constraints.
+  - Next step from context: review cleanup diff, then commit/push/redeploy with Agent Nexus if accepted.
+- Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/context-harness__next-step__progressive-harness/repo/CONTEXT.md` and `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/context-harness__next-step__progressive-harness/repo/AGENTS.md`.
+  - Noted v3 schema markers, Operating Constraints, small preferred skill set, explicit-only `context-upgrade`, and context routing rules.
+- Ran from repo root: `node scripts/context-index.js hydrate "plan next implementation step"`.
+  - Hydrate selected cards: `ctx-plan-archive`, `ctx-plan-progress`, `ctx-plan-verification`, `ctx-plan-current-findings`, `ctx-plan-decisions`, `ctx-plan-follow-ups`, `ctx-plan-goal`.
+  - Hydrate reported `CONTEXT.md` beyond generated always-read budget; treated as non-blocking follow-up.
+- Opened selected cards before raw plan:
+  - `.context-harness/cards/ctx-plan-progress.md`
+  - `.context-harness/cards/ctx-plan-verification.md`
+  - `.context-harness/cards/ctx-plan-current-findings.md`
+  - `.context-harness/cards/ctx-plan-decisions.md`
+  - `.context-harness/cards/ctx-plan-follow-ups.md`
+  - `.context-harness/cards/ctx-plan-goal.md`
+- Opened raw `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/context-harness__next-step__progressive-harness/repo/PLAN.md` after hydrate/cards because card summaries were truncated and exact closeout/verification history mattered.
+- Ran read-only inspection commands from repo root:
+  - `git status --short`
+  - `git diff --stat`
+  - `ls scripts && ls`
+  - `find context-launch context-handoff context-grill -maxdepth 2 -type f -print`
+  - `node scripts/context-index.js check` -> passed.
+- Caveat: Git commands in the nested eval copy resolved to the outer repository, so I did not use them as reliable isolated diff evidence.
+- Empty deprecated skill directories existed in the eval copy, but `find` showed no files under `context-launch`, `context-handoff`, or `context-grill`.
+- Save/update routing for real closeout: put review/deployment evidence in `PLAN.md`, current state in `NOW.md`, only durable lessons/constraints in `CONTEXT.md`, then run `node scripts/context-index.js update`. No repo source/context files were modified for this read-only eval.

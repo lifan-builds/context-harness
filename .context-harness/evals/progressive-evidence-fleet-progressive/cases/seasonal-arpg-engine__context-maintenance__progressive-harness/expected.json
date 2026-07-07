@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "repo": "seasonal-arpg-engine",
+  "scenario": "context-maintenance",
+  "mode": "progressive-harness",
+  "goal": "update context after completed task",
+  "mustMention": [
+    "Torchlight TLIDB: python3 games/torchlight/scripts/tlidbverify.py fetch https://tlidb.com/cn/Hero",
+    "NOW.md",
+    "PLAN.md",
+    "CONTEXT.md",
+    "context-index.js update"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-operating-constraints"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

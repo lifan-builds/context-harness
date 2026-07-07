@@ -1,0 +1,21 @@
+# Trace Notes
+
+- Read eval prompt: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/moonshot__cold-resume__progressive-harness/prompt.md`.
+- Invoked `context-catch-up` because this is a fresh-agent/cold-resume eval.
+- Read first: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/moonshot__cold-resume__progressive-harness/repo/NOW.md`.
+- Read context contract/canonical layer:
+  - `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/moonshot__cold-resume__progressive-harness/repo/CONTEXT.md`
+  - `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/moonshot__cold-resume__progressive-harness/repo/AGENTS.md`
+- Ran hydrate incorrectly once from the parent project and ignored that output for the case. Then reran correctly from the case repo:
+  - `cd "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/moonshot__cold-resume__progressive-harness/repo" && node scripts/context-index.js hydrate "resume current task"`
+  - Selected card: `ctx-now-now`.
+  - Raw detail estimate: about 924 tokens.
+- Read selected card: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/moonshot__cold-resume__progressive-harness/repo/.context-harness/cards/ctx-now-now.md`.
+- Did not read `expected.json`, `score.json`, run `manifest.json`, or eval reports.
+- Did not open `PLAN.md` or raw chunks because hydrate selected only `ctx-now-now` and the NOW/card detail was sufficient for the requested catch-up.
+- Ran read-only status check from case repo: `git status --short`; output reflected the enclosing parent worktree/nested eval directory, so it was not used as evidence for Moonshot source changes.
+- Noted follow-up/context routing if this were not read-only:
+  - Update `CONTEXT.md` Daily Moonshot Supervisor entry if `mission-loop` default is accepted, because it still says `shared-process` is default.
+  - Run `node scripts/context-index.js update` after any `CONTEXT.md` edit.
+  - Route diff-review findings/commit decision to `PLAN.md` if active planning continues.
+  - Update `NOW.md` after commit, deferral, or additional scout/dossier work.

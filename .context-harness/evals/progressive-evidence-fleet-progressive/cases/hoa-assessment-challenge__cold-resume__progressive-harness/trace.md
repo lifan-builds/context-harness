@@ -1,0 +1,31 @@
+# Trace Notes
+
+- Read eval prompt: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/hoa-assessment-challenge__cold-resume__progressive-harness/prompt.md`.
+- Invoked `context-catch-up` skill for fresh-session/read-only context-harness catch-up.
+- Read first: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/hoa-assessment-challenge__cold-resume__progressive-harness/repo/NOW.md`.
+  - Evidence: current focus is lender/refi clarity after Lifan's board exit; Basecamp unavailable; second-assessment risk likely but not formally adopted; Building 17 is the corrected building; Building 17 is absent from June 26 look-ahead.
+  - Drift: `NOW.md` uses `<!-- context-harness:schema v2 -->` while current context files expect v3.
+- Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/hoa-assessment-challenge__cold-resume__progressive-harness/repo/AGENTS.md`.
+  - Evidence: v3 Context Contract; Context Index says `CONTEXT.md` is intended to be concise and directly readable.
+- Ran `wc -l .../repo/CONTEXT.md`; result: 102 lines, small enough for direct always-read use.
+- Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/hoa-assessment-challenge__cold-resume__progressive-harness/repo/CONTEXT.md`.
+  - Evidence: operating constraints, Gmail-only default after board exit, VIS lender packet limitation, Building 17 correction, construction/budget facts, communication guidance, verification commands.
+- Ran from repo root: `node scripts/context-index.js hydrate "resume current task"`.
+  - Hydrate output selected cards: `ctx-plan-goal`, `ctx-now-now`, `ctx-context-structure`; estimated raw tokens ~941.
+- Read selected cards before raw plan/bulky context:
+  - `/repo/.context-harness/cards/ctx-plan-goal.md`
+  - `/repo/.context-harness/cards/ctx-now-now.md`
+  - `/repo/.context-harness/cards/ctx-context-structure.md`
+- Ran from repo root: `node scripts/context-index.js check`.
+  - Result: exit code 1, `FAIL AGENTS.md Context Index is stale; run node scripts/context-index.js update`.
+  - Routing: mention as non-blocking harness drift/follow-up; do not update during this read-only eval.
+- Ran `wc -l .../repo/PLAN.md`; result: 81 lines.
+- Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/hoa-assessment-challenge__cold-resume__progressive-harness/repo/PLAN.md` after hydrate/card review.
+  - Evidence: active goal, completed pulls through June 28, open follow-ups for lender-letter language, owner-form Board/J2 clarity request, Building 17 status request, Gmail-only future pulls, budget clarification, annual meeting outcome.
+- Save/update routing if this were a real continuation:
+  - Task-local findings/decisions: `PLAN.md`.
+  - Durable facts/constraints/language: `CONTEXT.md`.
+  - End-of-session resume state: `NOW.md`.
+  - Communication summaries only, no raw private content: `project/archive/communication_logs.md` and `project/archive/timeline.md`.
+  - After context updates: `node scripts/context-index.js update`, then `node scripts/context-index.js check`.
+- No repository source files were modified. Wrote only case outputs: `result.md` and `trace.md`.

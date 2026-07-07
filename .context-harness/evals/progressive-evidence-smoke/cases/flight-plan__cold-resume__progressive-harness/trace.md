@@ -1,0 +1,22 @@
+# Trace
+
+1. Read eval prompt: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/prompt.md`.
+2. Invoked `context-catch-up` skill with read-only eval repo path and required progressive read order.
+3. Read first: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo/NOW.md`.
+4. Read concise always-read layer: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo/CONTEXT.md`.
+5. Read Context Contract/Index: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo/AGENTS.md`.
+6. Ran hydrate with absolute script path but inherited parent cwd: `node /Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo/scripts/context-index.js hydrate "resume current task"`; output selected parent context-harness cards, so it was discarded for project conclusions.
+7. Ran required hydrate from repo copy: `cd "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo" && node scripts/context-index.js hydrate "resume current task"`.
+8. Correct hydrate output: selected card `ctx-now-now` only; summary was `Context-harness v3 migration completed for flight-plan.`
+9. Read selected card before raw planning context: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo/.context-harness/cards/ctx-now-now.md`.
+10. Listed repo files read-only: `find "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo" -maxdepth 2 -type f | sort`.
+11. Read project docs/config/check script: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo/README.md`, `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo/pyproject.toml`, `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo/verify_fb.py`.
+12. Read active work and CLI entrypoint: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo/ACTIVE_SEARCH.md`, `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo/main.py`.
+13. Ran status sanity check: `git -C "/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo" status --short`; it resolved to the parent repo and was treated only as a caution signal.
+14. Ran parent diff-name check: `git -C "/Users/lfan/Project/context-harness" diff --name-only`; not used for flight-plan conclusions.
+15. Read living plan after hydrate/card review: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/repo/PLANS.md`.
+16. Read output placeholders before overwriting: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/result.md`, `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/trace.md`.
+17. Wrote final answer to `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/result.md`.
+18. Wrote this trace to `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-smoke/cases/flight-plan__cold-resume__progressive-harness/trace.md`.
+
+Notes: Did not read `.env`. Did not run `uv run` or Python compile/test commands to avoid creating environment/cache artifacts during the read-only eval. Did not edit repository source files in the eval repo copy.

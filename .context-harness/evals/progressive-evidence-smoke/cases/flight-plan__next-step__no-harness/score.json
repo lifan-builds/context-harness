@@ -1,0 +1,42 @@
+{
+  "id": "flight-plan__next-step__no-harness",
+  "repo": "flight-plan",
+  "scenario": "next-step",
+  "mode": "no-harness",
+  "resultPath": "cases/flight-plan__next-step__no-harness/result.md",
+  "tracePath": "cases/flight-plan__next-step__no-harness/trace.md",
+  "status": "pass",
+  "total": 10,
+  "max": 10,
+  "answerScore": 10,
+  "retrievalScore": 10,
+  "saveRoutingScore": 10,
+  "contextEfficiencyScore": 10,
+  "missing": [],
+  "avoided": [],
+  "evidence": {
+    "hasTrace": true,
+    "hasContextEvidence": true,
+    "hydrate": false,
+    "card": false,
+    "selectedExpectedCards": [],
+    "plan": false,
+    "chunk": false,
+    "context": false,
+    "hydrateBeforePlan": false,
+    "hydrateBeforeChunk": false,
+    "hasAlwaysReadContext": false,
+    "taskLocalToPlan": false,
+    "durableToContext": false,
+    "nowLast": false,
+    "indexUpdate": false,
+    "flatOveruse": false
+  },
+  "deterministicChecks": {
+    "mustMention": 2,
+    "mentioned": 2,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "none"
+}

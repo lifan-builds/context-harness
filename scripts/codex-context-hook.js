@@ -39,7 +39,7 @@ function runCatchUp(startDir) {
       "context-harness detected.",
       needsUpgrade
         ? "Before planning/editing: use context-catch-up to report context drift, then use explicit context-upgrade for v3 layout inspection or repair."
-        : "Before planning/editing: use context-catch-up; read NOW.md, then relevant AGENTS-indexed CONTEXT.md sections.",
+        : "Before planning/editing: use context-catch-up; read NOW.md and concise CONTEXT.md, then run hydrate for PLAN.md, chunks, or bulky task-specific context.",
       now ? `Current NOW.md:\n${now}` : "",
     ]
       .filter(Boolean)
@@ -69,8 +69,8 @@ function runMaintain(startDir) {
   emitAdditionalContext(
     [
       "Before ending substantial work: use context-maintain.",
-      "Update NOW.md; route durable info to CONTEXT.md and task-local info to PLAN.md.",
-      "If CONTEXT.md changed, run `node scripts/context-index.js update`.",
+      "Save task-local info to PLAN.md, durable concise info to CONTEXT.md, and rewrite NOW.md last.",
+      "If CONTEXT.md, PLAN.md, or NOW.md changed for future retrieval, run `node scripts/context-index.js update`.",
     ].join("\n")
   );
 }

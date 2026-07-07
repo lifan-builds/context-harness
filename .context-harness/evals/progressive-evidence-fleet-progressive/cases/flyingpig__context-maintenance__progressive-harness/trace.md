@@ -1,0 +1,14 @@
+Evidence notes for fresh-agent eval:
+
+- Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/flyingpig__context-maintenance__progressive-harness/prompt.md`.
+- Used project root: `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/flyingpig__context-maintenance__progressive-harness/repo`.
+- Read `repo/NOW.md` first. Key evidence: completed minimal MCP-native existing-Chrome backend; blockers are real Amex tester, unsigned local beta artifacts, manual GitHub update wording, packaged app needing rebuild, narrow MCP mode.
+- Read `repo/CONTEXT.md` as the always-read layer. Key evidence: project constraints/workflow, durable MCP learned pattern, Desktop-First/Controlled Chrome language, verification expectations.
+- Ran correct hydrate command from repo root: `node scripts/context-index.js hydrate "update context after completed task"`.
+- Hydrate selected cards: `ctx-now-now`, `ctx-plan-findings`, `ctx-plan-active-blockers`, `ctx-plan-session-state`, `ctx-context-learned-patterns`, `ctx-context-operating-constraints`, `ctx-context-workflow`.
+- Opened selected cards: `.context-harness/cards/ctx-now-now.md`, `ctx-plan-active-blockers.md`, `ctx-plan-session-state.md`, `ctx-context-learned-patterns.md`, `ctx-context-operating-constraints.md`, `ctx-context-workflow.md`.
+- Opened raw `PLAN.md` only after cards, limited to active progress/findings/verification-relevant sections. Key evidence: `2026-07-05 Chrome DevTools MCP auto-connect` records MCP auto-connect, MCP-native executor, dashboard runnable mode, focused/full unit/dashboard/ruff verification, and live smoke artifact.
+- Save/update routing I would perform: `NOW.md` for current session state and next step; `PLAN.md` for task-local MCP completion, evidence, and remaining work; `CONTEXT.md` only for durable MCP lesson/relationship/terminology; generated cards/index via `node scripts/context-index.js update` and `node scripts/context-index.js check`.
+- Verification routing: preserve recorded product checks in `NOW.md`/`PLAN.md`; after context edits run `node scripts/context-index.js update`, `node scripts/context-index.js check`, and hydrate the same query to confirm future retrieval.
+- Read-only eval constraint followed for repository source: no files under `repo/` were modified. Wrote only `../result.md` and `../trace.md`.
+- Note: an initial hydrate command was accidentally run from the parent context-harness working directory; it was discarded and rerun from the case repo before conclusions were written.

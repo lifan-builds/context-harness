@@ -85,6 +85,27 @@ dump.
   deleted `scripts/adr.js`, `scripts/eval-loop.js`, and
   `scripts/migrate-project.js`; removed the legacy install profile; tightened
   schema checks to v3-only; and updated docs/skills/tests accordingly.
+- [x] Completed the 57-case progressive evidence fleet eval under
+  `.context-harness/evals/progressive-evidence-fleet-progressive`; all cases are
+  filled and the gate passes after separating high-scoring answer-only review
+  notes from release-blocking retrieval/save/order gaps.
+- [x] Closed the remaining release gaps: `eval-agent-problem-solving.js` now has
+  idempotent `fill-pending` retry/resume support, eval copies exclude obvious
+  private files, semantic expected-fact matching is less phrase-brittle, stale
+  hydrate output avoids pointing at stale generated cards, and upgrade docs now
+  spell out conservative fleet-refresh guardrails.
+
+## Release Review Checklist
+
+- Review source changes separately from generated `.context-harness/` artifacts.
+- Confirm eval-copy exclusions prevent `.env`, `.env.*`, `cookies.txt`, and key
+  material from entering case repos.
+- Confirm stale generated context is reported as a follow-up unless it blocks
+  correctness or safety.
+- Before deployment, run targeted suites, full `tests/run-all.sh`,
+  `node scripts/context-index.js check`, and the progressive fleet gate.
+- For fleet refresh, inspect repo status first, skip dirty repos by default,
+  record skipped/failed targets, and push only intentionally changed repos.
 
 ## Follow-Ups
 - Restart AI IDEs or agent hosts so frontmatter and skill metadata are reloaded
@@ -116,6 +137,13 @@ dump.
 - After legacy tooling cleanup, targeted suites `tests/run-all.sh install-project`,
   `context-index`, `codex-context-hook`, `skill`, and `skill-packaging` pass; full
   `tests/run-all.sh` passes with 185 passed, 0 failed; `node scripts/context-index.js check` passes.
+- `node scripts/eval-agent-problem-solving.js score .context-harness/evals/progressive-evidence-fleet-progressive --gate` passes across 57 progressive-harness cases: all completed, 9.6/10 average, 100% hydrate evidence, 0 card/chunk order violations, 0 flat-overuse violations, 100% save-routing evidence, and 0 harness-drift hijacks; answer-only review notes remain non-blocking when retrieval/save/order evidence is strong.
+- `node scripts/eval-agent-problem-solving.js fill-pending .context-harness/evals/progressive-evidence-fleet-progressive --modes progressive-harness --dry-run` reports 0 pending cases.
+- `tests/run-all.sh eval-agent-problem-solving` passes with 12 passed after adding `fill-pending`, private-file exclusion, semantic scoring, answer-only review note, and strict `mustAvoid` coverage.
+- `tests/run-all.sh context-index` passes with 23 passed after adding stale-hydrate warning coverage.
+- `tests/run-all.sh release-proof` passes with 37 passed after adding stale generated context and fleet-refresh guardrail coverage.
+- Full `tests/run-all.sh` passes with 217 passed, 0 failed after the remaining-gap fixes.
+- `node scripts/context-index.js check` passes after the remaining-gap fixes, with the existing PLAN.md length warning.
 
 ## Archive
 - June 2026 research compared Context Harness with Karpathy-style skill

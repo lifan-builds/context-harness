@@ -1,0 +1,25 @@
+# Trace notes
+
+- Read `/Users/lfan/Project/context-harness/.context-harness/evals/progressive-evidence-fleet-progressive/cases/nitan-pod__next-step__progressive-harness/prompt.md`.
+- Read `repo/NOW.md` first.
+- Read `repo/CONTEXT.md` as concise always-read context; verified v3 schema and required sections.
+- Read `repo/AGENTS.md`; verified v3 schema, Context Contract, and Context Index.
+- Ran from `repo/`: `node scripts/context-index.js hydrate "plan next implementation step"`.
+  - Hydrate selected cards: `ctx-plan-immediate-next-step`, `ctx-plan-active-blockers`, `ctx-plan-archive`, `ctx-plan-current-focus`, `ctx-plan-goal`, `ctx-plan-progress`, `ctx-plan-session-state`.
+- Read selected cards under `repo/.context-harness/cards/`:
+  - `ctx-plan-immediate-next-step.md`
+  - `ctx-plan-active-blockers.md`
+  - `ctx-plan-current-focus.md`
+  - `ctx-plan-progress.md`
+  - `ctx-plan-archive.md`
+  - `ctx-plan-goal.md`
+  - `ctx-plan-session-state.md`
+- Ran read-only inspection commands:
+  - `git status --short` from eval `repo/`.
+  - `git diff --stat` from eval `repo/`.
+  - `git rev-parse --show-toplevel` from eval `repo/`; found git root is the outer context-harness repo, not the case `repo/`, so git status/diff is not authoritative for Nitan Podcast.
+  - Shallow file listing of case `repo/` to confirm relevant project files exist.
+  - Checked that `repo/.git` is absent.
+- Did not read `expected.json`, `score.json`, run `manifest.json`, or eval reports.
+- Did not modify files under `repo/`.
+- Save/update routing I would perform in a real session: after deciding to commit or discard the context refresh, update `NOW.md` with closeout status; if durable lessons changed, update `CONTEXT.md`; if task-local decisions changed, update `PLAN.md`; then run `node scripts/context-index.js update` and commit only intended context files.

@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "repo": "snow-plan",
+  "scenario": "cold-resume",
+  "mode": "progressive-harness",
+  "goal": "resume current task",
+  "mustMention": [
+    "Flight tracking automation is stopped; future ski-air pricing will be searched manually using the documented seed fares and helper scripts.",
+    "Manually re-check Alaska-affiliated cash and award options for SEA-SLC/HDN/DEN/JAC/YYC when ready to book 2-4 night Jan-Mar 2027 ski trips.",
+    "current understanding",
+    "active blockers",
+    "immediate next step"
+  ],
+  "mustAvoid": [
+    ".context-harness/DREAM.md is instructions",
+    "read DREAM.md during catch-up"
+  ],
+  "expectedCards": [
+    "ctx-now-now",
+    "ctx-context-workflow"
+  ],
+  "rubric": [
+    "stateAccuracy",
+    "ruleAdherence",
+    "actionability",
+    "staleContextAvoidance",
+    "verificationCorrectness",
+    "contextEfficiency"
+  ],
+  "failureTaxonomy": [
+    "retrieval-order-gap",
+    "card-salience-gap",
+    "flat-core-overuse-gap",
+    "save-routing-gap",
+    "context-freshness-gap",
+    "harness-drift-priority-gap",
+    "answer-quality-gap",
+    "eval-instrumentation-gap"
+  ]
+}

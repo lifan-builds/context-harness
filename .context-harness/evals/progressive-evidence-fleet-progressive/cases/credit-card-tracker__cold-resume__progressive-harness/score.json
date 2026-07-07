@@ -1,0 +1,44 @@
+{
+  "id": "credit-card-tracker__cold-resume__progressive-harness",
+  "repo": "credit-card-tracker",
+  "scenario": "cold-resume",
+  "mode": "progressive-harness",
+  "resultPath": "cases/credit-card-tracker__cold-resume__progressive-harness/result.md",
+  "tracePath": "cases/credit-card-tracker__cold-resume__progressive-harness/trace.md",
+  "status": "pass",
+  "total": 10,
+  "max": 10,
+  "answerScore": 10,
+  "retrievalScore": 10,
+  "saveRoutingScore": 10,
+  "contextEfficiencyScore": 10,
+  "missing": [],
+  "avoided": [],
+  "evidence": {
+    "hasTrace": true,
+    "hasContextEvidence": true,
+    "hydrate": true,
+    "card": true,
+    "selectedExpectedCards": [
+      "ctx-now-now"
+    ],
+    "plan": true,
+    "chunk": false,
+    "context": true,
+    "hydrateBeforePlan": true,
+    "hydrateBeforeChunk": true,
+    "hasAlwaysReadContext": true,
+    "taskLocalToPlan": true,
+    "durableToContext": true,
+    "nowLast": false,
+    "indexUpdate": false,
+    "flatOveruse": false
+  },
+  "deterministicChecks": {
+    "mustMention": 6,
+    "mentioned": 6,
+    "mustAvoid": 2,
+    "avoided": 0
+  },
+  "gap": "none"
+}

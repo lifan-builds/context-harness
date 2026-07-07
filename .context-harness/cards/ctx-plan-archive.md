@@ -26,5 +26,10 @@ June 2026 research compared Context Harness with Karpathy-style skill
 - keep the harness small, use progressive disclosure, prefer visible markdown,
 - route current evidence to PLAN.md, and use model-led Dream/Compact only when
 
-## Open next
+## Retrieval order
+- Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.
+- Use this card before opening bulky `PLAN.md`, chunks, or raw source sections for this topic.
+- Open raw detail only when this summary is insufficient for the task.
+
+## Open next only if needed
 - `PLAN.md#archive`

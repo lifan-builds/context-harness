@@ -23,3 +23,10 @@
 - After legacy tooling cleanup, targeted suites `tests/run-all.sh install-project`,
   `context-index`, `codex-context-hook`, `skill`, and `skill-packaging` pass; full
   `tests/run-all.sh` passes with 185 passed, 0 failed; `node scripts/context-index.js check` passes.
+- `node scripts/eval-agent-problem-solving.js score .context-harness/evals/progressive-evidence-fleet-progressive --gate` passes across 57 progressive-harness cases: all completed, 9.6/10 average, 100% hydrate evidence, 0 card/chunk order violations, 0 flat-overuse violations, 100% save-routing evidence, and 0 harness-drift hijacks; answer-only review notes remain non-blocking when retrieval/save/order evidence is strong.
+- `node scripts/eval-agent-problem-solving.js fill-pending .context-harness/evals/progressive-evidence-fleet-progressive --modes progressive-harness --dry-run` reports 0 pending cases.
+- `tests/run-all.sh eval-agent-problem-solving` passes with 12 passed after adding `fill-pending`, private-file exclusion, semantic scoring, answer-only review note, and strict `mustAvoid` coverage.
+- `tests/run-all.sh context-index` passes with 23 passed after adding stale-hydrate warning coverage.
+- `tests/run-all.sh release-proof` passes with 37 passed after adding stale generated context and fleet-refresh guardrail coverage.
+- Full `tests/run-all.sh` passes with 217 passed, 0 failed after the remaining-gap fixes.
+- `node scripts/context-index.js check` passes after the remaining-gap fixes, with the existing PLAN.md length warning.

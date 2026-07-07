@@ -15,12 +15,12 @@ and what should I do next?**
 ## Core Design Principles
 
 1. **Always-read stays small** — `AGENTS.md` is only the activation contract and
-   generated index. It should not become the project brain.
+   generated index; `NOW.md` plus concise `CONTEXT.md` are the startup layer.
 2. **Durable truth lives on disk** — `CONTEXT.md`, `NOW.md`, and `PLAN.md` are
    visible markdown files that humans and agents can inspect, edit, diff, and
    commit.
-3. **Retrieve progressively** — agents start with `NOW.md`, then use the context
-   index or `hydrate "<task>"` to open only relevant cards, chunks, or sections.
+3. **Retrieve progressively** — agents read small `CONTEXT.md` directly, then use
+   `hydrate "<task>"` before opening `PLAN.md`, chunks, or bulky sections.
 4. **Constraints beat rulebooks** — projects keep short `Operating Constraints`
    only when they change future agent decisions. Generic coding-agent behavior
    belongs in the skill, not repeated in every repo.
@@ -42,10 +42,11 @@ The default flow is:
 ```text
 fresh agent starts
   → read NOW.md
+  → read concise CONTEXT.md
   → read AGENTS.md contract/index
-  → hydrate the current task
-  → open only relevant context
-  → update NOW/PLAN/CONTEXT when the work changes state
+  → hydrate the current task before PLAN.md, chunks, or bulky context
+  → open only relevant progressive detail
+  → update PLAN/CONTEXT/NOW in the right layer when work changes state
 ```
 
 Inspired by
@@ -78,8 +79,8 @@ explicit `context-upgrade`, not `context-init` or ordinary catch-up.
 
 The release proof covers catch-up timing, maintain routing, explicit-only
 upgrade behavior, set-goal output shape, and the cold-resume path where a fresh
-agent reads `NOW.md`, uses the `AGENTS.md` index, opens only relevant
-`CONTEXT.md` sections, and names the next action.
+agent reads `NOW.md` and concise `CONTEXT.md`, uses hydrate before bulky detail,
+and names the next action.
 
 ## Philosophy
 

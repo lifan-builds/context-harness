@@ -77,7 +77,10 @@ setup_tmpdir() {
   TMPDIR_ROOT=$(mktemp -d)
 }
 cleanup_tmpdir() {
-  [ -n "$TMPDIR_ROOT" ] && rm -rf "$TMPDIR_ROOT"
+  if [ -n "$TMPDIR_ROOT" ] && [ -e "$TMPDIR_ROOT" ]; then
+    chmod -R u+w "$TMPDIR_ROOT" 2>/dev/null || true
+    rm -rf "$TMPDIR_ROOT"
+  fi
 }
 trap cleanup_tmpdir EXIT
 
@@ -322,6 +325,54 @@ if should_run "install-project"; then
   node "$INSTALL_PROJECT" "$TMPDIR_ROOT" >/dev/null 2>&1; rc=$?
   assert_exit 1 "$rc"
 
+  it "plans fleet updates with sanitized relative repository identifiers"
+  setup_tmpdir
+  mkdir -p "$TMPDIR_ROOT/fleet/demo"
+  git -C "$TMPDIR_ROOT/fleet/demo" init -q
+  cat > "$TMPDIR_ROOT/fleet/demo/CONTEXT.md" <<'EOF'
+# Context
+<!-- context-harness:schema v3 -->
+
+## Project
+Fleet fixture.
+EOF
+  output=$(node "$INSTALL_PROJECT" --fleet "$TMPDIR_ROOT/fleet" --dry-run)
+  echo "$output" | grep -q '"repo": "demo"' && ! echo "$output" | grep -q "$TMPDIR_ROOT" && pass || fail "fleet ledger exposed absolute paths or omitted relative repo: $output"
+
+  it "updates managed fleet files while preserving custom metadata and unrelated dirty work"
+  cat > "$TMPDIR_ROOT/fleet/demo/NOW.md" <<'EOF'
+# Now
+
+## Current Focus
+Verify fleet preservation.
+
+## Active Blockers
+- None.
+
+## Immediate Next Step
+Run the updater.
+
+## Session State
+- Last modified: 2026-07-11T00:00:00Z
+- Files touched: CONTEXT.md
+EOF
+  cat > "$TMPDIR_ROOT/fleet/demo/AGENTS.md" <<'EOF'
+# Agent Instructions
+<!-- context-harness:schema v3 -->
+EOF
+  mkdir -p "$TMPDIR_ROOT/fleet/demo/scripts"
+  printf '%s\n' '{"type":"module","custom":true}' > "$TMPDIR_ROOT/fleet/demo/scripts/package.json"
+  printf '%s\n' 'tracked content' > "$TMPDIR_ROOT/fleet/demo/notes.txt"
+  git -C "$TMPDIR_ROOT/fleet/demo" add CONTEXT.md NOW.md AGENTS.md scripts/package.json notes.txt
+  git -C "$TMPDIR_ROOT/fleet/demo" -c user.name=test -c user.email=test@example.com commit -qm fixture
+  printf '%s\n' 'dirty user work' >> "$TMPDIR_ROOT/fleet/demo/notes.txt"
+  before_package=$(shasum -a 256 "$TMPDIR_ROOT/fleet/demo/scripts/package.json" | cut -d' ' -f1)
+  before_notes=$(shasum -a 256 "$TMPDIR_ROOT/fleet/demo/notes.txt" | cut -d' ' -f1)
+  output=$(node "$INSTALL_PROJECT" --fleet "$TMPDIR_ROOT/fleet" --apply)
+  after_package=$(shasum -a 256 "$TMPDIR_ROOT/fleet/demo/scripts/package.json" | cut -d' ' -f1)
+  after_notes=$(shasum -a 256 "$TMPDIR_ROOT/fleet/demo/notes.txt" | cut -d' ' -f1)
+  [ "$before_package" = "$after_package" ] && [ "$before_notes" = "$after_notes" ] && [ -f "$TMPDIR_ROOT/fleet/demo/scripts/context-index.js" ] && echo "$output" | grep -q '"path": "scripts/package.json"' && echo "$output" | grep -q '"preservedDirtyPaths"' && pass || fail "fleet apply did not preserve custom or dirty files: $output"
+
   cleanup_tmpdir
 fi
 
@@ -516,6 +567,14 @@ check-app
 EOF
   cat > "$TMPDIR_ROOT/NOW.md" << 'EOF'
 # Now
+## Current Focus
+Verify oversized plan warning.
+## Active Blockers
+- None.
+## Immediate Next Step
+Run check.
+## Session State
+- Active.
 EOF
   for i in $(seq 1 151); do echo "line $i"; done > "$TMPDIR_ROOT/PLAN.md"
   (cd "$TMPDIR_ROOT" && node "$CONTEXT_INDEX" update >/dev/null 2>&1)
@@ -669,7 +728,8 @@ if should_run "eval-agent-problem-solving"; then
 
   it "prepares no-harness flat-harness and progressive fresh-agent eval cases"
   setup_tmpdir
-  mkdir -p "$TMPDIR_ROOT/projects/demo/.git"
+  mkdir -p "$TMPDIR_ROOT/projects/demo"
+  git -C "$TMPDIR_ROOT/projects/demo" init -q
   cat > "$TMPDIR_ROOT/projects/demo/CONTEXT.md" << 'EOF'
 # Context
 <!-- context-harness:schema v3 -->
@@ -706,6 +766,9 @@ Ship the demo evaluator.
 
 ## Immediate Next Step
 Run npm test and review the eval report.
+
+## Session State
+- Active.
 EOF
   cat > "$TMPDIR_ROOT/projects/demo/PLAN.md" << 'EOF'
 # Demo Plan
@@ -720,6 +783,7 @@ EOF
   echo 'SECRET=demo' > "$TMPDIR_ROOT/projects/demo/.env"
   echo 'SECRET=demo' > "$TMPDIR_ROOT/projects/demo/.env.local"
   echo 'cookie demo' > "$TMPDIR_ROOT/projects/demo/cookies.txt"
+  git -C "$TMPDIR_ROOT/projects/demo" add CONTEXT.md NOW.md PLAN.md package.json
   output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" prepare "$TMPDIR_ROOT/projects" --sample 1 --scenarios cold-resume,next-step --output "$TMPDIR_ROOT/eval" 2>&1); rc=$?
   [ "$rc" -eq 0 ] && \
     [ -f "$TMPDIR_ROOT/eval/cases/demo__cold-resume__no-harness/prompt.md" ] && \
@@ -793,9 +857,10 @@ EOF
   output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" score "$TMPDIR_ROOT/eval" --gate 2>&1); rc=$?
   [ "$rc" -ne 0 ] && echo "$output" | grep -q "Gate: fail" && pass || fail "expected gate failure: $output"
 
-  it "treats high-scoring answer-only misses as review notes"
+  it "does not verify schema-2 retrieval from prose claims"
   setup_tmpdir
-  mkdir -p "$TMPDIR_ROOT/projects/demo/.git"
+  mkdir -p "$TMPDIR_ROOT/projects/demo"
+  git -C "$TMPDIR_ROOT/projects/demo" init -q
   cat > "$TMPDIR_ROOT/projects/demo/CONTEXT.md" << 'EOF'
 # Context
 <!-- context-harness:schema v3 -->
@@ -831,6 +896,9 @@ Ship the demo evaluator.
 
 ## Immediate Next Step
 Run npm test and review the eval report.
+
+## Session State
+- Active.
 EOF
   cat > "$TMPDIR_ROOT/projects/demo/PLAN.md" << 'EOF'
 # Demo Plan
@@ -841,6 +909,7 @@ EOF
 ## Verification
 - npm test
 EOF
+  git -C "$TMPDIR_ROOT/projects/demo" add CONTEXT.md NOW.md PLAN.md
   output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" prepare "$TMPDIR_ROOT/projects" --sample 1 --scenarios next-step --modes progressive-harness --output "$TMPDIR_ROOT/eval-answer-note" 2>&1); rc=$?
   cat > "$TMPDIR_ROOT/eval-answer-note/cases/demo__next-step__progressive-harness/result.md" << 'EOF'
 Current understanding: Ship the demo evaluator.
@@ -857,16 +926,27 @@ selected_cards: ctx-context-operating-constraints, ctx-context-workflow
 open card: .context-harness/cards/ctx-context-operating-constraints.md
 EOF
   output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" score "$TMPDIR_ROOT/eval-answer-note" --gate 2>&1); rc=$?
-  [ "$rc" -eq 0 ] && echo "$output" | grep -q "Gate: pass" && pass || fail "expected answer-only miss gate pass: $output"
+  [ "$rc" -ne 0 ] && echo "$output" | grep -q "retrieval-order-gap" && echo "$output" | grep -q "evidence claimed" && pass || fail "expected claimed retrieval gate failure: $output"
 
   it "semantic expected facts tolerate paraphrase"
   node -e "const fs=require('fs'); const s=JSON.parse(fs.readFileSync('$TMPDIR_ROOT/eval-answer-note/cases/demo__next-step__progressive-harness/score.json','utf8')); if(s.missing.length) { console.error(s.missing.join('; ')); process.exit(1); } if(s.answerScore !== 10) process.exit(2);"
   [ "$?" -eq 0 ] && pass || fail "expected semantic paraphrase score"
 
-  it "answer-only misses remain review notes when retrieval evidence is strong"
+  it "verifies schema-2 retrieval from structured events"
+  cat > "$TMPDIR_ROOT/eval-answer-note/cases/demo__next-step__progressive-harness/events.jsonl" << 'EOF'
+{"seq":1,"type":"file_read","path":"NOW.md"}
+{"seq":2,"type":"file_read","path":"CONTEXT.md"}
+{"seq":3,"type":"command","argv":["node","scripts/context-index.js","hydrate","plan next implementation step","--json"],"exitCode":0}
+{"seq":4,"type":"hydrate_result","selectedCardIds":["ctx-context-operating-constraints","ctx-context-workflow"]}
+{"seq":5,"type":"file_read","path":".context-harness/cards/ctx-context-operating-constraints.md"}
+EOF
+  output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" score "$TMPDIR_ROOT/eval-answer-note" --gate 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && echo "$output" | grep -q "Gate: pass" && echo "$output" | grep -q "evidence verified" && pass || fail "expected verified structured evidence: $output"
+
+  it "answer-only misses remain actionable independently of retrieval claims"
   node -e "const fs=require('fs'); const f='$TMPDIR_ROOT/eval-answer-note/cases/demo__next-step__progressive-harness/expected.json'; const e=JSON.parse(fs.readFileSync(f,'utf8')); e.mustMention.push('pytest unmentioned command one', 'pytest unmentioned command two'); fs.writeFileSync(f, JSON.stringify(e, null, 2)+'\\n');"
   output=$(cd "$REPO_ROOT" && node "$EVAL_AGENT" score "$TMPDIR_ROOT/eval-answer-note" --gate 2>&1); rc=$?
-  [ "$rc" -eq 0 ] && echo "$output" | grep -q "needs-review" && echo "$output" | grep -q "missing: pytest unmentioned command" && pass || fail "expected answer-only review note gate pass: $output"
+  [ "$rc" -ne 0 ] && echo "$output" | grep -q "answer-quality-gap" && echo "$output" | grep -q "missing: pytest unmentioned command" && pass || fail "expected actionable answer gap: $output"
 
   it "mustAvoid remains strict"
   cat > "$TMPDIR_ROOT/eval-answer-note/cases/demo__next-step__progressive-harness/result.md" << 'EOF'
@@ -893,7 +973,8 @@ if should_run "eval-context-library"; then
 
   it "parses retrieval-packet hydrate cards in real-project shadow eval"
   setup_tmpdir
-  mkdir -p "$TMPDIR_ROOT/projects/demo/.git"
+  mkdir -p "$TMPDIR_ROOT/projects/demo"
+  git -C "$TMPDIR_ROOT/projects/demo" init -q
   cat > "$TMPDIR_ROOT/projects/demo/CONTEXT.md" << 'EOF'
 # Context
 <!-- context-harness:schema v3 -->
@@ -931,6 +1012,9 @@ Ship the demo evaluator.
 
 ## Immediate Next Step
 Run npm test.
+
+## Session State
+- Active.
 EOF
   cat > "$TMPDIR_ROOT/projects/demo/AGENTS.md" << 'EOF'
 # Agent Instructions
@@ -962,10 +1046,11 @@ if should_run "release-proof"; then
   it "proves catch-up timing is fresh-session only"
   output=$(cat "$REPO_ROOT/context-catch-up/SKILL.md")
   assert_contains "$output" "fresh-session or true-resume boundary"
-  assert_contains "$output" "Do not invoke during ordinary mid-session follow-up turns"
-  assert_contains "$output" "Read \`NOW.md\` first"
+  assert_contains "$output" "changed user objective"
+  assert_contains "$output" "Read the small \`NOW.md\` recovery packet first"
   assert_contains "$output" "Read concise \`CONTEXT.md\`"
-  assert_contains "$output" "opening \`PLAN.md\`, chunks, or bulky"
+  assert_contains "$output" "before opening"
+  assert_contains "$output" "\`PLAN.md\`, chunks, or bulky/task-specific context"
   assert_contains "$output" "stale generated"
   assert_contains "$output" "current markdown fallback context"
   assert_contains "$output" "unless the drift blocks correctness or safety"
@@ -991,9 +1076,10 @@ if should_run "release-proof"; then
 
   it "proves upgrade owns conservative fleet refresh"
   assert_contains "$output" "Fleet Refresh Guardrails"
-  assert_contains "$output" "skip dirty repos by"
+  assert_contains "$output" "Include dirty target repos"
   assert_contains "$output" "Preserve project-specific context"
-  assert_contains "$output" "track skipped/failed repos"
+  assert_contains "$output" "record conflicts instead of forcing"
+  assert_contains "$output" "machine-readable release ledger"
 
   it "proves set-goal has long-running goal shape"
   output=$(cat "$REPO_ROOT/set-goal/SKILL.md")
@@ -1407,7 +1493,17 @@ EOF
   setup_tmpdir
   echo "# Agents" > "$TMPDIR_ROOT/AGENTS.md"
   echo "# Context" > "$TMPDIR_ROOT/CONTEXT.md"
-  echo "# Now" > "$TMPDIR_ROOT/NOW.md"
+  cat > "$TMPDIR_ROOT/NOW.md" << 'EOF'
+# Now
+## Current Focus
+Verify context harness.
+## Active Blockers
+- None.
+## Immediate Next Step
+Run check.
+## Session State
+- Active.
+EOF
   output=$(cd "$TMPDIR_ROOT" && printf '{"cwd":"%s"}' "$TMPDIR_ROOT" | node "$CODEX_HOOK" --mode catch-up)
   assert_contains "$output" "context-upgrade"
 
@@ -1426,7 +1522,17 @@ EOF
   setup_tmpdir
   echo "# Agents" > "$TMPDIR_ROOT/AGENTS.md"
   echo "# Context" > "$TMPDIR_ROOT/CONTEXT.md"
-  echo "# Now" > "$TMPDIR_ROOT/NOW.md"
+  cat > "$TMPDIR_ROOT/NOW.md" << 'EOF'
+# Now
+## Current Focus
+Verify context harness.
+## Active Blockers
+- None.
+## Immediate Next Step
+Run check.
+## Session State
+- Active.
+EOF
   output=$(cd "$TMPDIR_ROOT" && printf '{"cwd":"%s"}' "$TMPDIR_ROOT" | node "$CODEX_HOOK" --mode maintain)
   assert_contains "$output" "context-maintain"
   assert_contains "$output" "Save task-local info to PLAN.md"
@@ -1454,7 +1560,7 @@ if should_run "skill"; then
   assert_contains "$(cat "$SKILL")" "user-invocable: true"
 
   it "mentions session start activation"
-  assert_contains "$(cat "$SKILL")" "session start/resume"
+  assert_contains "$(cat "$SKILL")" "Fresh agent session, true resume"
 
   it "contains AGENTS.md template"
   assert_contains "$(cat "$SKILL")" "### AGENTS.md"
@@ -1462,7 +1568,7 @@ if should_run "skill"; then
   it "contains Context Contract"
   content=$(cat "$SKILL")
   assert_contains "$content" "Context Contract"
-  assert_contains "$content" "always-read project layer"
+  assert_contains "$content" "read the small \`NOW.md\` packet first"
   assert_contains "$content" "before opening \`PLAN.md\`, chunks, or bulky"
 
   it "contains all 4 behavioral principles"
@@ -1553,6 +1659,17 @@ Test project.
 
 ## Learned Patterns
 - When context changes, refresh the index.
+EOF
+    cat > "$TMPDIR_ROOT/NOW.md" << 'EOF'
+# Now
+## Current Focus
+Verify context harness.
+## Active Blockers
+- None.
+## Immediate Next Step
+Run check.
+## Session State
+- Active.
 EOF
   }
 

@@ -12,19 +12,17 @@ tags: [plan, current-findings]
 # PLAN.md: Current Findings
 
 ## Summary
-Deprecated context-launch, context-handoff, and context-grill stubs are
+Deprecated context-launch, context-handoff, and context-grill stubs are removed completely; tests assert those skill files are absent.
 
 ## Use when
-- continuing the active task
-- checking done criteria or decisions
-- update context with task-local progress
+- continuing task-local current findings
 
 ## Key facts
-- Deprecated context-launch, context-handoff, and context-grill stubs are
-- removed completely; tests assert those skill files are absent.
-- context-init is fresh-repo initialization only. Legacy v1, schema v2,
-- partial/custom layout repair, and fleet migration route to explicit
-- context-upgrade.
+- context-init is fresh-repo initialization only. Legacy v1, schema v2, partial/custom layout repair, and fleet migration route to explicit context-upgrade.
+- context-catch-up is only for fresh-session or true-resume boundaries. It reports schema drift and does not repair layouts implicitly.
+- set-goal is the long-running goal/loop workflow and includes goal, context, constraints, done criteria, milestones, verification, loop rules, and closeout.
+- context-upgrade is explicit-only through skill frontmatter and Codex policy metadata.
+- Public install URLs use lifan-builds/context-harness consistently.
 
 ## Retrieval order
 - Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.

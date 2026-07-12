@@ -12,18 +12,13 @@ tags: [plan, follow-ups]
 # PLAN.md: Follow-Ups
 
 ## Summary
-Restart AI IDEs or agent hosts so frontmatter and skill metadata are reloaded
+Restart AI IDEs or agent hosts so frontmatter and skill metadata are reloaded after the local Agent Nexus deployment.
 
 ## Use when
-- continuing the active task
-- checking done criteria or decisions
-- update context with task-local progress
+- continuing task-local follow-ups
 
 ## Key facts
-- Restart AI IDEs or agent hosts so frontmatter and skill metadata are reloaded
-- after the local Agent Nexus deployment.
-- Later, consider optional plugin packaging and richer qualitative fresh-agent
-- eval prompts, but do not block this release on those.
+- Later, consider optional plugin packaging and richer qualitative fresh-agent eval prompts, but do not block this release on those.
 
 ## Retrieval order
 - Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.

@@ -18,7 +18,6 @@ Agents can initialize lightweight project context in a new repo.
 - working on legacy objectives
 
 ## Key facts
-- Agents can initialize lightweight project context in a new repo.
 - Agents can catch up quickly from durable context files.
 - Agents can improve durable context through maintenance, reflection, plan stress-tests, and long-running goal prompts.
 

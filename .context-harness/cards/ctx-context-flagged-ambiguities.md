@@ -18,7 +18,6 @@ Update/capture/plan/end are not separate skills; they belong under context-maint
 - working on flagged ambiguities
 
 ## Key facts
-- Update/capture/plan/end are not separate skills; they belong under context-maintain.
 - Removed skills are not compatibility shims; set-goal, context-maintain, and context-upgrade own their replacement behaviors directly.
 
 ## Retrieval order

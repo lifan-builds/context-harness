@@ -257,9 +257,14 @@ raw web/API output, or large copied sections.
 Agents must not read `.context-harness/DREAM.md` during normal catch-up or task
 work. Use it only for debugging context drift or later human review.
 
-`context-catch-up` is only for fresh-session or true-resume boundaries. It
-reports partial or schema-drifted layouts but does not repair them. Layout
-repair moves through explicit `context-upgrade`.
+`context-catch-up` is for fresh sessions, true resumes, materially changed user
+objectives, or externally changed context. It reads `NOW.md` first, then uses an
+explicit user objective as the hydrate query and loads only relevant durable
+context; when no objective is supplied it derives the minimum recovery query
+from `NOW.md`. User context is reconciled with repository state rather than
+silently replaced by stale handoff state. Catch-up reports partial or
+schema-drifted layouts but does not repair them; repair moves through explicit
+`context-upgrade`.
 
 `context-upgrade` is the operator workflow for changing the harness itself,
 refreshing a local fleet, validating installed skill copies, or repairing a
@@ -316,7 +321,7 @@ follow the Init mode workflow. Init also copies the runtime scripts into the
 target repo so `AGENTS.md` can use project-local commands such as
 `node scripts/context-index.js update`.
 
-**Refresh the index** — after changing durable context:
+**Refresh generated retrieval** — after changing `CONTEXT.md`, `PLAN.md`, or `NOW.md`:
 ```bash
 node scripts/context-index.js update
 node scripts/context-index.js query "term"

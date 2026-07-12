@@ -160,25 +160,25 @@ append). First file read on recovery, last file written before session end.
 <!-- context-harness:schema v3 -->
 
 ## Context Contract
-- At session start/resume, read `NOW.md` first and read concise `CONTEXT.md` as
-  the always-read project layer.
+- At a fresh session or true resume, read the small `NOW.md` packet first.
+- If the user supplied an objective, question, or context, hydrate with it and
+  read only selected durable context. Otherwise hydrate from `NOW.md` focus and
+  next step.
+- Reconcile user context with repository state, prefer the user's current
+  objective when scope changed, and surface material conflicts.
+- Reuse loaded context on ordinary follow-ups; catch up again only after a real
+  context boundary, materially different objective, or external context change.
 - Use `node scripts/context-index.js hydrate "<task>"` before opening `PLAN.md`,
   chunks, or bulky/task-specific context.
-- Keep `CONTEXT.md` small; if it no longer fits the always-read layer, use
-  hydrate-selected cards/sections and compact it.
-- Before planning or editing, respect `CONTEXT.md` `## Operating Constraints`.
-- If context-harness files or generated indexes look stale, note that as a
-  follow-up unless it blocks the user task; do not let harness maintenance
-  replace the requested work.
-- If the user teaches a durable term, invariant, workflow, constraint, or
-  correction, update `CONTEXT.md` before it scrolls away.
-- Route task-local findings and decisions to `PLAN.md`; durable lessons to
-  `CONTEXT.md`.
-- After updating `CONTEXT.md`, `PLAN.md`, or `NOW.md`, run
-  `node scripts/context-index.js update` when the change should affect future
-  retrieval.
-- Before ending, update `NOW.md` with current focus, blockers, next step, and
-  touched files.
+- Read concise `CONTEXT.md` directly while it fits the startup budget; otherwise
+  use selected cards/sections. Respect `## Operating Constraints` before edits.
+- Do not let non-blocking harness maintenance replace the requested work.
+- Route task-local findings/decisions to `PLAN.md`; durable terms, constraints,
+  corrections, and lessons to `CONTEXT.md`.
+- After any update to `CONTEXT.md`, `PLAN.md`, or `NOW.md`, run
+  `node scripts/context-index.js update`.
+- Before ending, rewrite `NOW.md` from the observed final state after the last
+  commit, push, deployment, rollback, task switch, or blocker discovery.
 
 ## Context Index
 <!-- context-harness:index:start -->

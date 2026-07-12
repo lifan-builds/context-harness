@@ -12,17 +12,13 @@ tags: [context, structure]
 # CONTEXT.md: Structure
 
 ## Summary
-.
+repo map
 
 ## Use when
 - working on structure
 
 ## Key facts
-- .
-- context-catch-up/
-- context-init/
-- context-maintain/
-- context-upgrade/
+- Use this card before opening bulky raw context for this topic.
 
 ## Retrieval order
 - Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.

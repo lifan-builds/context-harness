@@ -5,26 +5,23 @@ importance: 0.85
 confidence: confirmed
 source: PLAN.md#release-review-checklist
 chunk: null
-tokens_est: 149
+tokens_est: 160
 tags: [plan, release-review-checklist]
 ---
 
 # PLAN.md: Release Review Checklist
 
 ## Summary
-Review source changes separately from generated .context-harness/ artifacts.
+[x] Reviewed source changes separately from generated .context-harness/ artifacts.
 
 ## Use when
-- continuing the active task
-- checking done criteria or decisions
-- update context with task-local progress
+- continuing task-local release review checklist
 
 ## Key facts
-- Review source changes separately from generated .context-harness/ artifacts.
-- Confirm eval-copy exclusions prevent .env, .env., cookies.txt, and key
-- material from entering case repos.
-- Confirm stale generated context is reported as a follow-up unless it blocks
-- correctness or safety.
+- [x] Confirmed Git inventory, private-path exclusions, secret scanning, and byte budgets fail closed before evaluation copies are prepared.
+- [x] Confirmed stale generated context is a visible follow-up unless it blocks correctness or safety.
+- [x] Ran targeted tests, full tests/run-all.sh, index check, five-repository evaluation preflight, Agent Nexus canary, and full fleet shadow.
+- [x] Updated dirty repositories only within exact managed boundaries; preserved unrelated work and recorded intentional conflicts without commit or push.
 
 ## Retrieval order
 - Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.

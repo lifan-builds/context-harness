@@ -16,14 +16,13 @@ The preferred companion skill set is context-init, context-catch-up, set-goal, c
 
 ## Use when
 - changing architecture or domain relationships
-- update context invariants
 
 ## Key facts
-- The preferred companion skill set is context-init, context-catch-up, set-goal, context-maintain, and explicit-only context-upgrade.
 - Deprecated compatibility stub skills are removed completely, not shipped as hidden/non-invocable skills.
 - context-init is only for fresh repositories; all migration and layout repair belongs to explicit context-upgrade.
-- context-catch-up is only for whole fresh session or true resume boundaries; ordinary follow-up turns should rely on already-loaded context and use context-ma...
+- context-catch-up is only for whole fresh session or true resume boundaries; ordinary follow-up turns should rely on already-loaded context and use...
 - context-maintain includes the old standalone reflection workflow as Reflect Mode.
+- set-goal is separate from context-maintain because its output is a ready-to-run goal/loop prompt for another agent or mode, not ordinary context preservation.
 
 ## Retrieval order
 - Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.

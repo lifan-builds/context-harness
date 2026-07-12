@@ -5,26 +5,24 @@ importance: 0.95
 confidence: confirmed
 source: NOW.md#now
 chunk: null
-tokens_est: 363
+tokens_est: 354
 tags: [now, resume]
 ---
 
 # NOW.md: Now
 
 ## Summary
-The remaining context-harness release gaps are implemented and verified: the eval runner has resumable pending-case filling, eval copies exclude obvious private files, scoring separates answer-only review notes from r...
+The coordinated Context Harness release is implemented, deployed locally, rolled out across the installed project fleet, and fully verified; the working tree is ready for human diff review and an intentional commit.
 
 ## Use when
-- resuming the current session
-- choosing the immediate next step
-- update context after current work
+- recovering current focus, blockers, or the immediate next step
 
 ## Key facts
-- The remaining context-harness release gaps are implemented and verified: the eval runner has resumable pending-case filling, eval copies exclude obvious priv...
-- No code blockers are known; diff review, Agent Nexus deployment, fleet refresh, and pushes remain.
-- Review the diff, deploy with Agent Nexus, refresh local repos with the latest context-harness, and push intentionally changed repos.
-- Last modified: 2026-07-07T00:00:00-0700
-- Files touched: scripts/eval-agent-problem-solving.js, scripts/context-index.js, tests/run-all.sh, context-catch-up/SKILL.md, context-upgrade/SKILL.md, PLAN.m...
+- No implementation or verification blockers.
+- AI IDE and agent hosts should be restarted to reload updated skill metadata.
+- Publishing remains intentionally unperformed because no commit or push was requested.
+- Review the final source and generated-artifact diff, then commit and publish only when explicitly requested.
+- Last modified: 2026-07-12T04:49:30Z
 
 ## Retrieval order
 - Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.

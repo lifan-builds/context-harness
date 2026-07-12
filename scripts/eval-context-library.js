@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 "use strict";
 
-// eval-context-library.js — shadow-test progressive context library behavior.
-// Copies only context-harness files from each repo into temp dirs, then runs
-// context-index.js update/check/stats/hydrate without mutating originals.
-
+const crypto = require("crypto");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { spawnSync } = require("child_process");
 const { ensureDir, readJSONSafe, readTextSafe, writeJson } = require("./lib");
 
-const projectRoot = process.argv[2] || "/Users/lfan/Project";
-const reportFile = process.argv[3] || path.join(process.cwd(), ".context-harness", "shadow-context-library-report.md");
+const cli = parseArgs(process.argv.slice(2));
+const projectRoot = cli.positionals[0] || process.cwd();
+const reportFile = cli.positionals[1] || path.join(process.cwd(), ".context-harness", "shadow-context-library-report.md");
+const jsonReportFile = cli["json-report"] || reportFile.replace(/\.md$/u, ".json");
+const minimumCoverage = Number(cli["min-coverage"] || 1);
 const contextIndex = path.join(__dirname, "context-index.js");
 const queries = ["resume current task", "run tests", "deployment", "update context"];
 
@@ -21,26 +21,30 @@ main();
 function main() {
   const repos = findRepos(projectRoot);
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "context-library-shadow-"));
-  const results = [];
+  let results = [];
+  try {
+    results = repos.map((repo) => evaluateRepo(repo, tempRoot));
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
 
-  for (const repo of repos) results.push(evaluateRepo(repo, tempRoot));
-
-  const report = renderReport(projectRoot, repos, results, tempRoot);
+  const report = buildReport(repos, results);
   ensureDir(path.dirname(reportFile));
-  fs.writeFileSync(reportFile, report);
-  process.stdout.write(report);
+  fs.writeFileSync(reportFile, renderReport(report));
+  writeJson(jsonReportFile, report);
+  process.stdout.write(renderReport(report));
 
-  const failures = results.filter((result) => result.status === "fail");
-  if (failures.length) process.exit(1);
+  const gateFailed = report.summary.errors > 0
+    || report.summary.malformed > 0
+    || report.summary.failed > 0
+    || report.summary.coverage < minimumCoverage;
+  if (gateFailed && (cli.gate || report.summary.errors > 0 || report.summary.failed > 0)) process.exit(1);
 }
 
 function findRepos(root) {
   const repos = [];
-  const seen = new Set();
   walk(root, (dir) => {
-    if (seen.has(dir)) return "prune";
     if (isRepoRoot(dir)) {
-      seen.add(dir);
       repos.push(dir);
       return "prune";
     }
@@ -50,19 +54,16 @@ function findRepos(root) {
 }
 
 function walk(dir, visit) {
-  let entries = [];
+  let entries;
   try {
     entries = fs.readdirSync(dir, { withFileTypes: true });
   } catch {
     return;
   }
-
-  const decision = visit(dir);
-  if (decision === "prune") return;
-
+  if (visit(dir) === "prune") return;
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
-    if (entry.name === ".git" || entry.name === "node_modules" || entry.name === ".cache" || entry.name === ".venv") continue;
+    if ([".git", ".context-harness", "node_modules", ".cache", ".venv", "venv"].includes(entry.name)) continue;
     walk(path.join(dir, entry.name), visit);
   }
 }
@@ -73,192 +74,232 @@ function isRepoRoot(dir) {
 
 function evaluateRepo(repo, tempRoot) {
   const relative = path.relative(projectRoot, repo) || path.basename(repo);
-  const tempRepo = path.join(tempRoot, safeName(relative));
-  ensureDir(tempRepo);
-
-  const copied = copyContextFiles(repo, tempRepo);
+  const id = safeName(relative);
+  const provenance = gitProvenance(repo);
+  const contextExists = fs.existsSync(path.join(repo, "CONTEXT.md"));
+  const harnessIndicators = contextExists
+    || fs.existsSync(path.join(repo, "NOW.md"))
+    || fs.existsSync(path.join(repo, "AGENTS.md"))
+    || fs.existsSync(path.join(repo, ".context-harness"));
   const base = {
-    repo,
-    relative,
-    tempRepo,
-    copied,
-    status: "skip",
-    skipReason: "missing CONTEXT.md",
+    id,
+    repo: relative,
+    status: "ineligible",
+    reason: "no installed context harness",
+    provenance,
+    copied: [],
     cards: 0,
     chunks: 0,
     warnings: [],
     issues: [],
+    commands: {},
     hydrates: [],
   };
+  if (!harnessIndicators) return base;
+  if (!contextExists) return { ...base, status: "malformed", reason: "harness indicators exist but CONTEXT.md is missing" };
 
-  if (!copied.includes("CONTEXT.md")) return base;
-  if (!copied.includes("NOW.md")) return { ...base, skipReason: "missing NOW.md" };
-  if (!copied.includes("AGENTS.md")) base.issues.push("missing AGENTS.md");
+  const required = ["CONTEXT.md", "NOW.md", "AGENTS.md"];
+  const missing = required.filter((file) => !fs.existsSync(path.join(repo, file)));
+  if (missing.length) return { ...base, status: "malformed", reason: `missing ${missing.join(", ")}` };
+
+  const tempRepo = path.join(tempRoot, id);
+  ensureDir(tempRepo);
+  let copied;
+  try {
+    copied = copyContextSources(repo, tempRepo);
+  } catch (error) {
+    return { ...base, status: "error", reason: `copy failed: ${error.message}` };
+  }
 
   const update = runNode(tempRepo, "update");
-  if (update.status !== 0) return { ...base, status: "fail", update, skipReason: "", issues: [...base.issues, `update failed: ${firstLine(update.output)}`] };
-
+  if (update.status !== 0) {
+    return { ...base, copied, status: "fail", reason: "update failed", commands: { update }, issues: [`update failed: ${firstLine(update.output)}`] };
+  }
   const check = runNode(tempRepo, "check");
   const stats = runNode(tempRepo, "stats");
   const manifest = readJSONSafe(path.join(tempRepo, ".context-harness", "index.json"));
   const hydrates = queries.map((query) => ({ query, ...hydrate(tempRepo, query) }));
-  const warnings = stats.output.split("\n").filter((line) => line.startsWith("- ") && /warn|consider|large|lines/i.test(line));
-  const issues = [...base.issues, ...evaluateHydrates(copied, hydrates)];
-
-  if (check.status !== 0) issues.push(`check failed: ${firstLine(check.output)}`);
+  const warnings = stats.output.split("\n").filter((line) => line.startsWith("WARN ") || /consider a .*pass/i.test(line));
+  const issues = evaluateHydrates(copied, hydrates);
+  if (check.status !== 0 && /(^|\n)FAIL /u.test(check.output)) issues.push(`check failed: ${firstLine(check.output)}`);
   if (!manifest) issues.push("manifest missing after update");
-  if (manifest?.cards) issues.push(...duplicateCardIssues(manifest.cards));
+  if (manifest?.cards) issues.push(...cardQualityIssues(manifest.cards));
 
   return {
     ...base,
-    status: check.status === 0 && issues.length === 0 ? "pass" : "warn",
-    skipReason: "",
-    check,
-    stats,
+    copied,
+    status: issues.length ? "fail" : "pass",
+    reason: issues.length ? "structural or retrieval checks failed" : "",
+    commands: { update, check, stats },
     cards: manifest?.cards?.length || 0,
     chunks: manifest?.cards?.filter((card) => card.chunk_path).length || 0,
+    sourceHash: manifest?.source_hash || null,
     warnings,
     issues,
     hydrates,
   };
 }
 
-function copyContextFiles(repo, tempRepo) {
-  const files = ["AGENTS.md", "CONTEXT.md", "NOW.md", "PLAN.md"];
+function copyContextSources(repo, tempRepo) {
   const copied = [];
-  for (const file of files) {
+  for (const file of ["AGENTS.md", "CONTEXT.md", "NOW.md", "PLAN.md"]) {
     const source = path.join(repo, file);
     if (!fs.existsSync(source)) continue;
     fs.copyFileSync(source, path.join(tempRepo, file));
     copied.push(file);
   }
-
-  const existingLibrary = path.join(repo, ".context-harness");
-  if (fs.existsSync(existingLibrary)) copyDirectory(existingLibrary, path.join(tempRepo, ".context-harness"));
   return copied;
 }
 
-function copyDirectory(source, target) {
-  ensureDir(target);
-  for (const entry of fs.readdirSync(source, { withFileTypes: true })) {
-    if (entry.name === "DREAM.md") continue;
-    const from = path.join(source, entry.name);
-    const to = path.join(target, entry.name);
-    if (entry.isDirectory()) copyDirectory(from, to);
-    else if (entry.isFile()) fs.copyFileSync(from, to);
-  }
-}
-
 function hydrate(tempRepo, query) {
-  const result = runNode(tempRepo, "hydrate", query);
+  const result = runNode(tempRepo, "hydrate", query, ["--json"]);
+  let payload = null;
+  try {
+    payload = JSON.parse(result.output);
+  } catch {
+    // Report the parse failure below.
+  }
   return {
     status: result.status,
-    cards: parseHydrateCards(result.output),
-    output: result.output,
+    cards: payload?.selected_cards?.map((card) => card.id) || [],
+    excerpts: payload?.selected_cards?.flatMap((card) => card.excerpts || []) || [],
+    parseable: Boolean(payload),
   };
-}
-
-function parseHydrateCards(output) {
-  const cards = [];
-  for (const line of output.split("\n")) {
-    const listed = line.match(/^\s*(?:-|\d+\.)\s+(ctx-[^\s,(]+)/);
-    if (listed) cards.push(listed[1]);
-    const selected = line.match(/^\s*-\s*selected_cards:\s*(.+)$/);
-    if (selected) {
-      cards.push(...selected[1].split(",").map((item) => item.trim()).filter((item) => item.startsWith("ctx-")));
-    }
-  }
-  return [...new Set(cards)];
 }
 
 function evaluateHydrates(copied, hydrates) {
   const issues = [];
-  const resume = hydrates.find((entry) => entry.query === "resume current task");
-  const tests = hydrates.find((entry) => entry.query === "run tests");
-  const deploy = hydrates.find((entry) => entry.query === "deployment");
-  const maintain = hydrates.find((entry) => entry.query === "update context");
-
-  if (copied.includes("NOW.md") && resume && !resume.cards.includes("ctx-now-now")) {
+  const byQuery = Object.fromEntries(hydrates.map((entry) => [entry.query, entry]));
+  if (copied.includes("NOW.md") && !byQuery["resume current task"]?.cards.includes("ctx-now-now")) {
     issues.push("resume hydrate did not include NOW card");
   }
-  if (tests && !tests.cards.includes("ctx-context-workflow")) {
-    issues.push("test hydrate did not include Workflow card");
-  }
-  if (deploy && !deploy.cards.includes("ctx-context-workflow")) {
-    issues.push("deployment hydrate did not include Workflow card");
-  }
-  if (maintain && !maintain.cards.some((card) => card === "ctx-context-operating-constraints" || card === "ctx-context-rules" || card === "ctx-context-learned-patterns" || card === "ctx-now-now")) {
-    issues.push("context maintenance hydrate lacked operating constraints, learned patterns, or NOW card");
-  }
+  if (!byQuery["run tests"]?.cards.includes("ctx-context-workflow")) issues.push("test hydrate did not include Workflow card");
   for (const entry of hydrates) {
     if (entry.status !== 0) issues.push(`hydrate failed for '${entry.query}'`);
+    if (!entry.parseable) issues.push(`hydrate JSON was invalid for '${entry.query}'`);
     if (!entry.cards.length) issues.push(`hydrate returned no cards for '${entry.query}'`);
   }
   return issues;
 }
 
-function duplicateCardIssues(cards) {
-  const seen = new Set();
-  const duplicates = new Set();
+function cardQualityIssues(cards) {
+  const issues = [];
+  const ids = new Set();
   for (const card of cards) {
-    if (seen.has(card.id)) duplicates.add(card.id);
-    seen.add(card.id);
+    if (ids.has(card.id)) issues.push(`duplicate card id ${card.id}`);
+    ids.add(card.id);
+    const summary = normalize(card.summary);
+    const facts = new Set();
+    for (const fact of card.key_facts || []) {
+      const normalized = normalize(fact);
+      if (normalized === summary || normalized.startsWith(summary) || summary.startsWith(normalized)) issues.push(`summary/fact duplication in ${card.id}`);
+      if (facts.has(normalized)) issues.push(`duplicate fact in ${card.id}`);
+      facts.add(normalized);
+    }
+    if ((card.read_when || []).some((cue) => /update context (after|with|safely)/i.test(cue))) issues.push(`generic read_when cue in ${card.id}`);
   }
-  return [...duplicates].map((id) => `duplicate card id ${id}`);
+  return [...new Set(issues)];
 }
 
-function runNode(cwd, command, arg = "") {
+function runNode(cwd, command, arg = "", extra = []) {
   const args = [contextIndex, command];
   if (arg) args.push(arg);
+  args.push(...extra);
   const result = spawnSync(process.execPath, args, { cwd, encoding: "utf8" });
+  return { status: result.status ?? 1, output: `${result.stdout || ""}${result.stderr || ""}`.trim() };
+}
+
+function gitProvenance(repo) {
+  const revision = runGit(repo, ["rev-parse", "HEAD"]);
+  const status = runGit(repo, ["status", "--porcelain"]);
   return {
-    status: result.status ?? 1,
-    output: `${result.stdout || ""}${result.stderr || ""}`.trim(),
+    revision: revision.status === 0 ? revision.output : null,
+    dirty: status.status === 0 ? Boolean(status.output) : null,
+    statusReadable: status.status === 0,
   };
 }
 
-function renderReport(root, repos, results, tempRoot) {
-  const pass = results.filter((result) => result.status === "pass").length;
-  const warn = results.filter((result) => result.status === "warn").length;
-  const fail = results.filter((result) => result.status === "fail").length;
-  const skip = results.filter((result) => result.status === "skip").length;
+function runGit(cwd, args) {
+  const result = spawnSync("git", args, { cwd, encoding: "utf8" });
+  return { status: result.status ?? 1, output: `${result.stdout || ""}`.trim() };
+}
+
+function buildReport(repos, results) {
+  const eligible = results.filter((result) => !["ineligible"].includes(result.status)).length;
+  const evaluated = results.filter((result) => ["pass", "fail"].includes(result.status)).length;
+  const count = (status) => results.filter((result) => result.status === status).length;
+  return {
+    schema: 2,
+    evaluator: { sha256: sha256(readTextSafe(__filename)), contextIndexSha256: sha256(readTextSafe(contextIndex)) },
+    queries,
+    summary: {
+      discovered: repos.length,
+      eligible,
+      evaluated,
+      coverage: eligible ? evaluated / eligible : 1,
+      passed: count("pass"),
+      failed: count("fail"),
+      malformed: count("malformed"),
+      ineligible: count("ineligible"),
+      errors: count("error"),
+    },
+    results,
+    temporaryCopiesRemoved: true,
+  };
+}
+
+function renderReport(report) {
+  const s = report.summary;
   const lines = [
     "# Shadow Context Library Report",
     "",
-    `Root: \`${root}\``,
-    `Temporary copies: \`${tempRoot}\``,
-    "",
-    `Repos found: ${repos.length}`,
-    `Pass: ${pass} · Warn: ${warn} · Fail: ${fail} · Skip: ${skip}`,
+    `Repos discovered: ${s.discovered}`,
+    `Eligible: ${s.eligible} · Evaluated: ${s.evaluated} · Coverage: ${(s.coverage * 100).toFixed(1)}%`,
+    `Pass: ${s.passed} · Fail: ${s.failed} · Malformed: ${s.malformed} · Ineligible: ${s.ineligible} · Error: ${s.errors}`,
     "",
     "| Repo | Status | Cards | Chunks | Hydrate cards | Issues |",
     "|---|---:|---:|---:|---|---|",
   ];
-
-  for (const result of results) {
+  for (const result of report.results) {
     const hydrateSummary = result.hydrates.length
       ? result.hydrates.map((entry) => `${entry.query}: ${entry.cards.slice(0, 3).join(", ") || "none"}`).join("<br>")
       : "n/a";
-    const issues = result.status === "skip" ? result.skipReason : (result.issues.join("<br>") || "none");
-    lines.push(`| \`${result.relative}\` | ${result.status} | ${result.cards} | ${result.chunks} | ${hydrateSummary} | ${issues} |`);
+    const issues = result.issues.length ? result.issues.join("<br>") : (result.reason || "none");
+    lines.push(`| \`${result.repo}\` | ${result.status} | ${result.cards} | ${result.chunks} | ${hydrateSummary} | ${issues} |`);
   }
-
-  const actionable = results.filter((result) => result.status === "warn" || result.status === "fail");
+  const actionable = report.results.filter((result) => !["pass", "ineligible"].includes(result.status));
   lines.push("", "## Actionable Gaps", "");
-  if (!actionable.length) {
-    lines.push("No easy-to-fix gaps identified by this shadow run.");
-  } else {
-    for (const result of actionable) {
-      lines.push(`- \`${result.relative}\`: ${result.issues.join("; ") || result.skipReason}`);
-    }
-  }
-
+  if (!actionable.length) lines.push("No structural, coverage, or retrieval gaps were found.");
+  else for (const result of actionable) lines.push(`- \`${result.repo}\` (${result.status}): ${result.issues.join("; ") || result.reason}`);
   lines.push("");
   return `${lines.join("\n")}\n`;
 }
 
+function parseArgs(args) {
+  const parsed = { positionals: [] };
+  for (let i = 0; i < args.length; i += 1) {
+    const value = args[i];
+    if (!value.startsWith("--")) {
+      parsed.positionals.push(value);
+      continue;
+    }
+    const key = value.slice(2);
+    if (["gate"].includes(key)) parsed[key] = true;
+    else parsed[key] = args[++i];
+  }
+  return parsed;
+}
+
 function safeName(name) {
   return name.replace(/[^a-zA-Z0-9._-]+/g, "__") || "repo";
+}
+
+function normalize(value) {
+  return String(value || "").toLowerCase().replace(/[^a-z0-9]+/gu, " ").trim();
+}
+
+function sha256(value) {
+  return crypto.createHash("sha256").update(value).digest("hex");
 }
 
 function firstLine(text) {

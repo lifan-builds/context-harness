@@ -12,18 +12,13 @@ tags: [plan, goal]
 # PLAN.md: Goal
 
 ## Summary
-Make Context Harness release-ready as a lightweight project-memory layer for
+Make Context Harness release-ready as a lightweight project-memory layer for coding agents: small visible context files, clear skill invocation timing, explicit upgrades,...
 
 ## Use when
-- continuing the active task
-- checking done criteria or decisions
-- update context with task-local progress
+- continuing task-local goal
 
 ## Key facts
-- Make Context Harness release-ready as a lightweight project-memory layer for
-- coding agents: small visible context files, clear skill invocation timing,
-- explicit upgrades, and proof that a fresh agent can resume without a long prompt
-- dump.
+- Use this card before opening bulky raw context for this topic.
 
 ## Retrieval order
 - Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.

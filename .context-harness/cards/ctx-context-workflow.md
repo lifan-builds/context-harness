@@ -15,14 +15,14 @@ tags: [context, workflow]
 Setup: n/a
 
 ## Use when
-- running, testing, linting, deploying, deployment, or verifying changes
+- running, testing, linting, deploying, or verifying changes
 
 ## Key facts
-- Setup: n/a
 - Run: n/a
 - Test: tests/run-all.sh
 - Lint: n/a
 - Verification: tests/run-all.sh exits 0 before completing code changes.
+- Local deploy: After every repo update, use agent access to deploy it locally.
 
 ## Retrieval order
 - Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.

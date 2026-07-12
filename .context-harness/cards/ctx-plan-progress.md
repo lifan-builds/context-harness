@@ -4,27 +4,25 @@ kind: plan
 importance: 0.85
 confidence: confirmed
 source: PLAN.md#progress
-chunk: .context-harness/chunks/ctx-plan-progress.md
-tokens_est: 1065
+chunk: null
+tokens_est: 382
 tags: [plan, progress]
 ---
 
 # PLAN.md: Progress
 
 ## Summary
-[x] Updated README positioning around four visible files, progressive
+[x] Unified the portable lifecycle contract around selective objective-driven catch-up, observed-state closeout, and refresh after source-context changes.
 
 ## Use when
-- continuing the active task
-- checking done criteria or decisions
-- update context with task-local progress
+- continuing task-local progress
 
 ## Key facts
-- [x] Updated README positioning around four visible files, progressive
-- disclosure, companion skills, and proof artifacts.
-- [x] Added RELEASEGOAL.md for repo-local release readiness.
-- [x] Added examples/cold-resume-demo.md showing NOW.md first, AGENTS.md
-- index second, selective CONTEXT.md sections, PLAN.md task state, and the
+- [x] Added logical Markdown cards, source-attributed query excerpts, stable hydrate --json, structural NOW.md checks, and script-owned index refresh.
+- [x] Made schema-2 evaluation distinguish verified structured events from prose claims, preserve answer gaps, compare matched pairs,...
+- [x] Added Git-inventoried, secret-scanned, budgeted, reusable evaluation fixtures plus preflight, inspection, finalization, and retention operations.
+- [x] Corrected structural-shadow classifications and retrieval checks; repaired four fleet recovery packets so all installed harnesses evaluate cleanly.
+- [x] Added exact-hash managed-runtime ownership and a non-destructive fleet updater that preserves dirty user work and custom package metadata.
 
 ## Retrieval order
 - Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.
@@ -33,4 +31,3 @@ tags: [plan, progress]
 
 ## Open next only if needed
 - `PLAN.md#progress`
-- `.context-harness/chunks/ctx-plan-progress.md`

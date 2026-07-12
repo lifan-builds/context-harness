@@ -47,8 +47,9 @@ broad rewrites.
 - Prefer model-led edits over blanket migration scripts when local conventions
   may matter. Use scripts for detection, dry runs, refreshes, and repeatable
   mechanical changes.
-- Skip dirty target repos by default. Include dirty repos only when the user
-  explicitly asks, then inspect changes and work with them.
+- Include dirty target repos in fleet refreshes, but classify candidate paths,
+  preserve unrelated work byte-for-byte, and record conflicts instead of forcing
+  overwrites. Never reset, restore, clean, stash, commit, or push user work.
 - Keep the preferred skill set small. Add or split a skill only when the
   invocation intent is genuinely different from existing skills.
 - Modify canonical skill source in this repository. Treat installed copies and
@@ -100,14 +101,14 @@ For a single repo or fleet refresh:
 
 ## Fleet Refresh Guardrails
 
-For local fleet refreshes, inspect target repo status first and skip dirty repos by
-default unless the user explicitly approves including them. Preserve
-project-specific context; refresh only managed harness boilerplate, runtime
-scripts, generated indexes, and schema markers that are in scope. Run
-`node scripts/context-index.js update` and `node scripts/context-index.js check`
-in updated targets or representative batches, track skipped/failed repos in
-`PLAN.md`, and do not let fleet refresh work replace the target project's actual
-product task.
+For local fleet refreshes, inspect every target's status and include dirty repos
+under managed-file boundaries. Capture pre/post state, preserve unrelated dirty
+paths, and record managed local conflicts rather than overwriting them. Refresh
+only managed harness boilerplate/runtime, generated indexes, and unambiguous
+schema markers. Run `node scripts/context-index.js update` and
+`node scripts/context-index.js check` in each updated target, keep a
+machine-readable release ledger of changed/unchanged/failed targets, and do not
+let fleet work replace a target project's product task.
 
 ## Deployment
 

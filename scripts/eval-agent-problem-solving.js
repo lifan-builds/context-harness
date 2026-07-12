@@ -9,6 +9,7 @@
 const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
+const crypto = require("crypto");
 const {
   ensureDir,
   readJSONSafe,
@@ -38,100 +39,120 @@ const skipDirs = new Set([
   "target",
 ]);
 const contextFiles = new Set(["AGENTS.md", "CONTEXT.md", "NOW.md", "PLAN.md"]);
-const privateFileNames = new Set([".netrc", "credentials.json", "cookies.txt"]);
-const privateFilePatterns = [/^\.env(?:\..*)?$/u, /\.(?:key|pem|p12|pfx)$/iu];
+const privateFileNames = new Set([".netrc", ".npmrc", ".pypirc", "credentials.json", "cookies.txt", "secrets.yaml", "secrets.yml"]);
+const privateFilePatterns = [/^\.env(?:\..*)?$/u, /\.(?:key|pem|p12|pfx|sqlite|sqlite3|db|wal|apk|ipa|dmp)$/iu];
+const privatePathParts = new Set([".aws", ".ssh", ".gnupg", ".config", ".vercel", "browser-data", "logs"]);
+const maxCopyFileBytes = 5 * 1024 * 1024;
+const maxRepoCopyBytes = 100 * 1024 * 1024;
+const maxRunCopyBytes = 500 * 1024 * 1024;
+const mutationScenarios = new Set(["context-maintenance", "closeout-reversal", "same-session-resume", "successor-recovery"]);
+const secretContentPatterns = [
+  { name: "private-key", pattern: new RegExp(["-----BEGIN ", "(?:RSA |EC |OPENSSH |DSA )?", "PRIVATE KEY-----"].join(""), "u") },
+  { name: "aws-access-key", pattern: /\b(?:AKIA|ASIA)[A-Z0-9]{16}\b/u },
+  { name: "github-token", pattern: /\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{30,}\b/u },
+  { name: "generic-secret", pattern: /\b(?:api[_-]?key|secret|token|password)\s*[:=]\s*["']?[A-Za-z0-9_./+=-]{16,}/iu },
+];
 
 main();
 
 function main() {
   if (command === "prepare") return prepare();
+  if (command === "preflight") return preflight();
   if (command === "score") return score();
   if (command === "fill-pending") return fillPending();
+  if (command === "list" || command === "inspect") return listRuns();
+  if (command === "finalize") return finalizeRun();
+  if (command === "prune") return pruneRuns();
   usage();
 }
 
 function prepare() {
   const args = parseArgs(process.argv.slice(3));
-  const projectRoot = path.resolve(args._[0] || defaultProjectRoot);
-  const scenarios = splitList(args.scenarios, defaultScenarios);
-  const selectedModes = splitList(args.modes, modes);
-  const selectedRepos = splitList(args.repos, []);
-  const sample = args.sample ? Number(args.sample) : 0;
-  const runId = args.runId || `${today()}-${timestampSuffix()}`;
-  const runDir = path.resolve(args.output || path.join(defaultEvalRoot, runId));
-
-  const repos = findRepos(projectRoot)
-    .filter((repo) => fs.existsSync(path.join(repo, "CONTEXT.md")))
-    .filter((repo) => !selectedRepos.length || selectedRepos.includes(path.relative(projectRoot, repo)) || selectedRepos.includes(path.basename(repo)))
-    .slice(0, sample > 0 ? sample : undefined);
-
-  ensureDir(path.join(runDir, "cases"));
+  const config = prepareConfig(args);
+  const inventories = inspectRepos(config);
+  if (inventories.some((item) => item.overBudget)) throw new Error("Preflight failed: one or more repositories exceed --max-repo-bytes");
+  ensureDir(path.join(config.runDir, "cases"));
+  ensureDir(path.join(config.runDir, "snapshots"));
   const cases = [];
+  const snapshots = [];
+  let copiedBytes = 0;
 
-  for (const repo of repos) {
-    const relative = path.relative(projectRoot, repo) || path.basename(repo);
-    const expected = buildExpected(repo, relative);
-    for (const scenario of scenarios) {
-      for (const mode of selectedModes) {
-        const caseId = `${safeName(relative)}__${scenario}__${mode}`;
-        const caseDir = path.join(runDir, "cases", caseId);
+  for (const inventory of inventories) {
+    const expected = buildExpected(inventory.repo, inventory.relative);
+    const snapshotByMode = new Map();
+    for (const mode of config.selectedModes) {
+      const snapshot = path.join(config.runDir, "snapshots", safeName(inventory.relative), mode);
+      const copy = copyRepo(inventory.repo, snapshot, { mode, inventory, remainingBytes: config.maxRunBytes - copiedBytes });
+      copiedBytes += copy.bytes;
+      if (mode === "progressive-harness") runContextIndex(snapshot, "update");
+      makeTreeReadOnly(snapshot);
+      snapshotByMode.set(mode, snapshot);
+      snapshots.push({ repo: inventory.relative, mode, path: path.relative(config.runDir, snapshot), files: copy.files, bytes: copy.bytes, excluded: copy.excluded, sourceHash: copy.sourceHash });
+    }
+    for (const scenario of config.scenarios) {
+      for (const mode of config.selectedModes) {
+        const caseId = `${safeName(inventory.relative)}__${scenario}__${mode}`;
+        const caseDir = path.join(config.runDir, "cases", caseId);
         const repoCopy = path.join(caseDir, "repo");
         ensureDir(caseDir);
-        copyRepo(repo, repoCopy, { mode });
-        if (mode === "progressive-harness") runContextIndex(repoCopy, "update");
-
+        const mutable = mutationScenarios.has(scenario);
+        if (mutable) {
+          fs.cpSync(snapshotByMode.get(mode), repoCopy, { recursive: true, dereference: true });
+          makeTreeWritable(repoCopy);
+          const privateBytes = treeBytes(repoCopy);
+          copiedBytes += privateBytes;
+          if (copiedBytes > config.maxRunBytes) throw new Error(`Eval run budget exceeded ${config.maxRunBytes} bytes`);
+        } else {
+          fs.symlinkSync(path.relative(caseDir, snapshotByMode.get(mode)), repoCopy, "dir");
+        }
         const caseData = {
-          id: caseId,
-          repo: relative,
-          sourceRepo: repo,
-          scenario,
-          mode,
-          caseDir,
-          repoCopy,
-          promptPath: path.join(caseDir, "prompt.md"),
-          expectedPath: path.join(caseDir, "expected.json"),
-          resultPath: path.join(caseDir, "result.md"),
-          tracePath: path.join(caseDir, "trace.md"),
-          scorePath: path.join(caseDir, "score.json"),
+          id: caseId, repo: inventory.relative, scenario, mode, mutable, caseDir, repoCopy,
+          promptPath: path.join(caseDir, "prompt.md"), expectedPath: path.join(caseDir, "expected.json"),
+          resultPath: path.join(caseDir, "result.md"), tracePath: path.join(caseDir, "trace.md"),
+          eventsPath: path.join(caseDir, "events.jsonl"), scorePath: path.join(caseDir, "score.json"),
           judgePromptPath: path.join(caseDir, "judge-prompt.md"),
         };
         const scenarioExpected = expectedForScenario(expected, scenario, mode);
+        scenarioExpected.provenance = { repoId: inventory.relative, sourceHash: inventory.sourceHash };
+        scenarioExpected.expectationHash = hashObject({ ...scenarioExpected, expectationHash: undefined });
         writeJson(caseData.expectedPath, scenarioExpected);
         fs.writeFileSync(caseData.promptPath, renderPrompt(caseData, scenarioExpected));
         fs.writeFileSync(caseData.resultPath, "");
         fs.writeFileSync(caseData.tracePath, "");
+        fs.writeFileSync(caseData.eventsPath, "");
         fs.writeFileSync(caseData.judgePromptPath, renderJudgePrompt(caseData, scenarioExpected));
+        caseData.fixtureHash = hashObject({ id: caseId, sourceHash: inventory.sourceHash, expectationHash: scenarioExpected.expectationHash, mutable });
         cases.push(caseData);
       }
     }
   }
 
   const manifest = {
-    schema: 1,
-    runId,
-    projectRoot,
-    scenarios,
-    modes: selectedModes,
-    repos: repos.map((repo) => path.relative(projectRoot, repo) || path.basename(repo)),
+    schema: 3, runId: config.runId, projectRootId: path.basename(config.projectRoot),
+    scenarios: config.scenarios, modes: config.selectedModes, repos: inventories.map((item) => item.relative), snapshots,
+    provenance: { includeUntracked: config.includeUntracked, inventoryHash: hashObject(inventories.map((item) => ({ repo: item.relative, sourceHash: item.sourceHash }))) },
+    preflight: preflightSummary(inventories, config, copiedBytes),
+    retention: { containsRepoCopies: true, snapshotBytes: copiedBytes, cleanupStatus: "active" },
     cases: cases.map((entry) => ({
-      id: entry.id,
-      repo: entry.repo,
-      scenario: entry.scenario,
-      mode: entry.mode,
-      caseDir: path.relative(runDir, entry.caseDir),
-      promptPath: path.relative(runDir, entry.promptPath),
-      expectedPath: path.relative(runDir, entry.expectedPath),
-      resultPath: path.relative(runDir, entry.resultPath),
-      tracePath: path.relative(runDir, entry.tracePath),
-      scorePath: path.relative(runDir, entry.scorePath),
-      judgePromptPath: path.relative(runDir, entry.judgePromptPath),
+      id: entry.id, repo: entry.repo, scenario: entry.scenario, mode: entry.mode, mutable: entry.mutable, fixtureHash: entry.fixtureHash,
+      caseDir: path.relative(config.runDir, entry.caseDir), promptPath: path.relative(config.runDir, entry.promptPath),
+      expectedPath: path.relative(config.runDir, entry.expectedPath), resultPath: path.relative(config.runDir, entry.resultPath),
+      tracePath: path.relative(config.runDir, entry.tracePath), eventsPath: path.relative(config.runDir, entry.eventsPath),
+      scorePath: path.relative(config.runDir, entry.scorePath), judgePromptPath: path.relative(config.runDir, entry.judgePromptPath),
     })),
   };
+  writeJson(path.join(config.runDir, "manifest.json"), manifest);
+  fs.writeFileSync(path.join(config.runDir, "report.md"), renderPrepareReport(config.runDir, manifest));
+  console.log(`Prepared ${cases.length} cases in ${config.runDir}`);
+  console.log(`Next: fill result.md files, then run: node scripts/eval-agent-problem-solving.js score ${config.runDir}`);
+}
 
-  writeJson(path.join(runDir, "manifest.json"), manifest);
-  fs.writeFileSync(path.join(runDir, "report.md"), renderPrepareReport(runDir, manifest));
-  console.log(`Prepared ${cases.length} cases in ${runDir}`);
-  console.log(`Next: fill result.md files, then run: node scripts/eval-agent-problem-solving.js score ${runDir}`);
+function preflight() {
+  const config = prepareConfig(parseArgs(process.argv.slice(3)));
+  const inventories = inspectRepos(config);
+  const summary = preflightSummary(inventories, config, 0);
+  process.stdout.write(renderPreflightReport(summary));
+  if (inventories.some((item) => item.overBudget) || summary.estimatedRunBytes > config.maxRunBytes) process.exitCode = 1;
 }
 
 function score() {
@@ -159,7 +180,10 @@ function score() {
     const tracePath = entry.tracePath ? path.join(runDir, entry.tracePath) : path.join(caseDir, "trace.md");
     const result = readTextSafe(resultPath);
     const trace = readTextSafe(tracePath);
-    const scored = scoreResult(expected, result, trace);
+    const eventsPath = entry.eventsPath ? path.join(runDir, entry.eventsPath) : path.join(caseDir, "events.jsonl");
+    const events = readEvents(eventsPath);
+    const persistence = verifyPersistence(events, path.join(caseDir, "repo"), expected);
+    const scored = scoreResult(expected, result, trace, events, manifest.schema || 1, persistence);
     const scoreData = {
       id: entry.id,
       repo: entry.repo,
@@ -167,6 +191,8 @@ function score() {
       mode: entry.mode,
       resultPath: entry.resultPath,
       tracePath: entry.tracePath || path.relative(runDir, tracePath),
+      eventsPath: entry.eventsPath || path.relative(runDir, eventsPath),
+      schema: 2,
       ...scored,
     };
     writeJson(path.join(caseDir, "score.json"), scoreData);
@@ -231,6 +257,78 @@ function fillPending() {
   if (remaining === 0) console.log(`Next: node scripts/eval-agent-problem-solving.js score ${runDir} --gate`);
 }
 
+function listRuns() {
+  const args = parseArgs(process.argv.slice(3));
+  const root = path.resolve(args._[0] || defaultEvalRoot);
+  if (!fs.existsSync(root)) return console.log("No eval runs found.");
+  for (const entry of fs.readdirSync(root, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    if (!entry.isDirectory()) continue;
+    const manifest = readJSONSafe(path.join(root, entry.name, "manifest.json"));
+    if (!manifest) continue;
+    const bytes = manifest.retention?.snapshotBytes ?? "unknown";
+    const cleanup = manifest.retention?.cleanupStatus || "legacy-unknown";
+    console.log(`${entry.name}\tcases=${manifest.cases?.length || 0}\tsnapshot_bytes=${bytes}\t${cleanup}`);
+  }
+}
+
+function finalizeRun() {
+  const args = parseArgs(process.argv.slice(3));
+  const runDirArg = args._[0];
+  if (!runDirArg) throw new Error("Provide an eval run directory.");
+  const runDir = path.resolve(runDirArg);
+  assertSafeManagedPath(runDir, path.dirname(runDir));
+  const manifestPath = path.join(runDir, "manifest.json");
+  const manifest = readJSONSafe(manifestPath);
+  if (!manifest) throw new Error(`No manifest.json found in ${runDir}`);
+  const pending = (manifest.cases || []).filter((entry) => isPendingEntry(runDir, entry));
+  if (pending.length && args.force !== "true") throw new Error(`Refusing to finalize ${pending.length} pending case(s); pass --force to override`);
+  const snapshotsPath = path.join(runDir, "snapshots");
+  if (fs.existsSync(snapshotsPath)) makeTreeWritable(snapshotsPath);
+  const disposable = [snapshotsPath];
+  for (const entry of manifest.cases || []) disposable.push(path.join(runDir, entry.caseDir, "repo"));
+  for (const disposablePath of disposable) {
+    assertSafeManagedPath(disposablePath, runDir);
+    fs.rmSync(disposablePath, { recursive: true, force: true });
+  }
+  manifest.retention = { ...(manifest.retention || {}), containsRepoCopies: false, cleanupStatus: "finalized", finalizedAt: new Date().toISOString() };
+  writeJson(manifestPath, manifest);
+  console.log(`Finalized ${runDir}; disposable snapshots removed.`);
+}
+
+function pruneRuns() {
+  const args = parseArgs(process.argv.slice(3));
+  const root = path.resolve(args._[0] || defaultEvalRoot);
+  assertSafeManagedPath(root, path.dirname(root));
+  const days = numericArg(args["older-than"], 14, "older-than");
+  const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
+  if (!fs.existsSync(root)) return console.log("No eval runs found.");
+  for (const entry of fs.readdirSync(root, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    if (!entry.isDirectory()) continue;
+    const runDir = path.join(root, entry.name);
+    const manifest = readJSONSafe(path.join(runDir, "manifest.json"));
+    if (!manifest || fs.statSync(runDir).mtimeMs >= cutoff) continue;
+    const pending = (manifest.cases || []).some((caseEntry) => isPendingEntry(runDir, caseEntry));
+    if (pending && args.force !== "true") {
+      console.log(`SKIP ${entry.name}: pending cases`);
+      continue;
+    }
+    if (args.yes === "true") {
+      assertSafeManagedPath(runDir, root);
+      makeTreeWritable(runDir);
+      fs.rmSync(runDir, { recursive: true, force: true });
+      console.log(`REMOVED ${entry.name}`);
+    } else console.log(`WOULD REMOVE ${entry.name}`);
+  }
+}
+
+function assertSafeManagedPath(candidate, parent) {
+  const resolved = path.resolve(candidate);
+  const resolvedParent = path.resolve(parent);
+  if (resolved === path.parse(resolved).root || resolved === resolvedParent || !resolved.startsWith(`${resolvedParent}${path.sep}`)) {
+    throw new Error(`Refusing unsafe retention path: ${resolved}`);
+  }
+}
+
 function filteredManifestEntries(manifest, args) {
   const filterScenarios = splitList(args.scenarios, []);
   const filterModes = splitList(args.modes, []);
@@ -251,6 +349,7 @@ function casePaths(runDir, entry) {
     promptPath: path.join(runDir, entry.promptPath),
     resultPath: path.join(runDir, entry.resultPath),
     tracePath: entry.tracePath ? path.join(runDir, entry.tracePath) : path.join(caseDir, "trace.md"),
+    eventsPath: entry.eventsPath ? path.join(runDir, entry.eventsPath) : path.join(caseDir, "events.jsonl"),
   };
 }
 
@@ -262,6 +361,7 @@ function expandTemplate(template, { entry, paths }) {
     promptPath: paths.promptPath,
     resultPath: paths.resultPath,
     tracePath: paths.tracePath,
+    eventsPath: paths.eventsPath,
   };
   return Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, shellQuote(value)), template);
 }
@@ -297,29 +397,162 @@ function walk(dir, visit) {
   }
 }
 
-function copyRepo(source, target, options) {
-  ensureDir(target);
-  copyDirectory(source, target, options);
+function prepareConfig(args) {
+  const projectRoot = path.resolve(args._[0] || defaultProjectRoot);
+  const scenarios = splitList(args.scenarios, defaultScenarios);
+  const selectedModes = splitList(args.modes, modes);
+  const selectedRepos = splitList(args.repos, []);
+  const sample = numericArg(args.sample, 0, "sample");
+  const runId = args.runId || `${today()}-${timestampSuffix()}`;
+  const runDir = path.resolve(args.output || path.join(defaultEvalRoot, runId));
+  const repos = findRepos(projectRoot)
+    .filter((repo) => fs.existsSync(path.join(repo, "CONTEXT.md")))
+    .filter((repo) => !selectedRepos.length || selectedRepos.includes(path.relative(projectRoot, repo)) || selectedRepos.includes(path.basename(repo)))
+    .slice(0, sample > 0 ? sample : undefined);
+  return {
+    projectRoot, scenarios, selectedModes, runId, runDir, repos,
+    includeUntracked: args["include-untracked"] === "true",
+    maxFileBytes: numericArg(args["max-file-bytes"], maxCopyFileBytes, "max-file-bytes"),
+    maxRepoBytes: numericArg(args["max-repo-bytes"], maxRepoCopyBytes, "max-repo-bytes"),
+    maxRunBytes: numericArg(args["max-run-bytes"], maxRunCopyBytes, "max-run-bytes"),
+  };
 }
 
-function copyDirectory(source, target, options) {
+function inspectRepos(config) {
+  return config.repos.map((repo) => inventoryRepo(repo, path.relative(config.projectRoot, repo) || path.basename(repo), config));
+}
+
+function inventoryRepo(repo, relativeRepo, config) {
+  const gitArgs = ["ls-files", "-c", "-z"];
+  if (config.includeUntracked) gitArgs.splice(2, 0, "-o", "--exclude-standard");
+  const listed = spawnSync("git", gitArgs, { cwd: repo, encoding: "buffer" });
+  if (listed.status !== 0) throw new Error(`Cannot inventory Git files for ${relativeRepo}`);
+  const entries = [];
+  const exclusions = {};
+  for (const relative of [...new Set(listed.stdout.toString("utf8").split("\0").filter(Boolean))].sort()) {
+    const from = path.join(repo, relative);
+    let stat;
+    try { stat = fs.statSync(from); } catch { continue; }
+    let reason = null;
+    if (!stat.isFile()) reason = "not-file";
+    else if (shouldSkipCopyPath(relative, "progressive-harness")) reason = "private-or-generated-path";
+    else if (stat.size > config.maxFileBytes) reason = "max-file-bytes";
+    else if (scanSecretContent(from, stat.size)) reason = "secret-content";
+    if (reason) exclusions[reason] = (exclusions[reason] || 0) + 1;
+    entries.push({ relative, size: stat.size, excluded: reason, hash: reason ? null : hashFile(from) });
+  }
+  const included = entries.filter((entry) => !entry.excluded);
+  const bytes = included.reduce((sum, entry) => sum + entry.size, 0);
+  return {
+    repo, relative: relativeRepo, entries, bytes, files: included.length, exclusions,
+    largest: [...included].sort((a, b) => b.size - a.size || a.relative.localeCompare(b.relative)).slice(0, 5).map(({ relative, size }) => ({ path: relative, bytes: size })),
+    sourceHash: hashObject(included.map(({ relative, size, hash }) => ({ path: relative, bytes: size, hash }))),
+    overBudget: bytes > config.maxRepoBytes,
+  };
+}
+
+function copyRepo(source, target, options) {
   ensureDir(target);
-  let entries = [];
-  try {
-    entries = fs.readdirSync(source, { withFileTypes: true });
-  } catch {
-    return;
+  let bytes = 0;
+  let files = 0;
+  let excluded = 0;
+  for (const entry of options.inventory.entries) {
+    if (entry.excluded || shouldSkipCopyPath(entry.relative, options.mode)) { excluded += 1; continue; }
+    bytes += entry.size;
+    if (bytes > options.remainingBytes) throw new Error(`Eval run budget exceeded while copying ${options.inventory.relative}`);
+    const to = path.join(target, entry.relative);
+    ensureDir(path.dirname(to));
+    fs.copyFileSync(path.join(source, entry.relative), to);
+    files += 1;
   }
-  for (const entry of entries) {
-    if (skipDirs.has(entry.name)) continue;
-    if (shouldSkipPrivateCopy(entry.name)) continue;
-    if (options.mode === "no-harness" && contextFiles.has(entry.name)) continue;
-    if (options.mode === "flat-harness" && entry.name === ".context-harness") continue;
-    const from = path.join(source, entry.name);
-    const to = path.join(target, entry.name);
-    if (entry.isDirectory()) copyDirectory(from, to, options);
-    else if (entry.isFile()) fs.copyFileSync(from, to);
+  return { bytes, files, excluded, sourceHash: options.inventory.sourceHash };
+}
+
+function scanSecretContent(file, size) {
+  if (size === 0 || size > 1024 * 1024) return null;
+  const buffer = fs.readFileSync(file);
+  if (buffer.includes(0)) return null;
+  const text = buffer.toString("utf8");
+  return secretContentPatterns.find((item) => item.pattern.test(text))?.name || null;
+}
+
+function hashFile(file) {
+  return crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex");
+}
+
+function hashObject(value) {
+  return crypto.createHash("sha256").update(JSON.stringify(value)).digest("hex");
+}
+
+function numericArg(value, fallback, name) {
+  if (value === undefined) return fallback;
+  const number = Number(value);
+  if (!Number.isSafeInteger(number) || number < 0) throw new Error(`--${name} must be a non-negative integer`);
+  return number;
+}
+
+function makeTreeReadOnly(root) {
+  forEachTreePath(root, (entryPath, stat) => fs.chmodSync(entryPath, stat.isDirectory() ? 0o555 : 0o444));
+}
+
+function makeTreeWritable(root) {
+  forEachTreePath(root, (entryPath, stat) => fs.chmodSync(entryPath, stat.isDirectory() ? 0o755 : 0o644), true);
+}
+
+function forEachTreePath(root, visit, parentsFirst = false) {
+  const entries = [];
+  const collect = (current) => {
+    const stat = fs.lstatSync(current);
+    entries.push([current, stat]);
+    if (stat.isDirectory()) for (const name of fs.readdirSync(current).sort()) collect(path.join(current, name));
+  };
+  collect(root);
+  for (const [entryPath, stat] of parentsFirst ? entries : entries.reverse()) visit(entryPath, stat);
+}
+
+function treeBytes(root) {
+  let bytes = 0;
+  forEachTreePath(root, (_entryPath, stat) => { if (stat.isFile()) bytes += stat.size; }, true);
+  return bytes;
+}
+
+function preflightSummary(inventories, config, actualRunBytes) {
+  const snapshotBytes = inventories.reduce((sum, item) => sum + (item.bytes * config.selectedModes.length), 0);
+  const mutableCopies = config.scenarios.filter((scenario) => mutationScenarios.has(scenario)).length;
+  const privateBytes = inventories.reduce((sum, item) => sum + (item.bytes * config.selectedModes.length * mutableCopies), 0);
+  return {
+    includeUntracked: config.includeUntracked,
+    limits: { maxFileBytes: config.maxFileBytes, maxRepoBytes: config.maxRepoBytes, maxRunBytes: config.maxRunBytes },
+    repos: inventories.map(({ relative, bytes, files, exclusions, largest, overBudget }) => ({ repo: relative, bytes, files, exclusions, largest, overBudget })),
+    reuse: { sharedSnapshots: inventories.length * config.selectedModes.length, readOnlyCases: inventories.length * config.selectedModes.length * config.scenarios.filter((item) => !mutationScenarios.has(item)).length, privateMutationCopies: inventories.length * config.selectedModes.length * mutableCopies },
+    estimatedRunBytes: snapshotBytes + privateBytes,
+    actualRunBytes,
+  };
+}
+
+function renderPreflightReport(summary) {
+  const lines = [
+    "# Eval Preflight", "", `Untracked files: ${summary.includeUntracked ? "included by opt-in" : "excluded"}`,
+    `Estimated run bytes: ${summary.estimatedRunBytes} / ${summary.limits.maxRunBytes}`,
+    `Reuse: ${summary.reuse.sharedSnapshots} shared read-only snapshots; ${summary.reuse.readOnlyCases} linked read-only cases; ${summary.reuse.privateMutationCopies} private mutation copies`, "",
+    "## Repositories", "",
+  ];
+  for (const repo of summary.repos) {
+    lines.push(`- ${repo.repo}: ${repo.files} files, ${repo.bytes} bytes${repo.overBudget ? " (OVER REPO BUDGET)" : ""}`);
+    lines.push(`  exclusions: ${Object.entries(repo.exclusions).map(([name, count]) => `${name}=${count}`).join(", ") || "none"}`);
+    lines.push(`  largest: ${repo.largest.map((item) => `${item.path} (${item.bytes})`).join(", ") || "none"}`);
   }
+  return `${lines.join("\n")}\n`;
+}
+
+function shouldSkipCopyPath(relative, mode) {
+  const parts = relative.split(/[\\/]/u);
+  const name = parts[parts.length - 1];
+  if (parts.some((part) => skipDirs.has(part) || privatePathParts.has(part))) return true;
+  if (shouldSkipPrivateCopy(name)) return true;
+  if (mode === "no-harness" && parts.length === 1 && contextFiles.has(name)) return true;
+  if (mode !== "progressive-harness" && parts[0] === ".context-harness") return true;
+  return false;
 }
 
 function shouldSkipPrivateCopy(name) {
@@ -347,7 +580,7 @@ function buildExpected(repo, relative) {
 
 function expectedForScenario(base, scenario, mode) {
   const expected = {
-    schema: 1,
+    schema: 2,
     repo: base.repo,
     scenario,
     mode,
@@ -408,8 +641,8 @@ function renderPrompt(caseData, expected) {
     scenarioPrompt(caseData.scenario),
     "",
     "## Constraints",
-    "- Do not modify repository source files for this read-only eval.",
-    "- If you need to run commands, use read-only inspection commands only.",
+    caseData.mutable ? "- This scenario uses a private writable fixture; make only the context changes required by the task." : "- Do not modify repository source files for this read-only eval.",
+    caseData.mutable ? "- Record structured file-change and command evidence in events.jsonl, including hashes needed to verify persistence." : "- If you need to run commands, use read-only inspection commands only.",
     "- Be concrete: cite files, next actions, blockers, and verification commands.",
   ];
 
@@ -420,7 +653,7 @@ function renderPrompt(caseData, expected) {
       "- Use selected cards before raw bulky sections; open raw chunks only when a selected card says they are needed.",
       "- If `CONTEXT.md` is small, direct `CONTEXT.md` use is expected; if it is large, use hydrate-selected cards/sections instead of reading it wholesale.",
       "- If context-harness files, generated indexes, or commands look stale or broken, mention that as a follow-up unless it blocks this read-only task; do not let harness maintenance replace the requested project understanding or planning task.",
-      "- Include a `Context Evidence` section listing files/commands used in order, including hydrate output or selected card IDs. Also copy tool trace notes to `" + path.relative(caseData.repoCopy, caseData.tracePath) + "` if possible."
+      "- Include a `Context Evidence` section for explanation. Runner-observed execution belongs in `" + path.relative(caseData.repoCopy, caseData.eventsPath) + "` as ordered JSONL events; prose in `" + path.relative(caseData.repoCopy, caseData.tracePath) + "` is claimed evidence only."
     );
   } else if (caseData.mode === "flat-harness") {
     lines.push(
@@ -466,7 +699,7 @@ function renderJudgePrompt(caseData, expected) {
   ].join("\n")}\n`;
 }
 
-function scoreResult(expected, result, trace = "") {
+function scoreResult(expected, result, trace = "", events = [], runSchema = 1, persistence = null) {
   const hasResult = Boolean(result.trim());
   if (!hasResult) {
     return {
@@ -475,11 +708,11 @@ function scoreResult(expected, result, trace = "") {
       max: 10,
       answerScore: 0,
       retrievalScore: 0,
-      saveRoutingScore: 0,
+      routingKnowledgeScore: 0,
       contextEfficiencyScore: 0,
       missing: [],
       avoided: [],
-      evidence: evidenceSummary(expected, result, trace),
+      evidence: evidenceSummary(expected, result, trace, events, runSchema, persistence),
       deterministicChecks: {
         mustMention: expected.mustMention.length,
         mentioned: 0,
@@ -495,15 +728,13 @@ function scoreResult(expected, result, trace = "") {
   const avoided = expected.mustAvoid.filter((item) => containsNormalizedPhrase(result, item));
   const mentioned = mustMention.length - missing.length;
   const answerScore = mustMention.length ? Math.round((mentioned / mustMention.length) * 10) : 10;
-  const evidence = evidenceSummary(expected, result, trace);
+  const evidence = evidenceSummary(expected, result, trace, events, runSchema, persistence);
   const retrievalScore = retrievalEvidenceScore(expected, evidence);
-  const saveRoutingScore = saveRoutingEvidenceScore(expected, evidence);
+  const routingKnowledgeScore = routingKnowledgeEvidenceScore(expected, evidence);
   const contextEfficiencyScore = contextEfficiencyEvidenceScore(expected, evidence);
   const penalty = avoided.length * 2;
-  const total = Math.max(0, Math.min(10, Math.round((answerScore * 0.6) + (retrievalScore * 0.2) + (saveRoutingScore * 0.1) + (contextEfficiencyScore * 0.1)) - penalty));
-  const rawGap = primaryGap(expected, missing, avoided, evidence);
-  const answerOnlyReviewNote = rawGap === "answer-quality-gap" && retrievalScore >= 8 && saveRoutingScore >= 8 && contextEfficiencyScore >= 8;
-  const gap = answerOnlyReviewNote ? "none" : rawGap;
+  const total = Math.max(0, Math.min(10, Math.round((answerScore * 0.6) + (retrievalScore * 0.2) + (routingKnowledgeScore * 0.1) + (contextEfficiencyScore * 0.1)) - penalty));
+  const gap = primaryGap(expected, missing, avoided, evidence);
   const status = total >= 9 && gap === "none" ? "pass" : "needs-review";
   return {
     status,
@@ -511,7 +742,7 @@ function scoreResult(expected, result, trace = "") {
     max: 10,
     answerScore,
     retrievalScore,
-    saveRoutingScore,
+    routingKnowledgeScore,
     contextEfficiencyScore,
     missing,
     avoided,
@@ -526,30 +757,50 @@ function scoreResult(expected, result, trace = "") {
   };
 }
 
-function evidenceSummary(expected, result, trace) {
+function evidenceSummary(expected, result, trace, events = [], runSchema = 1, persistence = null) {
   const combined = `${trace}\n${result}`;
+  const eventValidation = validateEvents(events);
   const lower = combined.toLowerCase();
-  const contextIndex = firstIndex(lower, ["context.md", "read context"]);
-  const hydrateIndex = firstIndex(lower, ["context-index.js hydrate", "hydrate_query:", "hydrate \""]);
-  const planIndex = firstIndex(lower, ["plan.md", "read plan"]);
-  const chunkIndex = firstIndex(lower, [".context-harness/chunks", "raw detail on demand"]);
-  const cardIndex = firstIndex(lower, [".context-harness/cards", "selected_cards:", "ctx-"]);
+  const ordered = events.map((event, index) => ({ ...event, order: Number.isFinite(event.seq) ? event.seq : index + 1 }));
+  const successfulCommands = ordered.filter((event) => event.type === "command" && event.exitCode === 0);
+  const hydrateEvent = successfulCommands.find((event) => Array.isArray(event.argv) && event.argv.includes("hydrate"));
+  const hydrateResult = ordered.find((event) => event.type === "hydrate_result" && Array.isArray(event.selectedCardIds));
+  const reads = ordered.filter((event) => event.type === "file_read");
+  const cardRead = reads.find((event) => String(event.path || "").startsWith(".context-harness/cards/"));
+  const planRead = reads.find((event) => event.path === "PLAN.md");
+  const chunkRead = reads.find((event) => String(event.path || "").startsWith(".context-harness/chunks/"));
+  const contextRead = reads.find((event) => event.path === "CONTEXT.md");
+  const legacy = runSchema < 2;
+  const claimedHydrate = firstIndex(lower, ["context-index.js hydrate", "hydrate_query:", "hydrate \""]) !== -1;
+  const claimedCard = firstIndex(lower, [".context-harness/cards", "selected_cards:", "ctx-"]) !== -1;
+  const verifiedHydrate = Boolean(hydrateEvent && hydrateResult);
+  const verifiedCard = Boolean(cardRead || hydrateResult?.selectedCardIds?.length);
+  const selectedCards = hydrateResult?.selectedCardIds || [];
   return {
-    hasTrace: Boolean(trace.trim()),
-    hasContextEvidence: /context evidence/i.test(result) || Boolean(trace.trim()),
-    hydrate: hydrateIndex !== -1,
-    card: cardIndex !== -1 || (expected.expectedCards || []).some((card) => lower.includes(card.toLowerCase())),
-    selectedExpectedCards: (expected.expectedCards || []).filter((card) => lower.includes(card.toLowerCase())),
-    plan: planIndex !== -1,
-    chunk: chunkIndex !== -1,
-    context: contextIndex !== -1,
-    hydrateBeforePlan: hydrateIndex !== -1 && (planIndex === -1 || hydrateIndex < planIndex),
-    hydrateBeforeChunk: hydrateIndex !== -1 && (chunkIndex === -1 || hydrateIndex < chunkIndex),
-    hasAlwaysReadContext: /always[-_ ]read|concise context|small context|context\.md/i.test(combined),
+    hasTrace: Boolean(trace.trim()) || events.length > 0,
+    hasContextEvidence: events.length > 0 || /context evidence/i.test(result) || Boolean(trace.trim()),
+    traceVerification: events.length ? "verified" : legacy && trace.trim() ? "legacy-unverified" : trace.trim() ? "claimed" : "absent",
+    claimedHydrate,
+    claimedCard,
+    verifiedHydrate,
+    verifiedCard,
+    hydrate: verifiedHydrate || (legacy && claimedHydrate),
+    card: verifiedCard || (legacy && (claimedCard || (expected.expectedCards || []).some((card) => lower.includes(card.toLowerCase())))),
+    selectedExpectedCards: (expected.expectedCards || []).filter((card) => selectedCards.includes(card) || (legacy && lower.includes(card.toLowerCase()))),
+    plan: Boolean(planRead) || (legacy && firstIndex(lower, ["plan.md", "read plan"]) !== -1),
+    chunk: Boolean(chunkRead) || (legacy && firstIndex(lower, [".context-harness/chunks", "raw detail on demand"]) !== -1),
+    context: Boolean(contextRead) || (legacy && firstIndex(lower, ["context.md", "read context"]) !== -1),
+    hydrateBeforePlan: Boolean(hydrateEvent) && (!planRead || hydrateEvent.order < planRead.order),
+    hydrateBeforeChunk: Boolean(hydrateEvent) && (!chunkRead || hydrateEvent.order < chunkRead.order),
+    hasAlwaysReadContext: Boolean(contextRead) || /always[-_ ]read|concise context|small context|context\.md/i.test(combined),
     taskLocalToPlan: /task-local|findings|progress|decisions/i.test(combined) && /plan\.md/i.test(combined),
     durableToContext: /durable|terms|rules|invariants|lessons/i.test(combined) && /context\.md/i.test(combined),
     nowLast: /now\.md.*last|rewrite.*now\.md|refresh.*now\.md|update.*now\.md|now\.md.*update|now\.md.*rewrite|now\.md.*refresh|resume packet/i.test(combined),
     indexUpdate: /context-index\.js update/i.test(combined),
+    eventsValid: eventValidation.valid,
+    eventErrors: eventValidation.errors,
+    persistenceVerified: Boolean(persistence?.verified),
+    persistence,
     flatOveruse: /read (all|whole|entire) (of )?(plan\.md|large context\.md)|whole-file plan|wholesale plan/i.test(lower),
   };
 }
@@ -565,7 +816,7 @@ function retrievalEvidenceScore(expected, evidence) {
   return Math.min(10, score);
 }
 
-function saveRoutingEvidenceScore(expected, evidence) {
+function routingKnowledgeEvidenceScore(expected, evidence) {
   if (expected.scenario !== "context-maintenance") return 10;
   let score = 0;
   if (evidence.taskLocalToPlan) score += 3;
@@ -594,6 +845,7 @@ function primaryGap(expected, missing, avoided, evidence) {
   if (expected.mode === "progressive-harness" && evidence.flatOveruse) return "flat-core-overuse-gap";
   if (expected.mode === "progressive-harness" && evidence.chunk && !evidence.hydrateBeforeChunk) return "retrieval-order-gap";
   if (expected.scenario === "context-maintenance" && (!evidence.taskLocalToPlan || !evidence.durableToContext || !evidence.nowLast || !evidence.indexUpdate)) return "save-routing-gap";
+  if (mutationScenarios.has(expected.scenario) && (!evidence.eventsValid || !evidence.persistenceVerified)) return "eval-instrumentation-gap";
   if (!evidence.hasContextEvidence && expected.mode === "progressive-harness") return "eval-instrumentation-gap";
   return "none";
 }
@@ -608,7 +860,7 @@ function renderPrepareReport(runDir, manifest) {
     "# Fresh Agent Problem-Solving Eval",
     "",
     `Run: \`${manifest.runId}\``,
-    `Project root: \`${manifest.projectRoot}\``,
+    `Project root ID: \`${manifest.projectRootId || path.basename(manifest.projectRoot || "unknown")}\``,
     `Cases: ${manifest.cases.length}`,
     "",
     "## How to run",
@@ -647,7 +899,7 @@ function renderScoreReport(manifest, scores, gate = evaluateGate(manifest, score
     `Run: \`${manifest.runId}\``,
     `Repos: ${manifest.repos.length}`,
     `Cases: ${scores.length}`,
-    "Modes: no-harness, flat-harness, progressive-harness",
+    `Modes: ${(manifest.modes || []).join(", ")}`,
     `Gate: ${gate.pass ? "pass" : "fail"}`,
     "",
     "| Repo | Scenario | No harness | Flat | Progressive | Δ vs none | Δ vs flat | Evidence | Main gap |",
@@ -659,17 +911,14 @@ function renderScoreReport(manifest, scores, gate = evaluateGate(manifest, score
     const noHarness = grouped["no-harness"];
     const flat = grouped["flat-harness"];
     const progressive = grouped["progressive-harness"];
-    const noScore = noHarness ? noHarness.total : 0;
-    const flatScore = flat ? flat.total : 0;
-    const progressiveScore = progressive ? progressive.total : 0;
-    const deltaNo = progressiveScore - noScore;
-    const deltaFlat = progressiveScore - flatScore;
+    const deltaNo = scoreDelta(progressive, noHarness);
+    const deltaFlat = scoreDelta(progressive, flat);
     const gap = progressive?.gap && progressive.gap !== "none" ? progressive.gap : "none";
     lines.push(`| \`${repo}\` | ${scenario} | ${scoreLabel(noHarness)} | ${scoreLabel(flat)} | ${scoreLabel(progressive)} | ${deltaNo} | ${deltaFlat} | ${evidenceLabel(progressive)} | ${gap} |`);
   }
 
   lines.push("", "## Gate Checks", "");
-  for (const check of gate.checks) lines.push(`- ${check.pass ? "PASS" : "FAIL"}: ${check.name} (${check.value})`);
+  for (const check of gate.checks) lines.push(`- ${check.status.toUpperCase()}: ${check.name} (${check.value})`);
 
   lines.push("", "## Actionable Gaps", "");
   const gaps = groupGaps(scores);
@@ -678,7 +927,8 @@ function renderScoreReport(manifest, scores, gate = evaluateGate(manifest, score
 
   lines.push("", "## Case Details", "");
   for (const score of scores) {
-    lines.push(`- \`${score.id}\`: ${score.status}, ${score.total}/${score.max}; answer ${score.answerScore}/10; retrieval ${score.retrievalScore}/10; save ${score.saveRoutingScore}/10; efficiency ${score.contextEfficiencyScore}/10; missing: ${score.missing.join("; ") || "none"}; avoided: ${score.avoided.join("; ") || "none"}`);
+    const routing = score.routingKnowledgeScore ?? score.saveRoutingScore ?? 0;
+    lines.push(`- \`${score.id}\`: ${score.status}, ${score.total}/${score.max}; answer ${score.answerScore}/10; retrieval ${score.retrievalScore}/10; routing knowledge ${routing}/10; efficiency ${score.contextEfficiencyScore}/10; evidence ${score.evidence?.traceVerification || "absent"}; missing: ${score.missing.join("; ") || "none"}; avoided: ${score.avoided.join("; ") || "none"}`);
   }
   lines.push("");
   return `${lines.join("\n")}\n`;
@@ -692,45 +942,53 @@ function evaluateGate(manifest, scores) {
     if (!grouped.has(key)) grouped.set(key, {});
     grouped.get(key)[score.mode] = score;
   }
-  const pairs = [...grouped.values()];
-  const noScores = pairs.map((group) => group["no-harness"]?.total).filter((value) => Number.isFinite(value));
-  const progressiveScores = pairs.map((group) => group["progressive-harness"]?.total).filter((value) => Number.isFinite(value));
-  const avgNo = average(noScores);
-  const avgProgressive = average(progressiveScores);
-  const regressions = pairs.filter((group) => group["progressive-harness"] && group["no-harness"] && group["progressive-harness"].total < group["no-harness"].total).length;
-  const flatPairs = pairs.filter((group) => group["progressive-harness"] && group["flat-harness"]);
+  const groups = [...grouped.values()];
+  const noPairs = groups.filter((group) => group["progressive-harness"] && group["no-harness"]);
+  const flatPairs = groups.filter((group) => group["progressive-harness"] && group["flat-harness"]);
+  const regressions = noPairs.filter((group) => group["progressive-harness"].total < group["no-harness"].total).length;
   const beatsFlat = flatPairs.filter((group) => group["progressive-harness"].total >= group["flat-harness"].total).length;
-  const hydrateRate = rate(progressive, (score) => score.evidence?.hydrate);
-  const cardOrderViolations = progressive.filter((score) => score.evidence?.chunk && !score.evidence?.hydrateBeforeChunk).length;
-  const overuseViolations = progressive.filter((score) => score.evidence?.flatOveruse).length;
-  const maintenance = progressive.filter((score) => score.scenario === "context-maintenance");
-  const saveRoutingRate = rate(maintenance, (score) => score.saveRoutingScore >= 8);
-  const driftHijacks = scores.filter((score) => score.avoided?.length).length;
+  const hydrate = ratio(progressive, (score) => score.evidence?.verifiedHydrate || (manifest.schema < 2 && score.evidence?.hydrate));
+  const routingCases = progressive.filter((score) => score.scenario === "context-maintenance");
+  const routing = ratio(routingCases, (score) => (score.routingKnowledgeScore ?? score.saveRoutingScore ?? 0) >= 8);
+  const flatRate = ratio(flatPairs, (group) => group["progressive-harness"].total >= group["flat-harness"].total);
   const pending = scores.filter((score) => score.status === "pending").length;
   const progressiveGaps = progressive.filter((score) => score.gap && score.gap !== "none").length;
-  const flatRate = flatPairs.length ? beatsFlat / flatPairs.length : 1;
+  const cardOrderViolations = progressive.filter((score) => score.evidence?.chunk && !score.evidence?.hydrateBeforeChunk).length;
+  const overuseViolations = progressive.filter((score) => score.evidence?.flatOveruse).length;
+  const driftHijacks = scores.filter((score) => score.avoided?.length).length;
+  const expectedProgressive = groups.filter((group) => group["progressive-harness"]).length;
   const checks = [
-    { name: "all cases completed", pass: pending === 0, value: `${pending} pending` },
-    { name: "no progressive actionable gaps", pass: progressiveGaps === 0, value: `${progressiveGaps} gap(s)` },
-    { name: "progressive average delta vs no-harness", pass: true, value: `${(avgProgressive - avgNo).toFixed(1)} (${avgProgressive.toFixed(1)} vs ${avgNo.toFixed(1)})` },
-    { name: "no progressive regressions vs no-harness", pass: regressions === 0, value: `${regressions} regression(s)` },
-    { name: "progressive beats/ties flat in >=90%", pass: flatRate >= 0.9, value: `${Math.round(flatRate * 100)}%` },
-    { name: "hydrate evidence >=90%", pass: hydrateRate >= 0.9, value: `${Math.round(hydrateRate * 100)}%` },
-    { name: "card/chunk order violations = 0", pass: cardOrderViolations === 0, value: `${cardOrderViolations}` },
-    { name: "flat overuse violations = 0", pass: overuseViolations === 0, value: `${overuseViolations}` },
-    { name: "save routing evidence >=90%", pass: saveRoutingRate >= 0.9, value: `${Math.round(saveRoutingRate * 100)}%` },
-    { name: "harness drift hijacks = 0", pass: driftHijacks === 0, value: `${driftHijacks}` },
+    check("all cases completed", pending === 0, `${pending} pending`),
+    check("no progressive actionable gaps", progressiveGaps === 0, `${progressiveGaps} gap(s)`),
+    comparisonCheck("no-harness matched-pair coverage", (manifest.modes || []).includes("no-harness"), noPairs.length === expectedProgressive, `${noPairs.length}/${expectedProgressive} pairs`),
+    comparisonCheck("no progressive regressions vs no-harness", noPairs.length > 0, regressions === 0, `${regressions}/${noPairs.length} regressions`),
+    comparisonCheck("progressive beats/ties flat in >=90%", flatRate.applicable, flatRate.value >= 0.9, flatRate.applicable ? `${beatsFlat}/${flatPairs.length} (${Math.round(flatRate.value * 100)}%)` : "n/a"),
+    comparisonCheck("verified hydrate evidence >=90%", hydrate.applicable, hydrate.value >= 0.9, hydrate.applicable ? `${hydrate.hits}/${hydrate.total} (${Math.round(hydrate.value * 100)}%)` : "n/a"),
+    check("card/chunk order violations = 0", cardOrderViolations === 0, `${cardOrderViolations}`),
+    check("flat overuse violations = 0", overuseViolations === 0, `${overuseViolations}`),
+    comparisonCheck("routing knowledge >=90%", routing.applicable, routing.value >= 0.9, routing.applicable ? `${routing.hits}/${routing.total} (${Math.round(routing.value * 100)}%)` : "n/a"),
+    check("harness drift hijacks = 0", driftHijacks === 0, `${driftHijacks}`),
   ];
-  return { pass: checks.every((check) => check.pass), checks };
+  return { pass: checks.every((item) => item.status !== "fail"), checks };
 }
 
-function average(values) {
-  return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+function check(name, pass, value) {
+  return { name, status: pass ? "pass" : "fail", pass, value };
 }
 
-function rate(items, predicate) {
-  if (!items.length) return 1;
-  return items.filter(predicate).length / items.length;
+function comparisonCheck(name, applicable, pass, value) {
+  return applicable ? check(name, pass, value) : { name, status: "not-applicable", pass: null, value: "n/a" };
+}
+
+function ratio(items, predicate) {
+  if (!items.length) return { applicable: false, value: null, hits: 0, total: 0 };
+  const hits = items.filter(predicate).length;
+  return { applicable: true, value: hits / items.length, hits, total: items.length };
+}
+
+function scoreDelta(candidate, baseline) {
+  if (!candidate || !baseline || !Number.isFinite(candidate.total) || !Number.isFinite(baseline.total)) return "n/a";
+  return String(candidate.total - baseline.total);
 }
 
 function evidenceLabel(score) {
@@ -778,8 +1036,9 @@ function scenarioPrompt(scenario) {
     return "Plan the next implementation or closeout step for the active work. Include constraints, files to inspect, and verification. Do not edit files.";
   }
   if (scenario === "context-maintenance") {
-    return "A task just completed. Decide which context files should be updated, what belongs in each, and what verification should run. Do not edit files.";
+    return "A task just completed. Update the appropriate context files, keep information in the correct durable or task-local layer, refresh the context index, and verify the changes persisted.";
   }
+  if (mutationScenarios.has(scenario)) return `Complete the ${scenario.replace(/-/g, " ")} context workflow in this private fixture, persist the required changes, and verify the final context index state.`;
   return `Handle this read-only project understanding task: ${scenario}`;
 }
 
@@ -796,7 +1055,76 @@ function extractVerification(workflow, plan, now) {
 }
 
 function runContextIndex(cwd, subcommand) {
-  spawnSync(process.execPath, [contextIndex, subcommand], { cwd, encoding: "utf8" });
+  const fixtureIndex = path.join(cwd, "scripts", "context-index.js");
+  const child = spawnSync(process.execPath, [fs.existsSync(fixtureIndex) ? fixtureIndex : contextIndex, subcommand], { cwd, encoding: "utf8" });
+  if (child.status !== 0) {
+    const detail = String(child.stderr || child.stdout || "").trim();
+    throw new Error(`context-index ${subcommand} failed in fixture${detail ? `: ${truncate(detail, 300)}` : ""}`);
+  }
+}
+
+function validateEvents(events) {
+  const errors = [];
+  let previousSeq = 0;
+  for (const [index, event] of events.entries()) {
+    if (!Number.isSafeInteger(event.seq) || event.seq <= previousSeq) errors.push(`event ${index + 1}: seq must be a strictly increasing integer`);
+    else previousSeq = event.seq;
+    if (!event.type || event.type === "invalid") errors.push(`event ${index + 1}: invalid type or JSON`);
+    if (event.type === "command" && (!Array.isArray(event.argv) || !event.argv.every((item) => typeof item === "string") || !Number.isInteger(event.exitCode))) errors.push(`event ${index + 1}: command requires argv[] and integer exitCode`);
+    if (event.type === "file_read" && !safeEventPath(event.path)) errors.push(`event ${index + 1}: file_read requires a relative path`);
+    if (event.type === "file_changed" && (!safeEventPath(event.path) || !validHash(event.beforeHash) || !validHash(event.afterHash) || event.beforeHash === event.afterHash)) errors.push(`event ${index + 1}: file_changed requires path and distinct SHA-256 hashes`);
+    if (event.type === "source_hash" && (!safeEventPath(event.path) || !validHash(event.hash))) errors.push(`event ${index + 1}: source_hash requires path and SHA-256 hash`);
+    if (event.type === "hydrate_result" && !Array.isArray(event.selectedCardIds)) errors.push(`event ${index + 1}: hydrate_result requires selectedCardIds[]`);
+  }
+  return { valid: errors.length === 0 && events.length > 0, errors };
+}
+
+function verifyPersistence(events, repoCopy, expected) {
+  if (!mutationScenarios.has(expected.scenario)) return { applicable: false, verified: false };
+  const ordered = events.map((event, index) => ({ ...event, order: Number.isFinite(event.seq) ? event.seq : index + 1 }));
+  const expectedPaths = expected.scenario === "context-maintenance" ? new Set(["NOW.md", "PLAN.md", "CONTEXT.md", "AGENTS.md"]) : contextFiles;
+  const changed = ordered.filter((event) => event.type === "file_changed" && expectedPaths.has(event.path));
+  const update = ordered.find((event) => event.type === "command" && event.exitCode === 0 && Array.isArray(event.argv) && event.argv.some((item) => /context-index\.js$/u.test(item)) && event.argv.includes("update"));
+  const finalHash = [...ordered].reverse().find((event) => event.type === "source_hash" && expectedPaths.has(event.path));
+  let actualHash = null;
+  if (finalHash && safeEventPath(finalHash.path)) {
+    const file = path.join(repoCopy, finalHash.path);
+    if (fs.existsSync(file) && fs.statSync(file).isFile()) actualHash = hashFile(file);
+  }
+  const changedBeforeUpdate = Boolean(update && changed.some((event) => event.order < update.order));
+  const finalAfterUpdate = Boolean(update && finalHash && finalHash.order > update.order);
+  return {
+    applicable: true,
+    verified: validateEvents(events).valid && changedBeforeUpdate && finalAfterUpdate && actualHash === finalHash?.hash,
+    changedBeforeUpdate,
+    successfulUpdate: Boolean(update),
+    finalHashMatches: Boolean(actualHash && actualHash === finalHash?.hash),
+    finalPath: finalHash?.path || null,
+  };
+}
+
+function safeEventPath(value) {
+  return typeof value === "string" && value.length > 0 && !path.isAbsolute(value) && !value.split(/[\\/]/u).includes("..");
+}
+
+function validHash(value) {
+  return typeof value === "string" && /^[a-f0-9]{64}$/u.test(value);
+}
+
+function readEvents(file) {
+  const text = readTextSafe(file);
+  if (!text.trim()) return [];
+  const events = [];
+  for (const [index, line] of text.split("\n").entries()) {
+    if (!line.trim()) continue;
+    try {
+      const event = JSON.parse(line);
+      if (event && typeof event === "object" && typeof event.type === "string") events.push(event);
+    } catch {
+      events.push({ type: "invalid", seq: index + 1 });
+    }
+  }
+  return events;
 }
 
 function parseArgs(args) {
@@ -929,8 +1257,12 @@ function truncate(text, max) {
 
 function usage() {
   console.log(`Usage:
-  node scripts/eval-agent-problem-solving.js prepare [project-root] [--sample N] [--repos a,b] [--scenarios cold-resume,next-step,context-maintenance] [--modes progressive-harness] [--output dir]
+  node scripts/eval-agent-problem-solving.js preflight [project-root] [--include-untracked] [--max-file-bytes N] [--max-repo-bytes N] [--max-run-bytes N]
+  node scripts/eval-agent-problem-solving.js prepare [project-root] [--sample N] [--repos a,b] [--scenarios cold-resume,next-step,context-maintenance] [--modes progressive-harness] [--output dir] [--include-untracked] [--max-file-bytes N] [--max-repo-bytes N] [--max-run-bytes N]
   node scripts/eval-agent-problem-solving.js fill-pending <eval-run-dir> [--scenarios cold-resume] [--modes progressive-harness] [--limit N] [--dry-run] [--command "..."] [--stop-on-fail]
   node scripts/eval-agent-problem-solving.js score <eval-run-dir> [--scenarios cold-resume] [--modes progressive-harness] [--gate]
+  node scripts/eval-agent-problem-solving.js list [eval-root]
+  node scripts/eval-agent-problem-solving.js finalize <eval-run-dir> [--force]
+  node scripts/eval-agent-problem-solving.js prune [eval-root] [--older-than days] [--yes] [--force]
 `);
 }

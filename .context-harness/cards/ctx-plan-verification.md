@@ -4,27 +4,25 @@ kind: plan
 importance: 0.85
 confidence: confirmed
 source: PLAN.md#verification
-chunk: .context-harness/chunks/ctx-plan-verification.md
-tokens_est: 1141
+chunk: null
+tokens_est: 355
 tags: [plan, verification]
 ---
 
 # PLAN.md: Verification
 
 ## Summary
-tests/run-all.sh exits 0 with 211 passed, 0 failed after adding minimal fresh-agent eval harness coverage.
+tests/run-all.sh passes: 222 passed, 0 failed, 0 skipped.
 
 ## Use when
-- continuing the active task
-- checking done criteria or decisions
-- update context with task-local progress
+- continuing task-local verification
 
 ## Key facts
-- tests/run-all.sh exits 0 with 211 passed, 0 failed after adding minimal fresh-agent eval harness coverage.
-- node scripts/context-index.js check exits 0 after refreshing generated cards/index.
-- node scripts/eval-context-library.js /Users/lfan/Project .context-harness/shadow-context-library-report.md exits 0: 24 repos found, 19 passed, 0 warned, 0 fa...
-- node scripts/eval-agent-problem-solving.js prepare ... plus score smoke exits 0 in a temporary eval run, confirming paired cases and pending-score reports work.
-- node scripts/eval-agent-problem-solving.js prepare /Users/lfan/Project --repos context-harness,agent-nexus,credit-card-tracker,flyingpig,flight-plan --scenar...
+- tests/run-all.sh install-project passes its 9 focused checks, including sanitized fleet identifiers and preservation of custom metadata plus unrelated...
+- node scripts/eval-agent-problem-solving.js preflight <project-root> --repos context-harness,agent-nexus,wishlist,moonshot,seasonal-arpg-engine --scenarios...
+- Final structural shadow: 27 repositories discovered, 19 installed harnesses evaluated, 100% coverage, 19 pass, 0 fail, 0 malformed, 0 error.
+- Fleet apply: 19 installed harnesses discovered, 18 changed, 1 unchanged, 3 intentional custom-package conflicts, 0 failures;...
+- Agent Nexus: 82 tests pass; local-candidate dry-run/apply and doctor pass; canonical catch-up skill hashes match on Claude, Cursor, Antigravity, and Codex.
 
 ## Retrieval order
 - Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.
@@ -33,4 +31,3 @@ tests/run-all.sh exits 0 with 211 passed, 0 failed after adding minimal fresh-ag
 
 ## Open next only if needed
 - `PLAN.md#verification`
-- `.context-harness/chunks/ctx-plan-verification.md`

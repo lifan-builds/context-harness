@@ -12,19 +12,15 @@ tags: [plan, decisions]
 # PLAN.md: Decisions
 
 ## Summary
-Do not ship hidden compatibility stubs; replacement behavior lives in
+Do not ship hidden compatibility stubs; replacement behavior lives in set-goal, context-maintain, and context-upgrade.
 
 ## Use when
-- continuing the active task
-- checking done criteria or decisions
-- update context with task-local progress
+- continuing task-local decisions
 
 ## Key facts
-- Do not ship hidden compatibility stubs; replacement behavior lives in
-- set-goal, context-maintain, and context-upgrade.
-- Keep the preferred skill set small: context-init, context-catch-up,
-- set-goal, context-maintain, and explicit-only context-upgrade.
-- Keep migration and layout repair out of ordinary catch-up so upgrades happen
+- Keep the preferred skill set small: context-init, context-catch-up, set-goal, context-maintain, and explicit-only context-upgrade.
+- Keep migration and layout repair out of ordinary catch-up so upgrades happen only when the user asks for harness/schema/fleet update work.
+- Keep AGENTS.md as activation contract plus generated context index; durable detail stays in CONTEXT.md and active task evidence stays here.
 
 ## Retrieval order
 - Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.

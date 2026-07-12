@@ -36,9 +36,8 @@ For ordinary uncertainty before the first attempt, inspect or ask instead.
 5. Update the smallest appropriate source section: task-local findings/progress/
    decisions to `PLAN.md`; durable concise terms, rules, invariants, or lessons
    to `CONTEXT.md`; resume packet to `NOW.md` last.
-6. After updating `CONTEXT.md`, `PLAN.md`, or `NOW.md`, run
-   `node scripts/context-index.js update` when the change should affect future
-   retrieval.
+6. After updating `CONTEXT.md`, `PLAN.md`, or `NOW.md`, always run
+   `node scripts/context-index.js update`.
 7. Prune stale or duplicate entries instead of appending forever.
 8. Run the project's verification command when the change affects behavior.
 9. Run the Should Dream check before closeout or final response.
@@ -197,12 +196,13 @@ behavior.
 
 ## Session Closeout
 
-Before ending: rewrite `NOW.md` with focus, blockers, next step, ISO timestamp,
-and touched files; refresh the `AGENTS.md` index if `CONTEXT.md`, `PLAN.md`, or
-`NOW.md` changed in a way future retrieval should see; prune completed `PLAN.md`
-progress into `## Archive` when the active plan is cluttered; keep `NOW.md`
-concise; run the Should Dream check and, if useful, log the Dream to
-`.context-harness/DREAM.md`.
+After the final state-changing action—commit, push, deployment, rollback, task
+switch, or blocker discovery—observe the result and rewrite `NOW.md` from that
+observed final state with focus, blockers, next step, ISO timestamp, and touched
+files. Write `NOW.md` last, then always refresh generated retrieval when any of
+`CONTEXT.md`, `PLAN.md`, or `NOW.md` changed. Prune completed `PLAN.md` progress
+into `## Archive` when cluttered; run the Should Dream check and, if useful, log
+the Dream to `.context-harness/DREAM.md`.
 
 ```bash
 node scripts/session-end.js

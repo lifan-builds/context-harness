@@ -18,7 +18,7 @@ context-harness is a portable context framework for AI coding agents. It ships a
 - working on project
 
 ## Key facts
-- context-harness is a portable context framework for AI coding agents. It ships a root skill, companion skills, markdown context files, and Node.js scripts fo...
+- Use this card before opening bulky raw context for this topic.
 
 ## Retrieval order
 - Read `NOW.md` and concise `CONTEXT.md` as the always-read layer.

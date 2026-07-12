@@ -1,15 +1,17 @@
 # Now
 
 ## Current Focus
-The remaining context-harness release gaps are implemented and verified: the eval runner has resumable pending-case filling, eval copies exclude obvious private files, scoring separates answer-only review notes from release-blocking harness gaps, stale hydrate output avoids stale card guidance, and fleet-refresh guardrails are documented.
+The coordinated Context Harness release is implemented, deployed locally, rolled out across the installed project fleet, and fully verified; the working tree is ready for human diff review and an intentional commit.
 
 ## Active Blockers
-- No code blockers are known; diff review, Agent Nexus deployment, fleet refresh, and pushes remain.
+- No implementation or verification blockers.
+- AI IDE and agent hosts should be restarted to reload updated skill metadata.
+- Publishing remains intentionally unperformed because no commit or push was requested.
 
 ## Immediate Next Step
-Review the diff, deploy with Agent Nexus, refresh local repos with the latest context-harness, and push intentionally changed repos.
+Review the final source and generated-artifact diff, then commit and publish only when explicitly requested.
 
 ## Session State
-- Last modified: 2026-07-07T00:00:00-0700
-- Files touched: scripts/eval-agent-problem-solving.js, scripts/context-index.js, tests/run-all.sh, context-catch-up/SKILL.md, context-upgrade/SKILL.md, PLAN.md, NOW.md, generated `.context-harness/` artifacts, and `.context-harness/evals/progressive-evidence-fleet-progressive/` score/report artifacts.
-- Verification: `tests/run-all.sh eval-agent-problem-solving` passes with 12 passed; `tests/run-all.sh context-index` passes with 23 passed; `tests/run-all.sh release-proof` passes with 37 passed; full `tests/run-all.sh` passes with 217 passed, 0 failed; `node scripts/context-index.js check` passes with the existing PLAN.md length warning; `fill-pending --dry-run` reports 0 pending; progressive fleet `score --gate` passes across 57 cases.
+- Last modified: 2026-07-12T04:49:30Z
+- Files touched: README.md, SKILL.md, context-catch-up/SKILL.md, context-maintain/SKILL.md, context-upgrade/SKILL.md, scripts/context-index.js, scripts/eval-agent-problem-solving.js, scripts/eval-context-library.js, scripts/install-project.js, scripts/lib.js, scripts/session-end.js, scripts/task.js, tests/run-all.sh, PLAN.md, NOW.md, and generated `.context-harness/` artifacts.
+- Verification: 222/222 canonical tests pass; final fleet shadow is 19/19 pass at 100% coverage with 0 malformed/fail/error; five-repository evaluation preflight is within budget with secret exclusions and shared snapshots; Agent Nexus has 82 passing tests and a passing local-candidate sync/doctor; installed catch-up skill hashes match canonical source on four hosts.

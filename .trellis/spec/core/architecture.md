@@ -59,6 +59,6 @@ Do not move semantic judgment into hard counters merely because it is easier to 
 
 Install/upgrade logic classifies canonical, missing, known-clean, and locally modified files. Refresh safe files and report local modifications as conflicts; never blanket-overwrite a project fleet.
 
-## Platform Scaffolding
+## Repository Workflow and Platform Scaffolding
 
-The current `.trellis/` and platform directories were generated for a local Trellis trial. Do not treat them as Context Harness source or add them to `scripts/install-project.js`. Canonical product adapters remain under `hooks/` and `scripts/`.
+This checkout uses Trellis for its repository workflow. `.trellis/`, `.claude/`, `.codex/`, and shared `.agents/` skills are local workflow scaffolding, not Context Harness source and must never enter `scripts/install-project.js`. Canonical Context Harness product adapters remain under `hooks/` and `scripts/`. Trellis-generated Cursor and Antigravity adapters are intentionally absent from this checkout.

@@ -4,13 +4,15 @@ Context Harness is a documentation-led Node/CommonJS CLI and skill package. It i
 
 ## Source-of-Truth Order
 
-When instructions conflict, use this order:
+For work in this repository, use this order when instructions conflict:
 
-1. `CONTEXT.md` for durable project constraints, terminology, and workflow.
-2. `AGENTS.md` for the activation contract and generated context index.
-3. The relevant root or companion `SKILL.md` for workflow behavior.
+1. `.trellis/spec/core/` for durable repository engineering constraints and terminology.
+2. The active `.trellis/tasks/` artifact for task-specific requirements and decisions.
+3. The relevant root or companion `SKILL.md` for Context Harness product workflow behavior.
 4. Product scripts and `tests/run-all.sh` for executable contracts.
 5. `README.md` for user-facing explanation; treat numerical size targets there as guidance unless scripts enforce them.
+
+Root `AGENTS.md` is the Trellis activation layer for this checkout. References to Context Harness `AGENTS.md`, `CONTEXT.md`, `NOW.md`, and `PLAN.md` elsewhere in these specs describe product-generated target-project contracts, not this repository's local workflow state.
 
 Repository-local `.trellis/`, `.claude/`, `.cursor/`, `.codex/`, `.agent/`, and `.agents/` are trial/platform scaffolding, not distributable Context Harness modules.
 
@@ -26,8 +28,7 @@ Repository-local `.trellis/`, `.claude/`, `.cursor/`, `.codex/`, `.agent/`, and 
 
 ## Pre-Development Checklist
 
-- Read `NOW.md`, then the relevant sections of `CONTEXT.md`.
-- Hydrate task-specific context before opening bulky sources: `node scripts/context-index.js hydrate "<task>"`.
+- Load the current Trellis task and relevant `.trellis/spec/core/` guidance.
 - Identify whether the change belongs to a skill, mechanical script, generated artifact, hook adapter, or evaluation tool.
 - Search for the value, field, schema version, managed marker, or file list before changing it.
 - Preserve the `AGENTS.md` Context Contract and edit only the managed index block programmatically.
@@ -36,7 +37,7 @@ Repository-local `.trellis/`, `.claude/`, `.cursor/`, `.codex/`, `.agent/`, and 
 ## Quality Check
 
 - Run `tests/run-all.sh` for every product change.
-- Run `node scripts/context-index.js check` after changing source context or indexing behavior.
-- Regenerate derived `.context-harness/` state instead of hand-editing it.
+- Exercise `context-index.js update`/`check` through disposable target-project fixtures; this checkout does not keep local Context Harness source state.
+- Regenerate target-project `.context-harness/` state instead of hand-editing it.
 - Verify user-facing docs, skill instructions, installer copies, and tests remain consistent.
-- Do not commit or deploy unless the user requests it.
+- Do not deploy Context Harness or Trellis through Agent Nexus; publication and product deployment require their own explicit scope.

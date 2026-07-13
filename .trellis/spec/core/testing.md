@@ -31,12 +31,13 @@ Use the narrowest new fixture that proves a behavior. Do not mock filesystem or 
 
 ```bash
 tests/run-all.sh
-node scripts/context-index.js check
 ```
 
-### Source context change
+This checkout no longer carries a local Context Harness source packet, so do not run `node scripts/context-index.js check` at the repository root. The full runner exercises that command against disposable product fixtures.
 
-Run `node scripts/context-index.js update` before `check` when `CONTEXT.md`, `NOW.md`, `PLAN.md`, or the managed index should change.
+### Source context or indexing change
+
+Use a disposable target-project fixture containing `CONTEXT.md`, `NOW.md`, optional `PLAN.md`, and the managed index. Run `context-index.js update` before `check` there. Do not recreate those files as local workflow state in this checkout; `tests/run-all.sh` owns the canonical fixture coverage.
 
 ### Retrieval/indexing change
 

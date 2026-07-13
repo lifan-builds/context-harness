@@ -1,13 +1,13 @@
 # Context and Data Contracts
 
-## Durable Markdown Ownership
+## Durable Markdown Ownership in Installed Target Projects
 
-`CONTEXT.md`, `NOW.md`, and optional `PLAN.md` are human/agent-owned sources.
+Context Harness generates and maintains the following contracts in target projects. This product repository itself uses Trellis task/spec state instead of keeping a local dogfood copy.
 
-- `CONTEXT.md`: durable project identity, structure, operating constraints, workflow, language, relationships, ambiguities, and learned patterns.
-- `NOW.md`: current focus, active blockers, immediate next step, and session state.
-- `PLAN.md`: task-local requirements, decisions, progress, and verification state.
-- `AGENTS.md`: mixed ownership. Preserve the hand-maintained Context Contract; only the marker-delimited Context Index is generated.
+- `CONTEXT.md`: human/agent-owned durable project identity, structure, operating constraints, workflow, language, relationships, ambiguities, and learned patterns.
+- `NOW.md`: human/agent-owned current focus, active blockers, immediate next step, and session state.
+- `PLAN.md`: optional human/agent-owned task requirements, decisions, progress, and verification state.
+- Context Harness `AGENTS.md`: mixed ownership in an installed target; preserve its hand-maintained Context Contract and generate only the marker-delimited Context Index. This is distinct from the Trellis-owned root `AGENTS.md` in this source checkout.
 
 The executable schema-v3 validation lives in `scripts/context-index.js` (`validateContext`, `validateNow`). Missing required sections, placeholder values, or stale generated state must fail `check`.
 

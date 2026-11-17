@@ -12,6 +12,9 @@ pile. It is a filesystem memory contract plus a few scripts and companion skills
 that help a fresh agent answer: **What is this project, what matters right now,
 and what should I do next?**
 
+- **Evaluation & Design Note:** [https://clifan.com/journal/#context-harness-eval](https://clifan.com/journal/#context-harness-eval)
+- **Portfolio:** [https://clifan.com/](https://clifan.com/)
+
 ## Core Design Principles
 
 1. **Always-read stays small** — `AGENTS.md` is only the activation contract and
@@ -289,23 +292,13 @@ Let `<skill-dir>` be wherever your harness loads skills from. Common paths:
 | Claude Code | `~/.claude/skills/` |
 | Cursor | `~/.cursor/skills/` |
 | Antigravity | `~/.gemini/antigravity/skills/` |
-| [agent-nexus](https://github.com/lifan-builds/agent-nexus) | manages all three via `nexus sync` |
 
-**Option 1: agent-nexus (multi-IDE)**
-```yaml
-# nexus.yml
-packages:
-  - repo: lifan-builds/context-harness
-    ref: main
-```
-Then `nexus sync` deploys to every configured target.
-
-**Option 2: Claude Code plugin**
+**Option 1: Claude Code plugin**
 ```
 /plugin marketplace add https://github.com/lifan-builds/context-harness
 ```
 
-**Option 3: Direct clone**
+**Option 2: Direct clone**
 ```bash
 git clone https://github.com/lifan-builds/context-harness <skill-dir>/context-harness
 ```

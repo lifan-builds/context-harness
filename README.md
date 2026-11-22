@@ -358,3 +358,7 @@ context-harness no longer ships a legacy schema migration script.
 | Files generated | 6 | 3–4 | **33–50%** |
 | Per-prompt instruction load | ~30 lines + noise | AGENTS.md contract + tiny context files | **cleaner** |
 | Default installed scripts | — | 9 | **lean default** |
+
+## License
+
+Copyright © 2026 [lifan-builds](https://github.com/lifan-builds). **All Rights Reserved** — source-available for **personal non-commercial use** and **upstream Pull Request contributions only** under [LICENSE](LICENSE) (`LicenseRef-lifan-builds-Proprietary`). Commercial use, hosted wrappers, rebranding, standalone forks/mirrors, and dataset/HTML extraction without prior written permission are prohibited. Pull Requests are welcome under [CONTRIBUTING.md](CONTRIBUTING.md).
